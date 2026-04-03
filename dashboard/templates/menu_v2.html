@@ -1,0 +1,429 @@
+{% extends "base.html" %}
+{% block title %}RPA Dashboard - Menu{% endblock %}
+{% block head_extra %}
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .top-navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        .navbar-brand {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            color: white;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .page-title h1 {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+
+        .menu-sections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .menu-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .menu-section:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-header {
+            padding: 20px;
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Section color themes */
+        .section-crypto .section-header {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+
+        .section-weather .section-header {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+
+        .section-social .section-header {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .section-alerts .section-header {
+            background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
+        }
+
+        .section-admin .section-header {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+        }
+
+        .section-icon {
+            font-size: 24px;
+        }
+
+        .menu-items {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .menu-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid #ecf0f1;
+            text-decoration: none;
+            color: #2c3e50;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-item:hover {
+            background: #f8f9fa;
+            padding-left: 24px;
+        }
+
+        .menu-item-icon {
+            font-size: 20px;
+            min-width: 24px;
+        }
+
+        .menu-item-content {
+            flex: 1;
+        }
+
+        .menu-item-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #2c3e50;
+            margin-bottom: 2px;
+        }
+
+        .menu-item-description {
+            font-size: 12px;
+            color: #7f8c8d;
+            line-height: 1.4;
+        }
+
+        .menu-item-arrow {
+            font-size: 18px;
+            opacity: 0.5;
+            transition: opacity 0.2s ease;
+        }
+
+        .menu-item:hover .menu-item-arrow {
+            opacity: 1;
+        }
+
+        .sync-status {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .spinner {
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            width: 14px;
+            height: 14px;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            margin-top: 40px;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .menu-sections {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title h1 {
+                font-size: 28px;
+            }
+
+            .top-navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+{% endblock %}
+{% block content %}
+<div class="top-navbar">
+        <div class="navbar-brand"> RPA Framework</div>
+        <div class="user-section">
+            <span> Welcome, {{ username }}!</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-title">
+            <h1>Dashboard Menu</h1>
+            <p>Manage your monitoring, analytics, and alerting systems</p>
+        </div>
+
+        <!-- CRYPTOCURRENCY SECTION -->
+        <div class="menu-sections">
+            <div class="menu-section section-crypto">
+                <div class="section-header">
+                    <span class="section-icon"></span>
+                    <span>Cryptocurrency</span>
+                </div>
+                <div class="menu-items">
+                    <a href="/asset-dashboard" class="menu-item">
+                        <span class="menu-item-icon"></span>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Standard Dashboard</div>
+                            <div class="menu-item-description">Interactive crypto analytics with price trends and volume analysis</div>
+                        </div>
+                        <span class="menu-item-arrow"></span>
+                    </a>
+                    <a href="/advanced-crypto-dashboard" class="menu-item">
+                        <span class="menu-item-icon"></span>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Advanced Analytics</div>
+                            <div class="menu-item-description">Deep market analysis with volatility and statistical insights</div>
+                        </div>
+                        <span class="menu-item-arrow"></span>
+                    </a>
+                    <a href="/asset-management" class="menu-item">
+                        <span class="menu-item-icon"></span>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Manage Assets</div>
+                            <div class="menu-item-description">Add or remove cryptocurrency assets for monitoring</div>
+                        </div>
+                        <span class="menu-item-arrow"></span>
+                    </a>
+                    <a href="/crypto-alerts" class="menu-item">
+                        <span class="menu-item-icon"></span>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Price Alerts</div>
+                            <div class="menu-item-description">Set price threshold alerts for your preferred assets</div>
+                        </div>
+                        <span class="menu-item-arrow"></span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- WEATHER SECTION -->
+            <div class="menu-section section-weather">
+                <div class="section-header">
+                    <span class="section-icon"></span>
+                    <span>Weather Monitoring</span>
+                </div>
+                <div class="menu-items">
+                    <a href="/weather-dashboard" class="menu-item">
+                        <span class="menu-item-icon"></span>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Weather Dashboard</div>
+                            <div class="menu-item-description">Real-time weather data for global locations</div>
+                        </div>
+                        <span class="menu-item-arrow"></span>
+                    </a>
+                    <a href="/advanced-weather-dashboard" class="menu-item">
+                        <span class="menu-item-icon"></span>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Advanced Analytics</div>
+                            <div class="menu-item-description">Statistical analysis and pattern recognition for weather</div>
+                        </div>
+                        <span class="menu-item-arrow"></span>
+                    </a>
+                    <a href="/manage-locations" class="menu-item">
+                        <span class="menu-item-icon"></span>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Manage Locations</div>
+                            <div class="menu-item-description">Configure locations for automatic weather tracking</div>
+                        </div>
+                        <span class="menu-item-arrow"></span>
+                    </a>
+                    <a href="/weather-alerts" class="menu-item">
+                        <span class="menu-item-icon"></span>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Weather Alerts</div>
+                            <div class="menu-item-description">Alert for temperature, humidity, and wind conditions</div>
+                        </div>
+                        <span class="menu-item-arrow"></span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- SOCIAL MEDIA SECTION -->
+            <div class="menu-section section-social">
+                <div class="section-header">
+                    <span class="section-icon"></span>
+                    <span>Social Media Trends</span>
+                </div>
+                <div class="menu-items">
+                    <a href="/social-trends-dashboard" class="menu-item">
+                        <span class="menu-item-icon"></span>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Trends Dashboard</div>
+                            <div class="menu-item-description">Monitor trending topics across social platforms</div>
+                        </div>
+                        <span class="menu-item-arrow"></span>
+                    </a>
+                    <a href="/advanced-social-trends-dashboard" class="menu-item">
+                        <span class="menu-item-icon"></span>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Advanced Analytics</div>
+                            <div class="menu-item-description">Sentiment analysis and emerging topic detection</div>
+                        </div>
+                        <span class="menu-item-arrow"></span>
+                    </a>
+                    <a href="/social-trend-alerts" class="menu-item">
+                        <span class="menu-item-icon"></span>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Trend Alerts</div>
+                            <div class="menu-item-description">Alert when trends reach engagement thresholds</div>
+                        </div>
+                        <span class="menu-item-arrow"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADMIN SECTION (Future Use) -->
+        <div style="margin-top: 30px;">
+            <div class="menu-section section-admin">
+                <div class="section-header">
+                    <span class="section-icon"></span>
+                    <span>Administration</span>
+                    <span style="margin-left: auto; font-size: 12px; font-weight: 400; opacity: 0.9;">Coming Soon</span>
+                </div>
+                <div class="menu-items" style="opacity: 0.6;">
+                    <div class="menu-item" style="cursor: not-allowed;">
+                        <span class="menu-item-icon"></span>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">User Management</div>
+                            <div class="menu-item-description">Manage user accounts and permissions</div>
+                        </div>
+                        <span class="menu-item-arrow"></span>
+                    </div>
+                    <div class="menu-item" style="cursor: not-allowed;">
+                        <span class="menu-item-icon"></span>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Feature Permission</div>
+                            <div class="menu-item-description">Control which features are visible to each user</div>
+                        </div>
+                        <span class="menu-item-arrow"></span>
+                    </div>
+                    <div class="menu-item" style="cursor: not-allowed;">
+                        <span class="menu-item-icon"></span>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">System Settings</div>
+                            <div class="menu-item-description">Configure system-wide settings and parameters</div>
+                        </div>
+                        <span class="menu-item-arrow"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p> RPA Framework - Intelligent Real-Time Monitoring & Alerting System</p>
+            <p> 2026 All Rights Reserved</p>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                fetch('/api/logout', { method: 'POST' })
+                    .then(() => {
+                        window.location.href = '/login';
+                    });
+            }
+        }
+
+
+    </script>
+{% endblock %}

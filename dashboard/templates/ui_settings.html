@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}UI Theme Settings{% endblock %}
+{% block head_extra %}
+<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <style>
+            body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f3f7ff; color:#1f2d3d; }
+            .wrap { max-width: 980px; margin: 24px auto; padding: 0 14px; }
+            .top { background: linear-gradient(120deg,#2f5bd2,#2048b8); color:white; border-radius:12px; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+            .card { background:white; border:1px solid #dbe4f2; border-radius:12px; padding:14px; margin-bottom:14px; box-shadow:0 5px 16px rgba(22,35,58,.07); }
+            .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+            .themes { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:14px; margin-top:16px; }
+            .theme { border:1px solid var(--theme-line, #dbe4f2); border-radius:12px; padding:12px; cursor:pointer; background:var(--theme-surface, white); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; justify-content: space-between; min-height: 50px; }
+            .theme:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 16px var(--theme-glow, rgba(0,0,0,0.1)); border-color: var(--theme-accent, #2f5bd2); }
+            .theme.active { border:2px solid var(--theme-accent, #2f5bd2); box-shadow: 0 0 15px var(--theme-glow, rgba(0,0,0,0.1)); transform: scale(1.02); background: var(--theme-surface-alt, #f9f9f9); }
+            .chips { display:flex; gap:8px; margin-top:10px; }
+            .chip { width:22px; height:22px; border-radius:50%; border:1px solid rgba(0,0,0,0.1); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+            button, select { border:1px solid #cbd7ea; border-radius:8px; padding:8px 10px; }
+            button { background:#2f5bd2; color:white; border-color:#2f5bd2; font-weight:600; cursor:pointer; }
+            button.secondary { background:white; color:#2f5bd2; }
+            .status { display:none; margin-top:10px; padding:8px 10px; border-radius:8px; font-size:13px; }
+        </style>
+{% endblock %}
+{% block content %}
+<div class="wrap">
+            <div class="top">
+                <div><strong>UI Theme Settings</strong> | {{ username }}</div>
+                <div class="row">
+                    <button class="secondary" onclick="window.location.href='/menu'">Back to Menu</button>
+                    <button onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="row">
+                    <label for="themeSelect"><strong>Theme</strong></label>
+                    <select id="themeSelect">
+                        <option value="ocean">Ocean</option>
+                        <option value="graphite">Graphite</option>
+                        <option value="emerald">Emerald</option>
+                        <option value="sunset">Sunset</option>
+                        <option value="cyberpunk">Cyberpunk</option>
+                        <option value="vaporwave">Vaporwave</option>
+                        <option value="midnight">Midnight Glass</option>
+                        <option value="aurora">Aurora</option>
+                    </select>
+                    <button onclick="saveTheme()">Apply Theme</button>
+                </div>
+                <div class="themes">
+                    <div class="theme" data-theme="ocean" onclick="pickTheme('ocean')">
+                        <div><strong style="font-size: 15px;">Ocean</strong></div>
+                        <div class="chips"><span class="chip" style="background:#eef3ff"></span><span class="chip" style="background:#2f5bd2"></span></div>
+                    </div>
+                    <div class="theme" data-theme="graphite" onclick="pickTheme('graphite')">
+                        <div><strong style="font-size: 15px;">Graphite</strong></div>
+                        <div class="chips"><span class="chip" style="background:#f1f2f4"></span><span class="chip" style="background:#3a4a5f"></span></div>
+                    </div>
+                    <div class="theme" data-theme="emerald" onclick="pickTheme('emerald')">
+                        <div><strong style="font-size: 15px;">Emerald</strong></div>
+                        <div class="chips"><span class="chip" style="background:#edf8f2"></span><span class="chip" style="background:#1f8f63"></span></div>
+                    </div>
+                    <div class="theme" data-theme="sunset" onclick="pickTheme('sunset')">
+                        <div><strong style="font-size: 15px;">Sunset</strong></div>
+                        <div class="chips"><span class="chip" style="background:#fff2eb"></span><span class="chip" style="background:#d46a3a"></span></div>
+                    </div>
+                    <div class="theme" data-theme="cyberpunk" onclick="pickTheme('cyberpunk')">
+                        <div><strong style="font-size: 15px;">Cyberpunk</strong></div>
+                        <div class="chips"><span class="chip" style="background:#0d0221"></span><span class="chip" style="background:#00ffcc"></span></div>
+                    </div>
+                    <div class="theme" data-theme="vaporwave" onclick="pickTheme('vaporwave')">
+                        <div><strong style="font-size: 15px;">Vaporwave</strong></div>
+                        <div class="chips"><span class="chip" style="background:#2b0f4c"></span><span class="chip" style="background:#ff61d8"></span></div>
+                    </div>
+                    <div class="theme" data-theme="midnight" onclick="pickTheme('midnight')">
+                        <div><strong style="font-size: 15px;">Midnight Glass</strong></div>
+                        <div class="chips"><span class="chip" style="background:#0B1021"></span><span class="chip" style="background:#38bdf8"></span></div>
+                    </div>
+                    <div class="theme" data-theme="aurora" onclick="pickTheme('aurora')">
+                        <div><strong style="font-size: 15px;">Aurora</strong></div>
+                        <div class="chips"><span class="chip" style="background:#0b2b26"></span><span class="chip" style="background:#4ade80"></span><span class="chip" style="background:#e0f2fe"></span></div>
+                    </div>
+                </div>
+                <div id="status" class="status"></div>
+            </div>
+        </div>
+        <script>
+            function logout() {
+                fetch('/api/logout', { method: 'POST' }).then(() => window.location.href = '/login');
+            }
+            function showStatus(msg, ok=true) {
+                const s = document.getElementById('status');
+                s.style.display = 'block';
+                s.textContent = msg;
+                s.style.background = ok ? '#eefbf4' : '#fff1f1';
+                s.style.border = '1px solid ' + (ok ? '#cce9d9' : '#f2c9c9');
+                s.style.color = ok ? '#0f7a53' : '#b42318';
+                setTimeout(() => { s.style.display = 'none'; }, 2200);
+            }
+            function markActive(theme) {
+                document.querySelectorAll('.theme').forEach(el => {
+                    el.classList.toggle('active', el.dataset.theme === theme);
+                });
+            }
+            function pickTheme(theme) {
+                document.getElementById('themeSelect').value = theme;
+                markActive(theme);
+            }
+            async function loadTheme() {
+                const r = await fetch('/api/ui-theme', { cache: 'no-store' });
+                const d = await r.json();
+                const theme = d.theme || 'ocean';
+                document.getElementById('themeSelect').value = theme;
+                markActive(theme);
+            }
+            async function saveTheme() {
+                const theme = document.getElementById('themeSelect').value;
+                const r = await fetch('/api/ui-theme', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ theme })
+                });
+                const d = await r.json();
+                if (!d.success) { showStatus(d.message || 'Failed to save theme', false); return; }
+                showStatus('Theme saved and applied');
+                setTimeout(() => window.location.reload(), 500);
+            }
+            document.getElementById('themeSelect').addEventListener('change', (e) => markActive(e.target.value));
+            loadTheme();
+        </script>
+{% endblock %}

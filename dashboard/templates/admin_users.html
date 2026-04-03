@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}User Management{% endblock %}
+{% block head_extra %}
+<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <style>
+            body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f3f7ff; color:#1f2d3d; }
+            .wrap { max-width: 1080px; margin: 22px auto; padding: 0 14px; }
+            .top { background: linear-gradient(120deg,#2f5bd2,#2048b8); color:white; border-radius:12px; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+            .card { background:white; border:1px solid #dbe4f2; border-radius:12px; padding:14px; margin-bottom:14px; box-shadow:0 5px 16px rgba(22,35,58,.07); }
+            .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+            input, button { border:1px solid #cbd7ea; border-radius:8px; padding:8px 10px; }
+            button { background:#2f5bd2; color:white; border-color:#2f5bd2; font-weight:600; cursor:pointer; }
+            button.secondary { background:white; color:#2f5bd2; }
+            .users { border:1px solid #e2eaf7; border-radius:10px; overflow:hidden; }
+            .u { display:grid; grid-template-columns: 1.2fr .6fr .6fr 1fr; gap:8px; padding:10px 12px; border-bottom:1px solid #edf2fb; align-items:center; }
+            .u:last-child { border-bottom:none; }
+            .head { font-weight:700; background:#f6f9ff; }
+            .status { display:none; margin-top:8px; padding:8px 10px; border-radius:8px; font-size:13px; }
+            @media (max-width: 900px) { .u { grid-template-columns: 1fr; } }
+        </style>
+{% endblock %}
+{% block content %}
+<div class="wrap">
+            <div class="top">
+                <div><strong>User Management</strong> | {{ username }}</div>
+                <div class="row">
+                    <button class="secondary" onclick="window.location.href='/admin/access-control'">Access Control</button>
+                    <button class="secondary" onclick="window.location.href='/admin/alert-settings'">Alert Settings</button>
+                    <button class="secondary" onclick="window.location.href='/menu'">Menu</button>
+                    <button onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="row">
+                    <input id="newUsername" placeholder="Username">
+                    <input id="newPassword" type="password" placeholder="Password">
+                    <label><input id="newIsAdmin" type="checkbox"> Admin</label>
+                    <button onclick="createUserFromPage()">Create User</button>
+                </div>
+                <div id="status" class="status"></div>
+            </div>
+
+            <div class="card">
+                <div class="users" id="users"></div>
+            </div>
+        </div>
+        <script>
+            function showStatus(msg, ok=true) {
+                const s = document.getElementById('status');
+                s.style.display = 'block';
+                s.textContent = msg;
+                s.style.background = ok ? '#eefbf4' : '#fff1f1';
+                s.style.border = '1px solid ' + (ok ? '#cce9d9' : '#f2c9c9');
+                s.style.color = ok ? '#0f7a53' : '#b42318';
+                setTimeout(() => { s.style.display = 'none'; }, 2500);
+            }
+
+            function logout() {
+                fetch('/api/logout', { method: 'POST' }).then(() => window.location.href = '/login');
+            }
+
+            async function loadUsers() {
+                const r = await fetch('/api/admin/access-config', { cache: 'no-store' });
+                const d = await r.json();
+                if (!d.success) { showStatus(d.message || 'Failed to load users', false); return; }
+                const root = document.getElementById('users');
+                root.innerHTML = '';
+                const head = document.createElement('div');
+                head.className = 'u head';
+                head.innerHTML = '<div>Username</div><div>Admin</div><div>Active</div><div>Actions</div>';
+                root.appendChild(head);
+                (d.users || []).forEach(u => {
+                    const row = document.createElement('div');
+                    row.className = 'u';
+                    row.innerHTML = `
+                        <div>${u.username}</div>
+                        <div><input type="checkbox" ${u.is_admin ? 'checked' : ''} data-field="admin"></div>
+                        <div><input type="checkbox" ${u.is_active ? 'checked' : ''} data-field="active"></div>
+                        <div class="row">
+                            <input type="password" placeholder="New password" data-field="pwd">
+                            <button class="secondary" data-action="save">Save</button>
+                        </div>
+                    `;
+                    const adminCb = row.querySelector('input[data-field="admin"]');
+                    const activeCb = row.querySelector('input[data-field="active"]');
+                    const pwd = row.querySelector('input[data-field="pwd"]');
+                    row.querySelector('button[data-action="save"]').onclick = async () => {
+                        const p1 = fetch('/api/admin/users/' + encodeURIComponent(u.username), {
+                            method: 'PATCH',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({ is_admin: adminCb.checked, is_active: activeCb.checked })
+                        });
+                        const tasks = [p1];
+                        if (pwd.value) {
+                            tasks.push(fetch('/api/admin/users/' + encodeURIComponent(u.username) + '/password', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({ password: pwd.value })
+                            }));
+                        }
+                        const rs = await Promise.all(tasks);
+                        const js = await Promise.all(rs.map(x => x.json()));
+                        if (js.some(x => !x.success)) {
+                            showStatus('Failed to update user ' + u.username, false);
+                        } else {
+                            showStatus('Updated user ' + u.username);
+                            pwd.value = '';
+                            await loadUsers();
+                        }
+                    };
+                    root.appendChild(row);
+                });
+            }
+
+            async function createUserFromPage() {
+                const username = document.getElementById('newUsername').value.trim();
+                const password = document.getElementById('newPassword').value;
+                const is_admin = document.getElementById('newIsAdmin').checked;
+                if (!username || !password) { showStatus('Username and password are required', false); return; }
+                const r = await fetch('/api/admin/users', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ username, password, is_admin })
+                });
+                const d = await r.json();
+                if (!d.success) { showStatus(d.message || 'Failed to create user', false); return; }
+                document.getElementById('newUsername').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('newIsAdmin').checked = false;
+                showStatus('User created');
+                await loadUsers();
+            }
+            loadUsers();
+        </script>
+{% endblock %}

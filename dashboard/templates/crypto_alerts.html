@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% block title %}Crypto Alerts{% endblock %}
+{% block head_extra %}
+<meta charset="utf-8" />
+        
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; background:#f5f6f8; color:#222; }
+            .container { max-width: 1200px; margin: 0 auto; }
+            .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+            .alerts-form { margin-top: 16px; background:#fff; padding:16px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.08); }
+            .alerts-list { margin-top: 20px; }
+            table { width:100%; border-collapse:collapse; background:#fff; }
+            th, td { padding:10px; border-bottom:1px solid #eee; text-align:left; }
+            th { background:#fafafa; }
+            .btn { padding:8px 12px; border-radius:6px; border:none; cursor:pointer; }
+            .btn-primary { background:#3498db; color:#fff; }
+            .btn-danger { background:#e74c3c; color:#fff; }
+            .sparkline { height:60px; }
+            .form-grid { display:grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap:12px; align-items:end; }
+            .field { display:flex; flex-direction:column; gap:4px; }
+            .field label { font-size:12px; color:#444; font-weight:600; }
+            .field input, .field select { height:34px; border:1px solid #d4d7dc; border-radius:6px; padding:0 10px; background:#fff; }
+            .hint { font-size:12px; color:#666; margin-top:8px; }
+            .section-title { margin:0 0 10px 0; }
+            .actions { display:flex; gap:8px; align-items:center; }
+            @media (max-width: 900px) {
+                .form-grid { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
+            }
+            @media (max-width: 520px) {
+                .form-grid { grid-template-columns: 1fr; }
+            }
+        </style>
+{% endblock %}
+{% block content %}
+<div class="container">
+            <div class="header">
+                <div>
+                    <h2> Crypto Alerts</h2>
+                    <a href="/menu" style="text-decoration:none; color:#3498db; font-size:14px;"> Back to Menu</a>
+                </div>
+                <div> {{ username }}</div>
+            </div>
+
+            <div class="alerts-form">
+                <h3 class="section-title">Create Alert</h3>
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="symbolSelect">Asset</label>
+                        <select id="symbolSelect"></select>
+                    </div>
+                    <div class="field">
+                        <label for="alertModeSelect">Alert Type</label>
+                        <select id="alertModeSelect" onchange="toggleCustomFields()">
+                            <option value="standard">Standard (Price)</option>
+                            <option value="custom">Custom Rule</option>
+                        </select>
+                    </div>
+                    <div class="field" id="customMetricWrap">
+                        <label for="customMetricSelect">Custom Metric</label>
+                        <select id="customMetricSelect" onchange="toggleCustomFields()">
+                            <option value="price_usd">Price</option>
+                            <option value="price_change_pct">Price Change %</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="conditionSelect">Condition</label>
+                        <select id="conditionSelect">
+                            <option value="gt">Greater Than (&gt;)</option>
+                            <option value="lt">Less Than (&lt;)</option>
+                            <option value="eq">Equals (=)</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="thresholdInput">Threshold Value</label>
+                        <input id="thresholdInput" type="number" step="0.0001" placeholder="e.g. 50000 or 3.5" />
+                    </div>
+                    <div class="field" id="lookbackWrap">
+                        <label for="lookbackMinutesInput">Lookback Minutes</label>
+                        <input id="lookbackMinutesInput" type="number" min="1" value="60" />
+                    </div>
+                    <div class="field">
+                        <label for="cooldownMinutesInput">Cooldown Minutes</label>
+                        <input id="cooldownMinutesInput" type="number" min="1" value="15" />
+                    </div>
+                    <div class="field">
+                        <label for="notifySelect">Notify Via</label>
+                        <select id="notifySelect">
+                            <option value="console">Console</option>
+                            <option value="telegram">Telegram</option>
+                            <option value="discord_webhook">Discord Webhook</option>
+                            <option value="email">Email (placeholder)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="actions" style="margin-top:12px;">
+                    <button class="btn btn-primary" onclick="createAlert()">Create Alert</button>
+                </div>
+                <div class="hint">For custom price change alerts, threshold is percentage and lookback defines comparison window.</div>
+            </div>
+
+            <div class="alerts-list">
+                <h3>Existing Alerts</h3>
+                <table id="alertsTable">
+                    <thead><tr><th>Symbol</th><th>Mode</th><th>Condition</th><th>Threshold</th><th>Current Price</th><th>Status</th><th>Last Triggered</th><th>Message</th><th>Chart</th><th>Actions</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <script>
+            async function loadSymbols() {
+                const resp = await fetch('/api/preferred-assets', { cache: 'no-store' });
+                const data = await resp.json();
+                const sel = document.getElementById('symbolSelect');
+                sel.innerHTML = '';
+                data.forEach(a => {
+                    const opt = document.createElement('option');
+                    opt.value = a.symbol;
+                    opt.textContent = a.symbol + ' - ' + a.name;
+                    sel.appendChild(opt);
+                });
+            }
+
+            function toggleCustomFields() {
+                const mode = document.getElementById('alertModeSelect').value;
+                const metric = document.getElementById('customMetricSelect').value;
+                const showCustom = mode === 'custom';
+                const showLookback = showCustom && metric === 'price_change_pct';
+                document.getElementById('customMetricWrap').style.display = showCustom ? 'flex' : 'none';
+                document.getElementById('lookbackWrap').style.display = showLookback ? 'flex' : 'none';
+            }
+
+            async function loadAlerts() {
+                const resp = await fetch('/api/crypto-alerts', { cache: 'no-store' });
+                const data = await resp.json();
+                const tbody = document.querySelector('#alertsTable tbody');
+                tbody.innerHTML = '';
+                data.forEach(alert => {
+                    const tr = document.createElement('tr');
+                    const status = alert.is_triggered ? 'Triggered' : 'Normal';
+                    tr.innerHTML = `
+                        <td>${alert.symbol}</td>
+                        <td>${alert.alert_mode || 'standard'}${alert.custom_metric ? ' (' + alert.custom_metric + ')' : ''}</td>
+                        <td>${alert.condition === 'gt' ? 'Above' : (alert.condition === 'lt' ? 'Below' : 'Equals')}</td>
+                        <td>${alert.threshold}</td>
+                        <td>${alert.current_price !== null ? alert.current_price : 'N/A'}</td>
+                        <td>${status}</td>
+                        <td>${alert.last_triggered || ''}</td>
+                        <td>${alert.last_trigger_message || ''}</td>
+                        <td><div id="spark_${alert.id}" class="sparkline"></div></td>
+                        <td><button class="btn btn-danger" onclick="deleteAlert(${alert.id})">Delete</button></td>
+                    `;
+                    tbody.appendChild(tr);
+
+                    // render sparkline
+                    if (alert.history && alert.history.length > 0) {
+                        const prices = alert.history.map(p => p.price_usd);
+                        const times = alert.history.map(p => p.timestamp);
+                        Plotly.newPlot('spark_' + alert.id, [{ x: times, y: prices, mode: 'lines', line: { width:1 } }], {margin:{t:0,b:0,l:0,r:0},height:60,displayModeBar:false});
+                    }
+                });
+            }
+
+            async function createAlert() {
+                const symbol = document.getElementById('symbolSelect').value;
+                const alertMode = document.getElementById('alertModeSelect').value;
+                const customMetric = document.getElementById('customMetricSelect').value;
+                const condition = document.getElementById('conditionSelect').value;
+                const threshold = document.getElementById('thresholdInput').value;
+                const lookbackMinutes = parseInt(document.getElementById('lookbackMinutesInput').value || '60', 10);
+                const cooldownMinutes = parseInt(document.getElementById('cooldownMinutesInput').value || '15', 10);
+                const notify = document.getElementById('notifySelect').value;
+                if (!symbol || !threshold) return alert('Please choose symbol and threshold');
+                const payload = {
+                    symbol,
+                    condition,
+                    threshold: parseFloat(threshold),
+                    notify_method: notify,
+                    alert_mode: alertMode,
+                    custom_metric: alertMode === 'custom' ? customMetric : null,
+                    custom_config: alertMode === 'custom' ? { lookback_minutes: lookbackMinutes } : {},
+                    cooldown_minutes: cooldownMinutes
+                };
+                const resp = await fetch('/api/crypto-alerts', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+                const data = await resp.json();
+                if (data.success) {
+                    document.getElementById('thresholdInput').value = '';
+                    loadAlerts();
+                } else {
+                    alert('Error creating alert');
+                }
+            }
+
+            async function deleteAlert(id) {
+                if (!confirm('Delete this alert?')) return;
+                const resp = await fetch('/api/crypto-alerts/' + id, { method: 'DELETE' });
+                const data = await resp.json();
+                if (data.success) loadAlerts(); else alert('Delete failed');
+            }
+
+            // init
+            loadSymbols();
+            loadAlerts();
+            toggleCustomFields();
+            setInterval(loadAlerts, 30000);
+        </script>
+{% endblock %}

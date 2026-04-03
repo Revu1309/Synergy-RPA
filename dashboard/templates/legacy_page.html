@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title or "RPA Dashboard" }}{% endblock %}
+{% block head_extra %}
+{{ legacy_head|safe }}
+{% endblock %}
+{% block content %}
+{{ page_content|safe }}
+{% endblock %}

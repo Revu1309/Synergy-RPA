@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+{% block title %}Access Control{% endblock %}
+{% block head_extra %}
+<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <style>
+            :root {
+                --bg1: #eef3ff;
+                --bg2: #f8faff;
+                --card: #ffffff;
+                --ink: #1d2a3b;
+                --muted: #627087;
+                --line: #dbe5f2;
+                --brand: #2f5bd2;
+                --brand-2: #1f46b5;
+                --ok: #11865a;
+            }
+            * { box-sizing: border-box; }
+            body {
+                margin: 0;
+                color: var(--ink);
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                background:
+                    radial-gradient(1200px 600px at 20% -10%, #dde7ff 0%, transparent 55%),
+                    linear-gradient(180deg, var(--bg1), var(--bg2));
+            }
+            .wrap { max-width: 1450px; margin: 22px auto; padding: 0 16px 24px; }
+            .topbar {
+                background: linear-gradient(120deg, var(--brand), var(--brand-2));
+                color: white;
+                border-radius: 14px;
+                padding: 16px 18px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                box-shadow: 0 8px 24px rgba(47,91,210,.28);
+                margin-bottom: 16px;
+            }
+            .topbar-title { font-size: 20px; font-weight: 700; }
+            .topbar-sub { font-size: 12px; opacity: .9; }
+            .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+            .card {
+                background: var(--card);
+                border: 1px solid var(--line);
+                border-radius: 14px;
+                padding: 14px;
+                box-shadow: 0 6px 18px rgba(27,42,65,.06);
+                margin-bottom: 14px;
+            }
+            input, button {
+                padding: 9px 10px;
+                border: 1px solid #c8d5ea;
+                border-radius: 8px;
+                font-size: 14px;
+            }
+            input { background: #fff; min-width: 180px; }
+            button {
+                cursor: pointer;
+                background: var(--brand);
+                color: white;
+                border-color: var(--brand);
+                font-weight: 600;
+            }
+            button:hover { background: var(--brand-2); }
+            button.secondary { background: #fff; color: var(--brand); }
+            .hint { font-size: 12px; color: var(--muted); }
+            .grid {
+                display: grid;
+                grid-template-columns: 320px 1fr;
+                gap: 14px;
+            }
+            .users {
+                max-height: 620px;
+                overflow: auto;
+                border: 1px solid var(--line);
+                border-radius: 10px;
+                background: #fbfdff;
+            }
+            .user-item {
+                padding: 12px;
+                border-bottom: 1px solid #e9eff8;
+                cursor: pointer;
+                font-size: 14px;
+            }
+            .user-item:hover { background: #f2f7ff; }
+            .user-item.active {
+                background: #e8f0ff;
+                border-left: 3px solid var(--brand);
+                padding-left: 9px;
+                font-weight: 700;
+            }
+            .panel-title {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+            .panel-title h3 { margin: 0; font-size: 16px; }
+            .module {
+                border: 1px solid var(--line);
+                border-radius: 12px;
+                overflow: hidden;
+                margin-bottom: 10px;
+            }
+            .module-h {
+                background: #f4f8ff;
+                padding: 10px 12px;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                border-bottom: 1px solid var(--line);
+            }
+            .pages {
+                padding: 10px 12px;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+                gap: 8px 12px;
+            }
+            .page-line {
+                background: #fafcff;
+                border: 1px solid #e6edf8;
+                border-radius: 8px;
+                padding: 8px 10px;
+            }
+            .page-path {
+                display: block;
+                font-size: 11px;
+                color: var(--muted);
+                margin-left: 22px;
+                margin-top: 3px;
+            }
+            .badge {
+                font-size: 11px;
+                border-radius: 999px;
+                padding: 2px 8px;
+                border: 1px solid #b9c9e8;
+                color: var(--brand);
+                background: #f4f8ff;
+            }
+            .status {
+                display: none;
+                margin-top: 10px;
+                padding: 9px 10px;
+                border-radius: 8px;
+                font-size: 13px;
+                border: 1px solid #cde9dc;
+                color: var(--ok);
+                background: #f1fcf6;
+            }
+            @media (max-width: 980px) {
+                .grid { grid-template-columns: 1fr; }
+            }
+        </style>
+{% endblock %}
+{% block content %}
+<div class="wrap">
+        <div class="topbar">
+            <div>
+                <div class="topbar-title">Administration: Access Control</div>
+                <div class="topbar-sub">Configure users, modules, and page visibility from database-driven config</div>
+            </div>
+            <div class="row">
+                <button class="secondary" onclick="window.location.href='/admin/users'">User Management</button>
+                <button class="secondary" onclick="window.location.href='/admin/alert-settings'">Alert Settings</button>
+                <button class="secondary" onclick="window.location.href='/menu'">Back to Menu</button>
+                <button onclick="logout()">Logout</button>
+            </div>
+        </div>
+        <div class="card">
+            <div class="row">
+                <span class="hint">Permissions are assigned by module/page checkboxes below. Use User Management for user creation and account updates.</span>
+            </div>
+            <div id="globalStatus" class="status"></div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <div class="panel-title"><h3>Users</h3><span class="badge" id="userCount">0 users</span></div>
+                <div id="users" class="users"></div>
+            </div>
+            <div class="card">
+                <div class="panel-title">
+                    <h3 id="selectedUserLabel">Select a user</h3>
+                    <div class="row">
+                        <label><input id="toggleAdmin" type="checkbox"> Admin</label>
+                        <label><input id="toggleActive" type="checkbox" checked> Active</label>
+                        <button class="secondary" onclick="saveUserMeta()">Save User</button>
+                        <input id="resetPassword" type="password" placeholder="New Password">
+                        <button class="secondary" onclick="resetPasswordForUser()">Reset Password</button>
+                    </div>
+                </div>
+                <div class="hint" style="margin-bottom:10px;">Enable a module checkbox to grant all pages under that module. Fine-tune at page level as needed.</div>
+                <div id="modules"></div>
+                <div class="row" style="justify-content:flex-end">
+                    <button onclick="savePermissions()">Save Permissions</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let state = { users: [], modules: [], selectedUser: null, permissions: [] };
+
+        function logout() {
+            fetch('/api/logout', { method: 'POST' }).then(() => window.location.href = '/login');
+        }
+
+        async function loadConfig() {
+            const resp = await fetch('/api/admin/access-config', { cache: 'no-store' });
+            const data = await resp.json();
+            if (!data.success) { alert(data.message || 'failed to load config'); return; }
+            state.users = data.users || [];
+            state.modules = data.modules || [];
+            renderUsers();
+            renderModules();
+        }
+
+        function renderUsers() {
+            const root = document.getElementById('users');
+            root.innerHTML = '';
+            document.getElementById('userCount').textContent = `${state.users.length} users`;
+            state.users.forEach(u => {
+                const div = document.createElement('div');
+                div.className = 'user-item' + (state.selectedUser === u.username ? ' active' : '');
+                div.textContent = `${u.username} ${u.is_admin ? '(admin)' : ''} ${u.is_active ? '' : '(inactive)'}`;
+                div.onclick = () => selectUser(u.username);
+                root.appendChild(div);
+            });
+        }
+
+        async function selectUser(username) {
+            state.selectedUser = username;
+            await loadUserPermissions(username);
+            renderUsers();
+        }
+
+        async function loadUserPermissions(username) {
+            const resp = await fetch('/api/admin/access-config?username=' + encodeURIComponent(username), { cache: 'no-store' });
+            const data = await resp.json();
+            state.permissions = data.allowed_page_keys || [];
+            const user = state.users.find(x => x.username === username);
+            document.getElementById('selectedUserLabel').textContent = 'Editing: ' + username;
+            document.getElementById('toggleAdmin').checked = !!(user && user.is_admin);
+            document.getElementById('toggleActive').checked = !!(user && user.is_active);
+            renderModules();
+        }
+
+        function renderModules() {
+            const root = document.getElementById('modules');
+            root.innerHTML = '';
+            state.modules.forEach(m => {
+                const mod = document.createElement('div');
+                mod.className = 'module';
+                const head = document.createElement('div');
+                head.className = 'module-h';
+                const modToggle = document.createElement('input');
+                modToggle.type = 'checkbox';
+                const pageKeys = (m.pages || []).map(p => p.page_key);
+                modToggle.checked = pageKeys.length > 0 && pageKeys.every(pk => state.permissions.includes(pk));
+                modToggle.onchange = () => {
+                    pageKeys.forEach(pk => {
+                        const idx = state.permissions.indexOf(pk);
+                        if (modToggle.checked && idx === -1) state.permissions.push(pk);
+                        if (!modToggle.checked && idx >= 0) state.permissions.splice(idx, 1);
+                    });
+                    renderModules();
+                };
+                head.appendChild(modToggle);
+                const ttl = document.createElement('span');
+                ttl.textContent = m.module_name;
+                head.appendChild(ttl);
+                mod.appendChild(head);
+                const pages = document.createElement('div');
+                pages.className = 'pages';
+                (m.pages || []).forEach(p => {
+                    const line = document.createElement('label');
+                    line.className = 'page-line';
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.checked = state.permissions.includes(p.page_key);
+                    cb.onchange = () => {
+                        const idx = state.permissions.indexOf(p.page_key);
+                        if (cb.checked && idx === -1) state.permissions.push(p.page_key);
+                        if (!cb.checked && idx >= 0) state.permissions.splice(idx, 1);
+                    };
+                    line.appendChild(cb);
+                    line.appendChild(document.createTextNode(' ' + p.menu_label + ' (' + p.route_path + ')'));
+                    const hint = document.createElement('span');
+                    hint.className = 'page-path';
+                    hint.textContent = p.page_description || '';
+                    line.appendChild(hint);
+                    pages.appendChild(line);
+                });
+                mod.appendChild(pages);
+                root.appendChild(mod);
+            });
+        }
+
+        function showStatus(message, ok = true) {
+            const box = document.getElementById('globalStatus');
+            box.style.display = 'block';
+            box.style.background = ok ? '#f1fcf6' : '#fff2f2';
+            box.style.borderColor = ok ? '#cde9dc' : '#f3cccc';
+            box.style.color = ok ? '#11865a' : '#b42318';
+            box.textContent = message;
+            setTimeout(() => { box.style.display = 'none'; }, 2500);
+        }
+
+        async function saveUserMeta() {
+            if (!state.selectedUser) { alert('select a user first'); return; }
+            const is_admin = document.getElementById('toggleAdmin').checked;
+            const is_active = document.getElementById('toggleActive').checked;
+            const resp = await fetch('/api/admin/users/' + encodeURIComponent(state.selectedUser), {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ is_admin, is_active })
+            });
+            const data = await resp.json();
+            if (!data.success) { showStatus(data.message || 'Failed to update user', false); return; }
+            await loadConfig();
+            await selectUser(state.selectedUser);
+            showStatus('User updated');
+        }
+
+        async function resetPasswordForUser() {
+            if (!state.selectedUser) { alert('select a user first'); return; }
+            const password = document.getElementById('resetPassword').value;
+            if (!password) { alert('enter new password'); return; }
+            const resp = await fetch('/api/admin/users/' + encodeURIComponent(state.selectedUser) + '/password', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ password })
+            });
+            const data = await resp.json();
+            if (!data.success) { showStatus(data.message || 'Failed to reset password', false); return; }
+            document.getElementById('resetPassword').value = '';
+            showStatus('Password updated');
+        }
+
+        async function savePermissions() {
+            if (!state.selectedUser) { alert('select a user first'); return; }
+            const resp = await fetch('/api/admin/users/' + encodeURIComponent(state.selectedUser) + '/permissions', {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ allowed_page_keys: state.permissions })
+            });
+            const data = await resp.json();
+            if (!data.success) { showStatus(data.message || 'Failed to save permissions', false); return; }
+            showStatus('Permissions saved');
+        }
+
+        loadConfig();
+    </script>
+{% endblock %}

@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% block title %}Advanced Trends Analytics - RPA Framework{% endblock %}
+{% block head_extra %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .header {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .header h1 {
+        font-size: 32px;
+        color: #1e3c72;
+        margin-bottom: 5px;
+    }
+
+    .header p {
+        color: #7f8c8d;
+        font-size: 14px;
+    }
+
+    .buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        background: #1e3c72;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #152847;
+        transform: translateY(-2px);
+    }
+
+    .insights {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .insight-card {
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border-left: 4px solid #2a5298;
+        text-align: center;
+    }
+
+    .insight-label {
+        font-size: 12px;
+        color: #95a5a6;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+    }
+
+    .insight-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: #2a5298;
+    }
+
+    .summary {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border-left: 4px solid #2a5298;
+    }
+
+    .summary h3 {
+        color: #1e3c72;
+        margin-bottom: 15px;
+        font-size: 18px;
+    }
+
+    .summary-item {
+        padding: 10px 0;
+        border-bottom: 1px solid #ecf0f1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .summary-item:last-child {
+        border-bottom: none;
+    }
+
+    .summary-label {
+        color: #7f8c8d;
+        font-weight: 500;
+    }
+
+    .summary-value {
+        color: #2c3e50;
+        font-weight: 700;
+        font-size: 16px;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="header">
+        <div>
+            <h1> Advanced Trends Analytics</h1>
+            <p>Deep insights into emerging trends and cross-platform analysis | Last updated: {{ generated_at }}</p>
+        </div>
+        <div class="buttons">
+            <button class="btn btn-primary" onclick="refreshAdvancedTrends()"> Refresh</button>
+        </div>
+    </div>
+
+    <div class="insights">
+        <div class="insight-card">
+            <div class="insight-label">Emerging Trends</div>
+            <div class="insight-value">{{ emerging }}</div>
+        </div>
+        <div class="insight-card">
+            <div class="insight-label">Declining Trends</div>
+            <div class="insight-value">{{ declining }}</div>
+        </div>
+        <div class="insight-card">
+            <div class="insight-label">Total Platforms</div>
+            <div class="insight-value">{{ platform_count }}</div>
+        </div>
+        <div class="insight-card">
+            <div class="insight-label">Top Platform</div>
+            <div class="insight-value" style="font-size: 18px; margin-top: 10px;">{{ top_platform }}</div>
+        </div>
+    </div>
+
+    <div class="summary">
+        <h3> Sentiment Distribution</h3>
+        <div class="summary-item">
+            <span class="summary-label"> Positive</span>
+            <span class="summary-value">{{ sentiment_counts['positive'] }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label"> Neutral</span>
+            <span class="summary-value">{{ sentiment_counts['neutral'] }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label"> Negative</span>
+            <span class="summary-value">{{ sentiment_counts['negative'] }}</span>
+        </div>
+    </div>
+
+    <div class="summary" style="margin-top: 20px;">
+        <h3> Platform Distribution</h3>
+        {% for platform, count in platform_counts %}
+        <div class="summary-item">
+            <span class="summary-label">{{ platform }}</span>
+            <span class="summary-value">{{ count }} trends</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<script>
+    function refreshAdvancedTrends() {
+        location.reload();
+    }
+
+    setInterval(refreshAdvancedTrends, 60000);
+</script>
+{% endblock %}

@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+{% block title %}Home Dashboard{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="hp-shell">
+    <aside class="hp-local-sidebar">
+        <div class="hp-local-brand">
+            <span class="hp-local-badge">i</span>
+        </div>
+        <nav class="hp-local-nav">
+            <a class="hp-nav-item active" href="#"><span class="dot"></span> Dashboard</a>
+            <a class="hp-nav-item" href="#"><span class="dot"></span> Crypto</a>
+            <a class="hp-nav-item" href="#"><span class="dot"></span> Weather</a>
+            <a class="hp-nav-item" href="#"><span class="dot"></span> Social</a>
+            <a class="hp-nav-item" href="#"><span class="dot"></span> Jobs</a>
+        </nav>
+    </aside>
+
+    <main class="hp-main">
+        <header class="hp-topbar">
+            <h1>Welcome Back</h1>
+            <div class="hp-top-actions">
+                <span id="refreshTime" class="chip">--</span>
+            </div>
+        </header>
+
+        <div class="hp-kpi-row">
+            <article class="kpi-card">
+                <span class="kpi-title">Crypto Assets</span>
+                <strong id="metricCryptoAssets" class="kpi-value">--</strong>
+                <svg id="sparkCrypto" class="spark" viewBox="0 0 160 40" preserveAspectRatio="none"></svg>
+            </article>
+            <article class="kpi-card">
+                <span class="kpi-title">Weather Temp</span>
+                <strong id="metricWeatherTemp" class="kpi-value">--</strong>
+                <svg id="sparkWeather" class="spark" viewBox="0 0 160 40" preserveAspectRatio="none"></svg>
+            </article>
+            <article class="kpi-card">
+                <span class="kpi-title">Sentiment</span>
+                <strong id="metricSocialScore" class="kpi-value">--</strong>
+                <svg id="sparkSocial" class="spark" viewBox="0 0 160 40" preserveAspectRatio="none"></svg>
+            </article>
+            <article class="kpi-card">
+                <span class="kpi-title">Automations</span>
+                <strong id="metricAutomationHealth" class="kpi-value">--</strong>
+                <svg id="sparkAutomation" class="spark" viewBox="0 0 160 40" preserveAspectRatio="none"></svg>
+            </article>
+        </div>
+
+        <div class="hp-mid-grid">
+            <section class="card chart-card">
+                <div class="card-head">
+                    <h2>Guide Performance</h2>
+                    <span class="chip">BTC Trend</span>
+                </div>
+                <svg id="cryptoTrendMain" class="main-chart" viewBox="0 0 900 300" preserveAspectRatio="none"></svg>
+            </section>
+
+            <section class="card side-card">
+                <div class="card-head">
+                    <h2>Total View Performance</h2>
+                </div>
+                <div class="gauge-wrap">
+                    <svg class="gauge" viewBox="0 0 220 150">
+                        <path d="M 20 130 A 90 90 0 0 1 200 130" class="gauge-track"></path>
+                        <path id="socialGaugeArc" d="M 20 130 A 90 90 0 0 1 200 130" class="gauge-value"></path>
+                        <line id="socialGaugeNeedle" x1="110" y1="130" x2="110" y2="56" class="gauge-needle"></line>
+                        <circle cx="110" cy="130" r="6" class="gauge-pin"></circle>
+                    </svg>
+                    <div id="socialGaugeValue" class="gauge-number">0</div>
+                    <div id="socialGaugeLabel" class="gauge-label">--</div>
+                </div>
+                <div class="weather-mini">
+                    <span id="weatherIcon" class="w-icon">☀</span>
+                    <div>
+                        <div id="weatherTemp" class="w-temp">--</div>
+                        <div id="weatherCond" class="w-cond">--</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="hp-bottom-grid">
+            <section class="card">
+                <div class="card-head">
+                    <h2>Automation Status</h2>
+                </div>
+                <div class="table-wrap">
+                    <table class="status-table">
+                        <thead>
+                            <tr>
+                                <th>Module</th>
+                                <th>Status</th>
+                                <th>Last Sync</th>
+                                <th>Rows</th>
+                                <th>Lag</th>
+                            </tr>
+                        </thead>
+                        <tbody id="automationBody">
+                            <tr><td colspan="5" class="empty">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-head">
+                    <h2>Activity Feed</h2>
+                </div>
+                <ul id="activityFeed" class="feed">
+                    <li class="empty">Loading...</li>
+                </ul>
+            </section>
+        </div>
+    </main>
+</section>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+    function num(v, fallback = 0) {
+        const n = Number(v);
+        return Number.isFinite(n) ? n : fallback;
+    }
+
+    function safe(v, fallback = '--') {
+        if (v === undefined || v === null || v === '') return fallback;
+        return String(v);
+    }
+
+    function weatherSymbol(name) {
+        const s = (name || '').toLowerCase();
+        if (s.includes('rain')) return '🌧';
+        if (s.includes('cloud')) return '☁';
+        if (s.includes('snow')) return '❄';
+        if (s.includes('storm') || s.includes('thunder')) return '⛈';
+        if (s.includes('mist') || s.includes('fog')) return '🌫';
+        return '☀';
+    }
+
+    function pathFrom(values, width, height, pad) {
+        if (!values || values.length < 2) return '';
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+        const range = (max - min) || 1;
+        const step = (width - (pad * 2)) / (values.length - 1);
+        let d = '';
+        values.forEach((value, i) => {
+            const x = pad + (i * step);
+            const y = height - pad - (((value - min) / range) * (height - (pad * 2)));
+            d += `${i ? 'L' : 'M'}${x},${y} `;
+        });
+        return d.trim();
+    }
+
+    function drawSpark(svgId, values) {
+        const svg = document.getElementById(svgId);
+        if (!svg) return;
+        svg.innerHTML = '';
+        if (!values || values.length < 2) return;
+        const d = pathFrom(values, 160, 40, 3);
+        const area = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        area.setAttribute('d', `${d} L157,37 L3,37 Z`);
+        area.setAttribute('fill', '#eaf2ff');
+        area.setAttribute('stroke', 'none');
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        line.setAttribute('d', d);
+        line.setAttribute('fill', 'none');
+        line.setAttribute('stroke', '#2f61d9');
+        line.setAttribute('stroke-width', '2');
+        line.setAttribute('stroke-linecap', 'round');
+        line.setAttribute('stroke-linejoin', 'round');
+        svg.appendChild(area);
+        svg.appendChild(line);
+    }
+
+    function drawMain(values) {
+        const svg = document.getElementById('cryptoTrendMain');
+        if (!svg) return;
+        svg.innerHTML = '';
+        if (!values || values.length < 2) return;
+        const d = pathFrom(values, 900, 300, 12);
+        const area = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        area.setAttribute('d', `${d} L888,288 L12,288 Z`);
+        area.setAttribute('fill', '#edf4ff');
+        area.setAttribute('stroke', 'none');
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        line.setAttribute('d', d);
+        line.setAttribute('fill', 'none');
+        line.setAttribute('stroke', '#315fdd');
+        line.setAttribute('stroke-width', '3');
+        line.setAttribute('stroke-linecap', 'round');
+        line.setAttribute('stroke-linejoin', 'round');
+        svg.appendChild(area);
+        svg.appendChild(line);
+    }
+
+    function drawGauge(score) {
+        const value = Math.max(0, Math.min(100, Number(score) || 0));
+        const arc = document.getElementById('socialGaugeArc');
+        const needle = document.getElementById('socialGaugeNeedle');
+        const label = document.getElementById('socialGaugeLabel');
+        const valueText = document.getElementById('socialGaugeValue');
+        const len = 283;
+        arc.style.strokeDasharray = `${(value / 100) * len} ${len}`;
+        const angle = -90 + ((value / 100) * 180);
+        needle.setAttribute('transform', `rotate(${angle} 110 130)`);
+        valueText.textContent = String(Math.round(value));
+        if (value >= 67) label.textContent = 'Positive';
+        else if (value >= 34) label.textContent = 'Neutral';
+        else label.textContent = 'Low';
+    }
+
+    function renderTable(modules) {
+        const body = document.getElementById('automationBody');
+        body.innerHTML = '';
+        if (!modules || !modules.length) {
+            body.innerHTML = '<tr><td colspan="5" class="empty">No data</td></tr>';
+            return;
+        }
+        modules.forEach((m) => {
+            const tr = document.createElement('tr');
+            const cls = m.status === 'fresh' ? 'fresh' : 'stale';
+            const lastSync = m.last_sync ? new Date(m.last_sync).toLocaleString() : 'N/A';
+            tr.innerHTML = `
+                <td>${safe(m.module)}</td>
+                <td><span class="status-pill ${cls}">${safe(m.status)}</span></td>
+                <td>${lastSync}</td>
+                <td>${safe(m.row_count, '0')}</td>
+                <td>${safe(m.age_minutes, '--')}m</td>
+            `;
+            body.appendChild(tr);
+        });
+    }
+
+    function renderFeed(items) {
+        const feed = document.getElementById('activityFeed');
+        feed.innerHTML = '';
+        if (!items.length) {
+            feed.innerHTML = '<li class="empty">No activity</li>';
+            return;
+        }
+        items.slice(0, 9).forEach((item) => {
+            const li = document.createElement('li');
+            li.className = 'feed-item';
+            li.innerHTML = `
+                <span class="feed-dot"></span>
+                <div class="feed-text">
+                    <p>${item.message}</p>
+                    <span>${item.time}</span>
+                </div>
+            `;
+            feed.appendChild(li);
+        });
+    }
+
+    async function loadDashboard() {
+        const now = new Date().toLocaleString();
+        document.getElementById('refreshTime').textContent = now;
+        const feed = [{ message: 'Refreshed', time: now }];
+
+        let crypto = null;
+        let weather = null;
+        let social = null;
+        let freshness = null;
+        let btc = null;
+        let fusion = null;
+
+        try {
+            const [r1, r2, r3, r4, r5, r6] = await Promise.all([
+                fetch('/api/dashboard-data', { cache: 'no-store' }),
+                fetch('/api/weather-dashboard-data', { cache: 'no-store' }),
+                fetch('/api/social-trends-dashboard-data', { cache: 'no-store' }),
+                fetch('/api/data-freshness', { cache: 'no-store' }),
+                fetch('/api/advanced-asset-data/BTC', { cache: 'no-store' }),
+                fetch('/api/signal-fusion?hours=24', { cache: 'no-store' }),
+            ]);
+            crypto = await r1.json();
+            weather = await r2.json();
+            social = await r3.json();
+            freshness = await r4.json();
+            btc = await r5.json();
+            fusion = await r6.json();
+        } catch (e) {
+            feed.push({ message: 'API load error', time: now });
+        }
+
+        const btcSeries = (((btc || {}).charts || [])[0] || {}).data || [];
+        const btcPrices = (btcSeries[0] && btcSeries[0].y ? btcSeries[0].y : []).map((v) => num(v));
+        drawSpark('sparkCrypto', btcPrices.slice(-24));
+        drawMain(btcPrices.slice(-90));
+        document.getElementById('metricCryptoAssets').textContent = safe((crypto && crypto.metrics && crypto.metrics['Total Assets']) || '--');
+
+        const wCards = (weather && weather.weather_cards) || [];
+        const wTraces = (((weather || {}).charts || {}).temp_comparison || {}).data || [];
+        const wSeries = wTraces.length ? (wTraces[0].y || []).map((v) => num(v)) : [];
+        drawSpark('sparkWeather', wSeries.slice(-24));
+        const topW = wCards[0] || {};
+        const wTemp = safe(topW.temperature, '--');
+        document.getElementById('metricWeatherTemp').textContent = `${wTemp}°`;
+        document.getElementById('weatherTemp').textContent = `${wTemp}°C`;
+        document.getElementById('weatherCond').textContent = safe(topW.weather, '--');
+        document.getElementById('weatherIcon').textContent = weatherSymbol(topW.weather);
+
+        const trends = (social && social.trends) || [];
+        const volumes = trends.slice(0, 30).map((t) => num(t.volume));
+        drawSpark('sparkSocial', volumes.length > 1 ? volumes : [0, 1, 0, 1]);
+        let sentiment = 50;
+        if (trends.length) {
+            const pos = trends.filter((t) => String(t.sentiment || '').toLowerCase() === 'positive').length;
+            const neu = trends.filter((t) => String(t.sentiment || '').toLowerCase() === 'neutral').length;
+            const neg = trends.filter((t) => String(t.sentiment || '').toLowerCase() === 'negative').length;
+            const total = pos + neu + neg || 1;
+            sentiment = ((pos + (neu * 0.5)) / total) * 100;
+        }
+        document.getElementById('metricSocialScore').textContent = String(Math.round(sentiment));
+        drawGauge(sentiment);
+
+        const modules = (freshness && freshness.modules) || [];
+        const fSeries = modules.map((m) => m.status === 'fresh' ? 100 : 0);
+        drawSpark('sparkAutomation', fSeries.length > 1 ? fSeries : [100, 100, 100, 100]);
+        const freshCount = modules.filter((m) => m.status === 'fresh').length;
+        document.getElementById('metricAutomationHealth').textContent = `${freshCount}/${modules.length || 0}`;
+        renderTable(modules);
+
+        if (fusion && fusion.series && fusion.series.length) {
+            const latest = fusion.series[fusion.series.length - 1];
+            feed.push({ message: `Fusion ${num(latest.fusion_score).toFixed(2)}`, time: now });
+        }
+        if (crypto && crypto.alerts) {
+            crypto.alerts.slice(0, 4).forEach((a) => feed.push({ message: safe(a.message, 'Crypto update'), time: now }));
+        }
+        modules.forEach((m) => feed.push({
+            message: `${safe(m.module)} ${safe(m.status)}`,
+            time: m.last_sync ? new Date(m.last_sync).toLocaleString() : now
+        }));
+        renderFeed(feed);
+    }
+
+    loadDashboard();
+    setInterval(loadDashboard, 60000);
+</script>
+{% endblock %}

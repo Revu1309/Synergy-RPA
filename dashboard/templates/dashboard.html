@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+{% block title %}Standard Dashboard - RPA Framework{% endblock %}
+{% block head_extra %}
+<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                /* switched from a strong gradient to a calm neutral background for a more professional tone */
+                background: #f3f4f6;
+                min-height: 100vh;
+                padding: 20px;
+            }
+
+            .dashboard-container {
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            .dashboard-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 30px;
+                flex-wrap: wrap;
+                gap: 20px;
+            }
+
+            .header-left h1 {
+                font-size: 28px;
+                color: #2c3e50;
+                margin-bottom: 5px;
+            }
+
+            .header-left p {
+                color: #7f8c8d;
+                font-size: 14px;
+            }
+
+            .header-right {
+                display: flex;
+                gap: 10px;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-size: 14px;
+            }
+
+            /* use the primary brand blue from base and remove loud gradient */
+            .btn-refresh {
+                background: #2563eb;
+                color: white;
+            }
+
+            .btn-refresh:hover {
+                background: #1e40af;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+
+            /* secondary action styled as light neutral button */
+            .btn-menu {
+                background: #f3f4f6;
+                color: #2c3e50;
+            }
+
+            .btn-menu:hover {
+                background: #e5e7eb;
+            }
+
+            .metrics-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+
+            .metric-card {
+                background: white;
+                padding: 20px;
+                border-radius: 12px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                border-left: 4px solid #667eea;
+                transition: all 0.3s ease;
+            }
+
+            .metric-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            }
+
+            .metric-value {
+                font-size: 24px;
+                font-weight: 700;
+                color: #2c3e50;
+                margin-bottom: 5px;
+            }
+
+            .metric-label {
+                font-size: 12px;
+                color: #6b7280; /* slightly darker for better legibility */
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .charts-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+
+            .chart-container {
+                background: white;
+                padding: 20px;
+                border-radius: 12px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .chart-container h3 {
+                margin-bottom: 15px;
+                color: #2c3e50;
+                font-size: 16px;
+                font-weight: 600;
+                /* light underline for visual separation */
+                border-bottom: 2px solid #e5e7eb;
+                padding-bottom: 6px;
+            }
+
+            .alerts {
+                margin-top: 30px; /* more breathing room before alerts */
+            }
+
+            .alert {
+                background: white;
+                padding: 18px;
+                border-radius: 8px;
+                margin-bottom: 16px; /* increased gap between individual alerts */
+                border-left: 4px solid;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                transition: background 0.2s;
+            }
+
+            .alert:hover {
+                background: #f9fafb; /* subtle hover lightening */
+            }
+
+            .alert-high { border-left-color: #e74c3c; background: #fdeaea; }
+            .alert-medium { border-left-color: #f39c12; background: #fef5e7; }
+            .alert-low { border-left-color: #27ae60; background: #eafaf1; }
+
+            .loading {
+                text-align: center;
+                padding: 40px;
+                color: #7f8c8d;
+            }
+
+            .spinner {
+                border: 4px solid #ecf0f1;
+                border-top: 4px solid #667eea;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 0.8s linear infinite;
+                margin: 0 auto 15px;
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
+{% endblock %}
+{% block content %}
+<div class="dashboard-container">
+            <div class="dashboard-header">
+                <div class="header-left">
+                    <h1> Standard Dashboard</h1>
+                    <p>Real-time cryptocurrency analytics and monitoring</p>
+                </div>
+                <div class="header-right">
+                    <button class="btn btn-refresh" onclick="refreshData()"> Refresh</button>
+                    <button class="btn btn-menu" onclick="goToMenu()"> Menu</button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Loading dashboard data...</p>
+            </div>
+
+            <div id="dashboard-content" style="display: none;">
+                <div class="metrics-grid" id="metrics"></div>
+                <div class="charts-grid" id="charts"></div>
+                <div class="alerts" id="alerts"></div>
+            </div>
+        </div>
+
+        <script>
+            function goToMenu() {
+                window.location.href = '/menu';
+            }
+
+            async function refreshData() {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('dashboard-content').style.display = 'none';
+                document.getElementById('loading').innerHTML = '<div class="spinner"></div><p>Refreshing dashboard data...</p>';
+                
+                await loadDashboard();
+            }
+
+            async function loadDashboard() {
+                try {
+                    const timestamp = new Date().getTime();
+                    const response = await fetch(`/api/dashboard-data?t=${timestamp}`, {
+                        cache: 'no-store'
+                    });
+                    const data = await response.json();
+                    updateDashboard(data);
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('dashboard-content').style.display = 'block';
+                } catch (error) {
+                    console.error('Error loading dashboard:', error);
+                    document.getElementById('loading').innerHTML = '<p>Error loading dashboard. Please refresh.</p>';
+                    document.getElementById('loading').style.display = 'block';
+                    document.getElementById('dashboard-content').style.display = 'none';
+                }
+            }
+
+            function updateDashboard(data) {
+                // Update metrics
+                const metricsDiv = document.getElementById('metrics');
+                metricsDiv.innerHTML = '';
+                
+                if (data.metrics) {
+                    Object.entries(data.metrics).forEach(([key, value]) => {
+                        metricsDiv.innerHTML += `
+                            <div class="metric-card">
+                                <div class="metric-value">${value}</div>
+                                <div class="metric-label">${key}</div>
+                            </div>
+                        `;
+                    });
+                }
+
+                // Update charts
+                const chartsDiv = document.getElementById('charts');
+                chartsDiv.innerHTML = '';
+
+                if (data.charts) {
+                    data.charts.forEach((chart, index) => {
+                        const chartId = 'chart-' + index;
+                        chartsDiv.innerHTML += `<div class="chart-container"><h3>${chart.title}</h3><div id="${chartId}"></div></div>`;
+                        
+                        if (chart.data) {
+                            Plotly.newPlot(chartId, chart.data, chart.layout);
+                        }
+                    });
+                }
+
+                // Update alerts
+                const alertsDiv = document.getElementById('alerts');
+                alertsDiv.innerHTML = '<h3>Alerts</h3>';
+                
+                if (data.alerts && data.alerts.length > 0) {
+                    data.alerts.forEach(alert => {
+                        const alertClass = `alert alert-${alert.level}`;
+                        alertsDiv.innerHTML += `<div class="${alertClass}">${alert.message}</div>`;
+                    });
+                } else {
+                    alertsDiv.innerHTML += '<div class="alert alert-low"> All systems operating normally</div>';
+                }
+            }
+
+            // Load dashboard on page load
+            loadDashboard();
+            
+            // Refresh every 5 minutes
+            setInterval(loadDashboard, 300000);
+        </script>
+{% endblock %}

@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}Alert Settings{% endblock %}
+{% block head_extra %}
+<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <style>
+            body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f3f7ff; color:#1f2d3d; }
+            .wrap { max-width: 1080px; margin: 22px auto; padding: 0 14px; }
+            .top { background: linear-gradient(120deg,#2f5bd2,#2048b8); color:white; border-radius:12px; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+            .card { background:white; border:1px solid #dbe4f2; border-radius:12px; padding:14px; margin-bottom:14px; box-shadow:0 5px 16px rgba(22,35,58,.07); }
+            .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+            .grid { display:grid; grid-template-columns: repeat(2, minmax(260px, 1fr)); gap:10px; }
+            .field { display:flex; flex-direction:column; gap:4px; }
+            .field label { font-size:12px; font-weight:600; color:#34475f; }
+            input, select, button { border:1px solid #cbd7ea; border-radius:8px; padding:8px 10px; }
+            button { background:#2f5bd2; color:white; border-color:#2f5bd2; font-weight:600; cursor:pointer; }
+            button.secondary { background:white; color:#2f5bd2; }
+            table { width:100%; border-collapse: collapse; font-size: 13px; }
+            th, td { border-bottom:1px solid #edf2fb; text-align:left; padding:8px; }
+            th { background:#f6f9ff; }
+            .status { display:none; margin-top:8px; padding:8px 10px; border-radius:8px; font-size:13px; }
+            @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+        </style>
+{% endblock %}
+{% block content %}
+<div class="wrap">
+            <div class="top">
+                <div><strong>Alert Settings</strong> | {{ username }}</div>
+                <div class="row">
+                    <button class="secondary" onclick="window.location.href='/admin/access-control'">Access Control</button>
+                    <button class="secondary" onclick="window.location.href='/admin/users'">User Management</button>
+                    <button class="secondary" onclick="window.location.href='/menu'">Menu</button>
+                    <button onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="grid">
+                    <div class="field">
+                        <label for="moduleKey">Alert Module</label>
+                        <select id="moduleKey">
+                            <option value="all">All Modules (Default)</option>
+                            <option value="crypto">Crypto</option>
+                            <option value="weather">Weather</option>
+                            <option value="social">Social</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="channelType">Channel Type</label>
+                        <select id="channelType">
+                            <option value="telegram">Telegram</option>
+                            <option value="discord_webhook">Discord Webhook</option>
+                        </select>
+                    </div>
+                    <div class="field" id="telegramTokenWrap">
+                        <label for="telegramBotToken">Telegram Bot Token</label>
+                        <input id="telegramBotToken" type="text" placeholder="123456:ABCDEF..." />
+                    </div>
+                    <div class="field" id="telegramChatWrap">
+                        <label for="telegramChatId">Telegram Chat ID</label>
+                        <input id="telegramChatId" type="text" placeholder="e.g. -1001234567890" />
+                    </div>
+                    <div class="field" id="discordWrap" style="grid-column: span 2; display:none;">
+                        <label for="discordWebhookUrl">Discord Webhook URL</label>
+                        <input id="discordWebhookUrl" type="text" placeholder="https://discord.com/api/webhooks/..." />
+                    </div>
+                </div>
+                <div class="row" style="margin-top:10px;">
+                    <button onclick="saveChannel()">Save Setting</button>
+                    <button class="secondary" onclick="loadChannels()">Refresh</button>
+                </div>
+                <div id="status" class="status"></div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-top:0;">Saved Alert Channel Settings</h3>
+                <table>
+                    <thead>
+                        <tr><th>Module</th><th>Channel</th><th>Key</th><th>Active</th><th>Updated</th></tr>
+                    </thead>
+                    <tbody id="channelRows"></tbody>
+                </table>
+            </div>
+        </div>
+        <script>
+            function showStatus(msg, ok=true) {
+                const s = document.getElementById('status');
+                s.style.display = 'block';
+                s.textContent = msg;
+                s.style.background = ok ? '#eefbf4' : '#fff1f1';
+                s.style.border = '1px solid ' + (ok ? '#cce9d9' : '#f2c9c9');
+                s.style.color = ok ? '#0f7a53' : '#b42318';
+                setTimeout(() => { s.style.display = 'none'; }, 2500);
+            }
+
+            function logout() {
+                fetch('/api/logout', { method: 'POST' }).then(() => window.location.href = '/login');
+            }
+
+            function toggleChannelFields() {
+                const t = document.getElementById('channelType').value;
+                const telegram = t === 'telegram';
+                document.getElementById('telegramTokenWrap').style.display = telegram ? 'flex' : 'none';
+                document.getElementById('telegramChatWrap').style.display = telegram ? 'flex' : 'none';
+                document.getElementById('discordWrap').style.display = telegram ? 'none' : 'flex';
+            }
+
+            async function loadChannels() {
+                const r = await fetch('/api/admin/alert-channels', { cache: 'no-store' });
+                const data = await r.json();
+                const tbody = document.getElementById('channelRows');
+                tbody.innerHTML = '';
+                (data || []).forEach(ch => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${ch.module_key || 'all'}</td>
+                        <td>${ch.channel_type}</td>
+                        <td>${ch.channel_key}</td>
+                        <td>${ch.is_active ? 'Yes' : 'No'}</td>
+                        <td>${ch.updated_at || ''}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            async function saveChannel() {
+                const moduleKey = document.getElementById('moduleKey').value;
+                const channelType = document.getElementById('channelType').value;
+                let config = {};
+                if (channelType === 'telegram') {
+                    const token = document.getElementById('telegramBotToken').value.trim();
+                    const chat = document.getElementById('telegramChatId').value.trim();
+                    if (!token || !chat) { showStatus('Telegram token and chat id are required', false); return; }
+                    config = { bot_token: token, chat_id: chat };
+                } else {
+                    const webhook = document.getElementById('discordWebhookUrl').value.trim();
+                    if (!webhook) { showStatus('Discord webhook URL is required', false); return; }
+                    config = { webhook_url: webhook };
+                }
+
+                const channelKey = `${moduleKey}_${channelType}_default`;
+                const r = await fetch('/api/admin/alert-channels', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        channel_key: channelKey,
+                        module_key: moduleKey,
+                        channel_type: channelType,
+                        is_active: true,
+                        config
+                    })
+                });
+                const d = await r.json();
+                if (!d.success) { showStatus(d.message || 'Failed to save setting', false); return; }
+                showStatus('Alert channel setting saved');
+                await loadChannels();
+            }
+
+            document.getElementById('channelType').addEventListener('change', toggleChannelFields);
+            toggleChannelFields();
+            loadChannels();
+        </script>
+{% endblock %}

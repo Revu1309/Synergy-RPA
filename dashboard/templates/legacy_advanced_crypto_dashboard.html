@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Advanced Crypto Dashboard{% endblock %}
+{% block head_extra %}
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        .container { max-width: 1600px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; background: rgba(255,255,255,0.95); padding: 30px; border-radius: 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+        .header h1 { color: #2c3e50; margin: 0; font-size: 2.5em; font-weight: 700; }
+        .header p { color: #7f8c8d; margin: 10px 0 0 0; font-size: 1.1em; }
+        .nav-links { text-align: center; margin-bottom: 20px; }
+        .nav-links a { color: #3498db; text-decoration: none; margin: 0 15px; padding: 8px 16px; border-radius: 6px; transition: background 0.3s ease; }
+        .nav-links a:hover { background: rgba(52, 152, 219, 0.1); }
+        .dashboard-container { background: rgba(255,255,255,0.95); padding: 30px; border-radius: 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+        .refresh-btn { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; margin-bottom: 20px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3); }
+        .refresh-btn:hover { background: linear-gradient(135deg, #2980b9 0%, #21618c 100%); transform: translateY(-1px); box-shadow: 0 4px 8px rgba(52, 152, 219, 0.4); }
+    </style>
+{% endblock %}
+{% block content %}
+<div class="container">
+        <div class="nav-links">
+            <a href="/">📊 Basic Dashboard</a> |
+            <a href="/advanced">🚀 Advanced Dashboard</a>
+        </div>
+        <div class="header">
+            <h1>🚀 Advanced Crypto Analytics Dashboard</h1>
+            <p>Comprehensive Cryptocurrency Analysis & Risk Assessment</p>
+            <button class="refresh-btn" onclick="loadAdvancedDashboard()">🔄 Refresh Advanced Dashboard</button>
+        </div>
+
+        <div id="loading" style="text-align: center; display: none;">Loading advanced analytics...</div>
+
+        <div class="dashboard-container">
+            <div id="advanced-dashboard"></div>
+        </div>
+    </div>
+
+    <script>
+        async function loadAdvancedDashboard() {
+            document.getElementById('loading').style.display = 'block';
+            try {
+                const response = await fetch('/api/advanced-dashboard');
+                const data = await response.json();
+                if (data.dashboard) {
+                    Plotly.newPlot('advanced-dashboard', JSON.parse(data.dashboard));
+                } else {
+                    document.getElementById('advanced-dashboard').innerHTML = '<p>Error loading dashboard</p>';
+                }
+            } catch (error) {
+                console.error('Error loading advanced dashboard:', error);
+                document.getElementById('advanced-dashboard').innerHTML = '<p>Error loading dashboard</p>';
+            }
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // Load dashboard on page load
+        loadAdvancedDashboard();
+
+        // Auto-refresh every 10 minutes for advanced dashboard
+        setInterval(loadAdvancedDashboard, 600000);
+    </script>
+{% endblock %}

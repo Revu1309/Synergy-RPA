@@ -1,0 +1,350 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Menu - RPA Framework{% endblock %}
+{% block head_extra %}
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .menu-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .user-info {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .username {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .menu-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+        }
+
+        .menu-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .menu-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+
+        .menu-description {
+            font-size: 14px;
+            color: #7f8c8d;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .menu-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 13px;
+        }
+
+        .menu-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .menu-card:nth-child(1) .menu-icon {
+            color: #3498db;
+        }
+
+        .menu-card:nth-child(2) .menu-icon {
+            color: #e74c3c;
+        }
+
+        .menu-card:nth-child(3) .menu-icon {
+            color: #f39c12;
+        }
+
+        .sync-card {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .sync-card .menu-title {
+            color: white;
+        }
+
+        .sync-card .menu-description {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .sync-button {
+            background: rgba(255, 255, 255, 0.2) !important;
+            border: 2px solid white !important;
+            color: white !important;
+        }
+
+        .sync-button:hover {
+            background: rgba(255, 255, 255, 0.3) !important;
+        }
+
+        .refresh-status {
+            margin-top: 10px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .spinner {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+{% endblock %}
+{% block content %}
+<div class="user-info">
+        <span class="username"> Welcome, {{ username }}!</span>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="menu-container">
+        <div class="header">
+            <h1> RPA Dashboard Menu</h1>
+            <p>An Intelligent RPA Framework for Real-Time Data Monitoring and Alerting</p>
+        </div>
+
+        <div class="menu-grid">
+            <a href="/asset-dashboard" class="menu-card">
+                <div class="menu-icon"></div>
+                <div class="menu-title">Standard Dashboard</div>
+                <div class="menu-description">
+                    Interactive cryptocurrency analytics with asset selection. View detailed charts, price trends, volume analysis, and market data for each asset.
+                </div>
+                <button class="menu-button">View Dashboard</button>
+            </a>
+
+            <a href="/advanced-crypto-dashboard" class="menu-card">
+                <div class="menu-icon"></div>
+                <div class="menu-title">Advanced Dashboard</div>
+                <div class="menu-description">
+                    Deep market analytics with advanced insights. View price trends, volatility analysis, market cap trends, volume heatmaps, and statistical analysis for each asset.
+                </div>
+                <button class="menu-button">View Advanced</button>
+            </a>
+
+            <a href="/asset-management" class="menu-card">
+                <div class="menu-icon"></div>
+                <div class="menu-title">Manage Assets</div>
+                <div class="menu-description">
+                    Add, edit, or delete your preferred cryptocurrency assets. Select which assets you want to monitor.
+                </div>
+                <button class="menu-button">Manage Assets</button>
+            </a>
+
+            <a href="/weather-dashboard" class="menu-card">
+                <div class="menu-icon"></div>
+                <div class="menu-title">Weather Analytics</div>
+                <div class="menu-description">
+                    Real-time weather data and analytics for predefined global locations. Monitor temperature, humidity, wind patterns, and weather conditions.
+                </div>
+                <button class="menu-button">View Weather</button>
+            </a>
+
+            <a href="/advanced-weather-dashboard" class="menu-card">
+                <div class="menu-icon"></div>
+                <div class="menu-title">Advanced Weather Analytics</div>
+                <div class="menu-description">
+                    Deep weather analysis with statistical metrics, correlation analysis, pattern recognition, and advanced multi-parameter comparisons.
+                </div>
+                <button class="menu-button">Advanced Analysis</button>
+            </a>
+
+            <a href="/manage-locations" class="menu-card">
+                <div class="menu-icon"></div>
+                <div class="menu-title">Manage Locations</div>
+                <div class="menu-description">
+                    Add, edit, or remove locations for automatic weather monitoring. Configure custom locations and control sync intervals.
+                </div>
+                <button class="menu-button">Manage Locations</button>
+            </a>
+
+            <a href="/social-trends-dashboard" class="menu-card">
+                <div class="menu-icon"></div>
+                <div class="menu-title">Social Media Trends</div>
+                <div class="menu-description">
+                    Monitor trending topics, hashtags, and keywords across multiple social media platforms. Real-time trend tracking from Reddit, GitHub, Hacker News, and more.
+                </div>
+                <button class="menu-button">View Trends</button>
+            </a>
+
+            <a href="/advanced-social-trends-dashboard" class="menu-card">
+                <div class="menu-icon"></div>
+                <div class="menu-title">Advanced Trends Analytics</div>
+                <div class="menu-description">
+                    Deep analysis of social media trends with growth metrics, emerging topic detection, sentiment analysis, and cross-platform comparisons.
+                </div>
+                <button class="menu-button">Advanced Analysis</button>
+            </a>
+
+            <a href="/crypto-alerts" class="menu-card">
+                <div class="menu-icon"></div>
+                <div class="menu-title">Crypto Alerts</div>
+                <div class="menu-description">
+                    Create, manage, and view alerts for your crypto assets. Trigger notifications when price thresholds are crossed.
+                </div>
+                <button class="menu-button">Manage Alerts</button>
+            </a>
+
+            <a href="/weather-alerts" class="menu-card">
+                <div class="menu-icon"></div>
+                <div class="menu-title">Weather Alerts</div>
+                <div class="menu-description">
+                    Create and manage alerts for weather metrics. Get notified when temperature, humidity, wind speed, or other conditions meet your thresholds.
+                </div>
+                <button class="menu-button">Manage Weather Alerts</button>
+            </a>
+
+            <a href="/social-trend-alerts" class="menu-card">
+                <div class="menu-icon"></div>
+                <div class="menu-title">Social Trend Alerts</div>
+                <div class="menu-description">
+                    Set up alerts for social media trends. Get notified when trends reach specific engagement levels, rank positions, or momentum thresholds.
+                </div>
+                <button class="menu-button">Manage Trend Alerts</button>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                fetch('/api/logout', { method: 'POST' })
+                    .then(() => {
+                        window.location.href = '/login';
+                    });
+            }
+        }
+
+        async function syncData() {
+            const spinner = document.getElementById('syncSpinner');
+            const status = document.getElementById('refreshStatus');
+            const button = event.target;
+
+            spinner.innerHTML = '<div class="spinner"></div>';
+            status.style.display = 'block';
+            status.textContent = 'Syncing...';
+            button.disabled = true;
+
+            try {
+                const response = await fetch('/api/sync-data');
+                const data = await response.json();
+
+                if (data.success) {
+                    status.textContent = ' Sync completed successfully!';
+                    setTimeout(() => {
+                        status.style.display = 'none';
+                        spinner.innerHTML = '';
+                        button.disabled = false;
+                    }, 3000);
+                } else {
+                    status.textContent = ' Sync failed: ' + data.message;
+                }
+            } catch (error) {
+                status.textContent = ' Error: ' + error.message;
+            }
+        }
+    </script>
+{% endblock %}

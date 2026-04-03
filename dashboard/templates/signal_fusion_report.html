@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}Signal Fusion Report - RPA Framework{% endblock %}
+{% block head_extra %}
+<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+                margin: 0;
+                padding: 24px;
+                min-height: 100vh;
+                color: #1f2d3d;
+            }
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            .header {
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 14px;
+                padding: 20px;
+                margin-bottom: 18px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 12px;
+                flex-wrap: wrap;
+            }
+            .title { font-size: 28px; font-weight: 700; margin: 0 0 6px 0; color: #2c3e50; }
+            .subtitle { margin: 0; color: #5d6d7e; }
+            .controls { display: flex; gap: 10px; align-items: center; }
+            .btn {
+                border: none;
+                border-radius: 8px;
+                padding: 10px 14px;
+                font-weight: 600;
+                cursor: pointer;
+            }
+            .btn-primary { background: #2f5bd2; color: white; }
+            .btn-secondary { background: #e8edf7; color: #2c3e50; }
+            .card-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+                gap: 14px;
+                margin-bottom: 16px;
+            }
+            .card {
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 14px;
+                padding: 18px;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            }
+            .label { color: #5d6d7e; font-size: 12px; text-transform: uppercase; letter-spacing: .6px; }
+            .value { color: #1f2d3d; font-size: 34px; font-weight: 700; margin-top: 8px; }
+            .chart {
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 14px;
+                padding: 14px;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            }
+            .row { display: flex; align-items: center; gap: 8px; }
+            select {
+                padding: 8px 10px;
+                border: 1px solid #dbe5f2;
+                border-radius: 8px;
+                background: white;
+            }
+        </style>
+{% endblock %}
+{% block content %}
+<div class="container">
+            <div class="header">
+                <div>
+                    <h1 class="title">Signal Fusion Report</h1>
+                    <p class="subtitle">Dedicated report for fused crypto/social/weather signal index</p>
+                </div>
+                <div class="controls">
+                    <div class="row">
+                        <label for="hoursFilter">Hours:</label>
+                        <select id="hoursFilter" onchange="loadFusion()">
+                            <option value="6">6</option>
+                            <option value="12">12</option>
+                            <option value="24" selected>24</option>
+                            <option value="48">48</option>
+                            <option value="72">72</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="loadFusion()">Refresh</button>
+                    <button class="btn btn-secondary" onclick="window.location.href='/menu'">Menu</button>
+                </div>
+            </div>
+
+            <div class="card-grid">
+                <div class="card">
+                    <div class="label">Current Fusion Score</div>
+                    <div id="fusionScore" class="value">0.00</div>
+                </div>
+                <div class="card">
+                    <div class="label">Confidence Level</div>
+                    <div id="fusionConfidence" class="value" style="font-size: 28px;">Low</div>
+                </div>
+            </div>
+
+            <div class="chart">
+                <div id="fusionChart"></div>
+            </div>
+        </div>
+
+        <script>
+            async function loadFusion() {
+                const hours = parseInt(document.getElementById('hoursFilter').value || '24');
+                const response = await fetch(`/api/signal-fusion?hours=${hours}&t=${Date.now()}`, { cache: 'no-store' });
+                const data = await response.json();
+
+                const series = data.series || [];
+                const latest = series.length ? series[series.length - 1] : { fusion_score: 0 };
+                document.getElementById('fusionScore').textContent = Number(latest.fusion_score || 0).toFixed(2);
+                document.getElementById('fusionConfidence').textContent = data.latest_confidence_level || 'Low';
+
+                const x = series.map(p => p.timestamp);
+                const y = series.map(p => p.fusion_score);
+
+                Plotly.newPlot('fusionChart', [{
+                    x: x,
+                    y: y,
+                    mode: 'lines+markers',
+                    name: 'Fusion Score',
+                    line: { color: '#f39c12', width: 3 }
+                }], {
+                    title: `Signal Fusion Index (${hours}h)`,
+                    yaxis: { title: 'Score', range: [0, 100] },
+                    xaxis: { title: 'Time' },
+                    margin: { l: 60, r: 20, t: 50, b: 60 },
+                    paper_bgcolor: 'rgba(255,255,255,0)',
+                    plot_bgcolor: 'rgba(255,255,255,0)'
+                }, {responsive: true});
+            }
+
+            loadFusion();
+            setInterval(loadFusion, 60000);
+        </script>
+{% endblock %}

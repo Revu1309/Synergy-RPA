@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}Social Trend Alerts{% endblock %}
+{% block head_extra %}
+<meta charset="utf-8" />
+        
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; background:#f5f5f5; }
+            .container { max-width: 1200px; margin: 0 auto; }
+            .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+            .alerts-form { margin-top: 20px; background:#fff; padding:16px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.08); }
+            .alerts-list { margin-top: 20px; }
+            table { width:100%; border-collapse:collapse; background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.08); }
+            th, td { padding:12px; border-bottom:1px solid #eee; text-align:left; }
+            th { background:#f8f9fa; font-weight:600; }
+            .btn { padding:8px 12px; border-radius:6px; border:none; cursor:pointer; font-size:12px; }
+            .btn-primary { background:#e74c3c; color:#fff; }
+            .btn-danger { background:#c0392b; color:#fff; }
+            .btn-primary:hover { background:#c0392b; }
+            .btn-danger:hover { background:#a93226; }
+            select, input { padding:8px 10px; border:1px solid #ddd; border-radius:4px; font-size:13px; }
+            .back-btn { padding:10px 16px; background:#95a5a6; color:#fff; border:none; border-radius:6px; cursor:pointer; text-decoration:none; display:inline-block; margin-bottom:15px; }
+            .back-btn:hover { background:#7f8c8d; }
+        </style>
+{% endblock %}
+{% block content %}
+<div class="container">
+            <a href="/menu" class="back-btn"> Back to Menu</a>
+            <div class="header">
+                <h2> Social Trend Alerts</h2>
+                <div> {{ username }}</div>
+            </div>
+
+            <div class="alerts-form">
+                <h3>Create Trend Alert</h3>
+                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                    <input id="trendInput" type="text" placeholder="Trend Name/Keyword" style="min-width:150px;" />
+                    <select id="platformSelect" style="min-width:150px;"><option value="">Select Platform...</option><option value="reddit">Reddit</option><option value="twitter">Twitter</option><option value="github">GitHub</option><option value="hackernews">Hacker News</option></select>
+                    <select id="metricSelect" style="min-width:150px;"><option value="volume">Volume</option><option value="engagement">Engagement</option><option value="rank">Rank Position</option></select>
+                    <select id="conditionSelect"><option value="gt">Above (&gt;)</option><option value="lt">Below (&lt;)</option><option value="eq">Equals (=)</option></select>
+                    <input id="thresholdInput" type="number" min="0" placeholder="Threshold" />
+                    <input id="cooldownInput" type="number" min="1" value="15" placeholder="Cooldown (min)" />
+                    <select id="notifySelect"><option value="console">Console</option><option value="telegram">Telegram</option><option value="discord_webhook">Discord Webhook</option><option value="email">Email</option></select>
+                    <button class="btn btn-primary" onclick="createAlert()">Create</button>
+                </div>
+            </div>
+
+            <div class="alerts-list">
+                <h3>Existing Alerts</h3>
+                <table id="alertsTable">
+                    <thead><tr><th>Trend</th><th>Platform</th><th>Metric</th><th>Condition</th><th>Threshold</th><th>Current Value</th><th>State</th><th>Last Triggered</th><th>Message</th><th>Actions</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <script>
+            async function loadAlerts() {
+                try {
+                    const resp = await fetch('/api/social-trend-alerts');
+                    const data = await resp.json();
+                    const tbody = document.querySelector('#alertsTable tbody');
+                    tbody.innerHTML = '';
+                    data.forEach(alert => {
+                        const tr = document.createElement('tr');
+                        const state = alert.is_triggered ? (alert.in_cooldown ? 'Triggered (Cooldown)' : 'Triggered') : 'Normal';
+                        tr.innerHTML = `
+                            <td><strong>${alert.trend_name}</strong></td>
+                            <td>${alert.source_platform}</td>
+                            <td>${alert.metric_type}</td>
+                            <td>${alert.condition === 'gt' ? 'Above' : (alert.condition === 'lt' ? 'Below' : 'Equals')}</td>
+                            <td>${alert.threshold}</td>
+                            <td>${alert.current_metric_value ?? 'N/A'}</td>
+                            <td>${state}</td>
+                            <td>${alert.last_triggered || 'Never'}</td>
+                            <td>${alert.last_trigger_message || alert.state_message || ''}</td>
+                            <td><button class="btn btn-danger" onclick="deleteAlert(${alert.id})">Delete</button></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } catch (e) {
+                    console.error('Error loading alerts:', e);
+                }
+            }
+
+            async function createAlert() {
+                const trend = document.getElementById('trendInput').value.trim();
+                const platform = document.getElementById('platformSelect').value;
+                const metric = document.getElementById('metricSelect').value;
+                const condition = document.getElementById('conditionSelect').value;
+                const threshold = document.getElementById('thresholdInput').value;
+                const cooldown = parseInt(document.getElementById('cooldownInput').value || '15', 10);
+                const notify = document.getElementById('notifySelect').value;
+                if (!trend || !platform || !threshold) return alert('Please fill all required fields');
+                try {
+                    const resp = await fetch('/api/social-trend-alerts', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ trend_name: trend, source_platform: platform, alert_type: 'Standard', condition, threshold: parseInt(threshold), metric_type: metric, notify_method: notify, cooldown_minutes: cooldown }) });
+                    const data = await resp.json();
+                    if (data.success) {
+                        document.getElementById('trendInput').value = '';
+                        document.getElementById('thresholdInput').value = '';
+                        loadAlerts();
+                        alert('Alert created successfully!');
+                    } else {
+                        alert('Error: ' + (data.message || 'Failed to create alert'));
+                    }
+                } catch (e) {
+                    console.error('Error creating alert:', e);
+                    alert('Error creating alert');
+                }
+            }
+
+            async function deleteAlert(id) {
+                if (!confirm('Delete this alert?')) return;
+                try {
+                    const resp = await fetch('/api/social-trend-alerts/' + id, { method: 'DELETE' });
+                    const data = await resp.json();
+                    if (data.success) {
+                        loadAlerts();
+                        alert('Alert deleted!');
+                    } else {
+                        alert('Delete failed');
+                    }
+                } catch (e) {
+                    console.error('Error deleting alert:', e);
+                    alert('Error deleting alert');
+                }
+            }
+
+            // init
+            loadAlerts();
+            setInterval(loadAlerts, 30000);
+        </script>
+{% endblock %}

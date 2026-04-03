@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% block title %}Crypto RPA Dashboard{% endblock %}
+{% block head_extra %}
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .metric-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .metric-value { font-size: 2em; font-weight: bold; color: #2c3e50; }
+        .metric-label { color: #7f8c8d; margin-top: 5px; }
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .chart-container { background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08); border: 1px solid #e9ecef; transition: transform 0.2s ease, box-shadow 0.2s ease; width: 100%; overflow: hidden; }
+        .report-card { overflow: hidden; }
+        .chart-container > div { width: 100%; height: 320px; position: relative; overflow: hidden; }
+        .chart-container canvas, .chart-container svg, .chart-container .js-plotly-plot, .chart-container .plot-container, .chart-container .svg-container { width: 100% !important; height: 100% !important; max-width: 100% !important; }
+        .chart-container .js-plotly-plot, .chart-container .plot-container, .chart-container .svg-container { min-width: 0 !important; }
+        .chart-container:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(0,0,0,0.15); }
+        .chart-container h3 { margin: 0 0 20px 0; color: #2c3e50; font-size: 1.2em; font-weight: 600; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .alerts { margin-top: 30px; }
+        .alert { padding: 12px 16px; margin: 8px 0; border-radius: 6px; border-left: 4px solid; font-weight: 500; }
+        .alert-high { background-color: #fee; border-left-color: #e74c3c; color: #c0392b; }
+        .alert-medium { background-color: #fff3cd; border-left-color: #f39c12; color: #e67e22; }
+        .alert-low { background-color: #d1ecf1; border-left-color: #17a2b8; color: #138496; }
+        .refresh-btn { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; margin-bottom: 20px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3); }
+        .refresh-btn:hover { background: linear-gradient(135deg, #2980b9 0%, #21618c 100%); transform: translateY(-1px); box-shadow: 0 4px 8px rgba(52, 152, 219, 0.4); }
+        .metric-card { background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e9ecef; transition: transform 0.2s ease; }
+        .metric-card:hover { transform: translateY(-2px); }
+        .metric-value { font-size: 2.2em; font-weight: bold; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px; }
+        .metric-label { color: #7f8c8d; margin-top: 8px; font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.5px; }
+    </style>
+{% endblock %}
+{% block content %}
+<div class="container">
+        <div class="header">
+            <h1>🚀 Crypto RPA Dashboard</h1>
+            <p>Real-time Cryptocurrency Analytics & Monitoring</p>
+            <button class="refresh-btn" onclick="refreshData()">🔄 Refresh Data</button>
+        </div>
+
+        <div id="loading" style="text-align: center; display: none;">Loading...</div>
+
+        <div id="dashboard-content">
+            <div class="metrics-grid" id="metrics"></div>
+            <div class="charts-grid" id="charts"></div>
+            <div class="alerts" id="alerts"></div>
+        </div>
+    </div>
+
+    <script>
+        let priceChart, volumeChart, marketCapChart;
+
+        async function loadDashboard() {
+            document.getElementById('loading').style.display = 'block';
+            try {
+                const response = await fetch('/api/dashboard-data');
+                const data = await response.json();
+                updateDashboard(data);
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function updateDashboard(data) {
+            updateMetrics(data.metrics);
+            updateCharts(data.charts);
+            updateAlerts(data.alerts);
+        }
+
+        function updateMetrics(metrics) {
+            const metricsDiv = document.getElementById('metrics');
+            metricsDiv.innerHTML = '';
+
+            Object.entries(metrics).forEach(([key, value]) => {
+                const card = document.createElement('div');
+                card.className = 'metric-card';
+                card.innerHTML = `
+                    <div class="metric-value">${value}</div>
+                    <div class="metric-label">${key.replace(/_/g, ' ').toUpperCase()}</div>
+                `;
+                metricsDiv.appendChild(card);
+            });
+        }
+
+        function updateCharts(charts) {
+            const chartsDiv = document.getElementById('charts');
+            chartsDiv.innerHTML = '';
+
+            // Original charts
+            if (charts.price_chart) {
+                const priceDiv = document.createElement('div');
+                priceDiv.className = 'chart-container';
+                priceDiv.innerHTML = '<h3>📈 Price Trends (24h)</h3><div id="price-chart"></div>';
+                chartsDiv.appendChild(priceDiv);
+                Plotly.newPlot('price-chart', JSON.parse(charts.price_chart));
+            }
+
+            if (charts.volume_chart) {
+                const volumeDiv = document.createElement('div');
+                volumeDiv.className = 'chart-container';
+                volumeDiv.innerHTML = '<h3>📊 Volume Trends (24h)</h3><div id="volume-chart"></div>';
+                chartsDiv.appendChild(volumeDiv);
+                Plotly.newPlot('volume-chart', JSON.parse(charts.volume_chart));
+            }
+
+            if (charts.market_cap_chart) {
+                const marketCapDiv = document.createElement('div');
+                marketCapDiv.className = 'chart-container';
+                marketCapDiv.innerHTML = '<h3>🏆 Market Cap Distribution</h3><div id="market-cap-chart"></div>';
+                chartsDiv.appendChild(marketCapDiv);
+                Plotly.newPlot('market-cap-chart', JSON.parse(charts.market_cap_chart));
+            }
+
+            // New advanced charts
+            if (charts.candlestick_chart) {
+                const candlestickDiv = document.createElement('div');
+                candlestickDiv.className = 'chart-container';
+                candlestickDiv.innerHTML = '<h3>🕯️ BTC Candlestick Chart</h3><div id="candlestick-chart"></div>';
+                chartsDiv.appendChild(candlestickDiv);
+                Plotly.newPlot('candlestick-chart', JSON.parse(charts.candlestick_chart));
+            }
+
+            if (charts.correlation_chart) {
+                const correlationDiv = document.createElement('div');
+                correlationDiv.className = 'chart-container';
+                correlationDiv.innerHTML = '<h3>🔗 Price Correlation Heatmap</h3><div id="correlation-chart"></div>';
+                chartsDiv.appendChild(correlationDiv);
+                Plotly.newPlot('correlation-chart', JSON.parse(charts.correlation_chart));
+            }
+
+            if (charts.performance_chart) {
+                const performanceDiv = document.createElement('div');
+                performanceDiv.className = 'chart-container';
+                performanceDiv.innerHTML = '<h3>🚀 Performance Comparison</h3><div id="performance-chart"></div>';
+                chartsDiv.appendChild(performanceDiv);
+                Plotly.newPlot('performance-chart', JSON.parse(charts.performance_chart));
+            }
+
+            if (charts.risk_chart) {
+                const riskDiv = document.createElement('div');
+                riskDiv.className = 'chart-container';
+                riskDiv.innerHTML = '<h3>⚠️ Risk Metrics Analysis</h3><div id="risk-chart"></div>';
+                chartsDiv.appendChild(riskDiv);
+                Plotly.newPlot('risk-chart', JSON.parse(charts.risk_chart));
+            }
+
+            if (charts.ma_chart) {
+                const maDiv = document.createElement('div');
+                maDiv.className = 'chart-container';
+                maDiv.innerHTML = '<h3>📉 BTC with Moving Averages</h3><div id="ma-chart"></div>';
+                chartsDiv.appendChild(maDiv);
+                Plotly.newPlot('ma-chart', JSON.parse(charts.ma_chart));
+            }
+
+            if (charts.volume_ratio_chart) {
+                const volumeRatioDiv = document.createElement('div');
+                volumeRatioDiv.className = 'chart-container';
+                volumeRatioDiv.innerHTML = '<h3>💰 Volume-to-Price Ratio</h3><div id="volume-ratio-chart"></div>';
+                chartsDiv.appendChild(volumeRatioDiv);
+                Plotly.newPlot('volume-ratio-chart', JSON.parse(charts.volume_ratio_chart));
+            }
+
+            if (charts.price_dist_chart) {
+                const priceDistDiv = document.createElement('div');
+                priceDistDiv.className = 'chart-container';
+                priceDistDiv.innerHTML = '<h3>📊 Price Distribution</h3><div id="price-dist-chart"></div>';
+                chartsDiv.appendChild(priceDistDiv);
+                Plotly.newPlot('price-dist-chart', JSON.parse(charts.price_dist_chart));
+            }
+        }
+
+        function updateAlerts(alerts) {
+            const alertsDiv = document.getElementById('alerts');
+            alertsDiv.innerHTML = '<h3>🚨 Price Alerts</h3>';
+
+            if (alerts.length === 0) {
+                alertsDiv.innerHTML += '<p>No alerts at this time.</p>';
+                return;
+            }
+
+            alerts.forEach(alert => {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${alert.severity}`;
+                alertDiv.innerHTML = `
+                    <strong>${alert.symbol}</strong>: ${alert.message}
+                    <small>(${alert.timestamp})</small>
+                `;
+                alertsDiv.appendChild(alertDiv);
+            });
+        }
+
+        async function refreshData() {
+            await loadDashboard();
+        }
+
+        // Load dashboard on page load
+        window.onload = loadDashboard;
+
+        // Auto-refresh every 5 minutes
+        setInterval(loadDashboard, 300000);
+    </script>
+{% endblock %}

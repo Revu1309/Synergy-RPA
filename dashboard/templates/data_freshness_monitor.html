@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Data Freshness Monitor{% endblock %}
+{% block head_extra %}
+<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <style>
+            body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f4f7ff; color:#1f2d3d; }
+            .wrap { max-width: 1200px; margin: 22px auto; padding: 0 16px; }
+            .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+            .title { font-size: 24px; font-weight: 700; }
+            .sub { color:#5f6f86; font-size: 13px; margin-top:4px; }
+            .row { display:flex; gap:10px; align-items:center; flex-wrap: wrap; }
+            button { border:1px solid #2f5bd2; background:#2f5bd2; color:white; border-radius:8px; padding:8px 12px; cursor:pointer; font-weight:600; }
+            button.secondary { background:white; color:#2f5bd2; }
+            .banner { display:none; margin:10px 0; padding:10px 12px; border-radius:10px; font-weight:600; }
+            .banner.stale { display:block; background:#fff1f1; border:1px solid #f3cbcb; color:#b42318; }
+            .banner.ok { display:block; background:#eefbf4; border:1px solid #cde9da; color:#0f7a53; }
+            .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap:12px; }
+            .card { background:white; border:1px solid #dbe4f2; border-radius:12px; padding:14px; box-shadow:0 5px 16px rgba(25,40,64,.07); }
+            .head { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+            .status { font-size: 12px; border-radius: 999px; padding: 3px 8px; font-weight: 700; }
+            .fresh { background:#eefbf4; color:#0f7a53; border:1px solid #cde9da; }
+            .stale { background:#fff1f1; color:#b42318; border:1px solid #f3cbcb; }
+            .no_data { background:#f5f7fa; color:#5f6f86; border:1px solid #dde4ef; }
+            .kv { font-size:13px; margin:4px 0; color:#4e5d73; }
+            .muted { color:#6f7f95; font-size:12px; }
+        </style>
+{% endblock %}
+{% block content %}
+<div class="wrap">
+            <div class="top">
+                <div>
+                    <div class="title">Data Freshness Monitor</div>
+                    <div class="sub">Tracks last successful sync per module and flags stale pipelines.</div>
+                </div>
+                <div class="row">
+                    <button class="secondary" onclick="window.location.href='/menu'">Back to Menu</button>
+                    <button onclick="loadFreshness()">Refresh</button>
+                </div>
+            </div>
+            <div id="banner" class="banner"></div>
+            <div id="cards" class="grid"></div>
+            <div id="foot" class="muted" style="margin-top:10px;"></div>
+        </div>
+        <script>
+            function fmtDate(v) {
+                if (!v) return 'N/A';
+                const d = new Date(v);
+                if (Number.isNaN(d.getTime())) return v;
+                return d.toLocaleString();
+            }
+
+            function statusClass(s) {
+                if (s === 'fresh') return 'fresh';
+                if (s === 'stale') return 'stale';
+                return 'no_data';
+            }
+
+            async function loadFreshness() {
+                const resp = await fetch('/api/data-freshness', { cache: 'no-store' });
+                const data = await resp.json();
+                if (!data.success) {
+                    document.getElementById('cards').innerHTML = '<div class="card">Failed to load data freshness.</div>';
+                    return;
+                }
+
+                const cards = document.getElementById('cards');
+                cards.innerHTML = '';
+                (data.modules || []).forEach(m => {
+                    const div = document.createElement('div');
+                    div.className = 'card';
+                    div.innerHTML = `
+                        <div class="head">
+                            <strong>${m.module}</strong>
+                            <span class="status ${statusClass(m.status)}">${m.status.toUpperCase()}</span>
+                        </div>
+                        <div class="kv">Last Sync: ${fmtDate(m.last_sync)}</div>
+                        <div class="kv">Data Age: ${m.age_minutes === null ? 'N/A' : m.age_minutes + ' min'}</div>
+                        <div class="kv">Expected Interval: ${m.expected_interval_minutes} min</div>
+                        <div class="kv">Stale Threshold: ${m.stale_after_minutes} min</div>
+                        <div class="kv">Rows in Snapshot: ${m.row_count}</div>
+                        <div class="muted">${m.message}</div>
+                    `;
+                    cards.appendChild(div);
+                });
+
+                const banner = document.getElementById('banner');
+                if ((data.stale_count || 0) > 0) {
+                    banner.className = 'banner stale';
+                    banner.textContent = `Alert: ${data.stale_count} pipeline(s) are stale.`;
+                } else {
+                    banner.className = 'banner ok';
+                    banner.textContent = 'All monitored pipelines are fresh.';
+                }
+                document.getElementById('foot').textContent = 'Last checked: ' + fmtDate(data.generated_at);
+            }
+
+            loadFreshness();
+            setInterval(loadFreshness, 30000);
+        </script>
+{% endblock %}

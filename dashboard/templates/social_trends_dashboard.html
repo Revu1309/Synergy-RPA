@@ -1,0 +1,338 @@
+{% extends "base.html" %}
+{% block title %}Social Media Trends - RPA Framework{% endblock %}
+{% block head_extra %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .header {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .header-left h1 {
+        font-size: 32px;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+
+    .header-left p {
+        color: #7f8c8d;
+        font-size: 14px;
+    }
+
+    .header-right {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .filter-section {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .platform-select {
+        padding: 10px 15px;
+        border: 2px solid #667eea;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        background: white;
+        color: #2c3e50;
+        min-width: 150px;
+        transition: all 0.3s ease;
+    }
+
+    .platform-select:hover {
+        background: #f5f7fa;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    }
+
+    .platform-select:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #5568d3;
+        transform: translateY(-2px);
+    }
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border-left: 4px solid #667eea;
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #95a5a6;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .trends-table {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+
+    .trends-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .trends-table th {
+        background: #667eea;
+        color: white;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+    }
+
+    .trends-table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #ecf0f1;
+    }
+
+    .trend-link {
+        color: #1f5ca8;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .trend-link:hover {
+        text-decoration: underline;
+    }
+
+    .trends-table tr:hover {
+        background: #f8f9fa;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .badge-reddit { background: #ff4500; color: white; }
+    .badge-github { background: #24292e; color: white; }
+    .badge-hacker-news { background: #ff6600; color: white; }
+    .badge-youtube { background: #ff0000; color: white; }
+    .badge-stack-overflow { background: #f48024; color: white; }
+    .badge-twitter { background: #1DA1F2; color: white; }
+
+    .badge-positive { background: #d5f4e6; color: #27ae60; }
+    .badge-neutral { background: #e8eef5; color: #34495e; }
+    .badge-negative { background: #fadbd8; color: #c0392b; }
+
+    .filter-label {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 14px;
+    }
+
+    .no-results {
+        padding: 40px;
+        text-align: center;
+        color: #95a5a6;
+        background: white;
+        border-radius: 12px;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="header">
+        <div class="header-left">
+            <h1> Social Media Trends</h1>
+            <p>Real-time trending topics across platforms | Last updated: {{ generated_at }}</p>
+        </div>
+        <div class="header-right">
+            <div class="filter-section">
+                <span class="filter-label"> Filter by Platform:</span>
+                <select class="platform-select" id="platformFilter" onchange="filterByPlatform()">
+                    <option value="">All Platforms</option>
+                    {% for p in platforms %}
+                    <option value="{{ p }}">{{ p }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-primary" onclick="refreshTrends()"> Refresh</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-value" id="totalTrends">{{ total_trends }}</div>
+            <div class="stat-label">Total Trends</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="platformCount">{{ platform_count }}</div>
+            <div class="stat-label">Platforms</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="avgEngagement">{{ avg_engagement }}</div>
+            <div class="stat-label">Avg Engagement</div>
+        </div>
+    </div>
+
+    <div class="trends-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Trend Name</th>
+                    <th>Platform</th>
+                    <th>Type</th>
+                    <th>Engagement</th>
+                    <th>Sentiment</th>
+                </tr>
+            </thead>
+            <tbody id="trendsTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const allTrends = {{ trends_json | tojson }};
+
+    function escapeHtml(text) {
+        return String(text || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function filterByPlatform() {
+        const selectedPlatform = document.getElementById('platformFilter').value;
+        const tableBody = document.getElementById('trendsTableBody');
+
+        let filteredTrends = selectedPlatform === ''
+            ? allTrends
+            : allTrends.filter(t => t.platform === selectedPlatform);
+
+        if (filteredTrends.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="no-results">
+                        No trends found for ${selectedPlatform}
+                    </td>
+                </tr>
+            `;
+            updateStats(0, 0);
+            return;
+        }
+
+        let html = '';
+        filteredTrends.forEach(trend => {
+            const trendLabel = escapeHtml(trend.name);
+            const trendCell = trend.url
+                ? `<a class="trend-link" href="${trend.url}" target="_blank" rel="noopener noreferrer">${trendLabel}</a>`
+                : `<strong>${trendLabel}</strong>`;
+            html += `
+                <tr>
+                    <td>#${trend.rank}</td>
+                    <td>${trendCell}</td>
+                    <td><span class="badge ${trend.platform_class}">${trend.platform}</span></td>
+                    <td>${trend.type}</td>
+                    <td>${trend.engagement.toLocaleString()}</td>
+                    <td><span class="badge ${trend.sentiment_class}">${trend.sentiment.toUpperCase()}</span></td>
+                </tr>
+            `;
+        });
+
+        tableBody.innerHTML = html;
+
+        const avgEngagement = filteredTrends.reduce((a, b) => a + b.engagement, 0) / filteredTrends.length;
+        updateStats(filteredTrends.length, Math.round(avgEngagement));
+    }
+
+    function updateStats(count, avgEngagement) {
+        document.getElementById('totalTrends').textContent = count;
+        document.getElementById('avgEngagement').textContent = avgEngagement;
+    }
+
+    function refreshTrends() {
+        location.reload();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        filterByPlatform();
+        setInterval(refreshTrends, 60000);
+    });
+</script>
+{% endblock %}
