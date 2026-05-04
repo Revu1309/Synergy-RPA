@@ -12,13 +12,7 @@
                 box-sizing: border-box;
             }
 
-            body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-                min-height: 100vh;
-                padding: 20px;
-                color: white;
-            }
+            
 
             .dashboard-container {
                 max-width: 1600px;
@@ -28,25 +22,34 @@
             .dashboard-header {
                 display: flex;
                 justify-content: space-between;
-                align-items: center;
+                align-items: flex-start;
                 margin-bottom: 30px;
                 flex-wrap: wrap;
                 gap: 20px;
-                background: #ffffff;
-                padding: 25px;
-                border-radius: 12px;
-                border: 1px solid #dfe4ea;
-                box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+                background: var(--bg-panel);
+                padding: 24px 32px;
+                border-radius: var(--radius-md);
+                border: 1px solid var(--border-subtle);
+                box-shadow: var(--shadow-lg);
+                position: relative;
+            }
+            .dashboard-header::before {
+                content: "";
+                position: absolute;
+                inset: 0 auto 0 0;
+                width: 6px;
+                background: var(--accent-grad);
             }
 
             .header-left h1 {
-                font-size: 28px;
-                color: #17363a;
-                margin-bottom: 10px;
+                font-size: 26px;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin-bottom: 8px;
             }
 
             .header-left p {
-                color: #5f6b76;
+                color: var(--text-tertiary);
                 font-size: 14px;
             }
 
@@ -57,16 +60,16 @@
             }
 
             .asset-selector {
-                padding: 10px 15px;
-                border: 1px solid #bfd0dc;
-                border-radius: 8px;
-                font-size: 14px;
+                padding: 10px 16px;
+                border: 1px solid var(--border-subtle);
+                border-radius: var(--radius-sm);
+                font-size: 13px;
                 font-weight: 600;
-                color: #17363a;
-                background: #ffffff;
+                color: var(--text-primary);
+                background: var(--bg-glass);
                 cursor: pointer;
-                transition: all 0.3s ease;
-                min-width: 150px;
+                transition: var(--transition-normal);
+                min-width: 180px;
             }
 
             .asset-selector:hover {
@@ -80,8 +83,8 @@
             }
 
             .asset-selector option {
-                background: #1e3c72;
-                color: white;
+                background: var(--bg-secondary);
+                color: var(--text-primary);
             }
 
             .btn {
@@ -105,22 +108,22 @@
             }
 
             .btn-menu {
-                background: #f3f6fa;
-                color: #17363a;
-                border: 1px solid #d6e0ea;
+                background: var(--bg-glass);
+                color: var(--text-primary);
+                border: 1px solid var(--border-subtle);
             }
 
             .btn-menu:hover {
-                background: rgba(255, 255, 255, 0.3);
+                background: var(--bg-glass-hover);
             }
 
             .asset-info {
-                background: #ffffff;
-                padding: 25px;
-                border-radius: 12px;
+                background: var(--bg-panel);
+                padding: 32px;
+                border-radius: var(--radius-md);
                 margin-bottom: 30px;
-                border: 1px solid #dfe4ea;
-                box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+                border: 1px solid var(--border-subtle);
+                box-shadow: var(--shadow-md);
             }
 
             .asset-header {
@@ -133,24 +136,24 @@
             }
 
             .asset-name {
-                font-size: 24px;
+                font-size: 26px;
                 font-weight: 700;
-                color: #17363a;
+                color: var(--text-primary);
             }
 
             .asset-symbol {
-                font-size: 18px;
-                color: #4e5f69;
-                background: #f3f7fb;
-                padding: 5px 15px;
+                font-size: 14px;
+                color: var(--text-tertiary);
+                background: var(--bg-glass);
+                padding: 4px 12px;
                 border-radius: 20px;
-                border: 1px solid #dce6ee;
+                border: 1px solid var(--border-subtle);
             }
 
             .price-display {
                 font-size: 32px;
                 font-weight: 700;
-                color: #4dd0e1;
+                color: var(--accent-tertiary);
             }
 
             .metrics-grid {
@@ -161,24 +164,25 @@
             }
 
             .metric-card {
-                background: #ffffff;
-                padding: 15px;
-                border-radius: 10px;
-                border: 1px solid #e1e8ef;
-                box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+                background: var(--bg-panel);
+                padding: 24px;
+                border-radius: var(--radius-md);
+                border: 1px solid var(--border-subtle);
+                box-shadow: var(--shadow-sm);
                 text-align: center;
+                transition: var(--transition-normal);
             }
 
             .metric-value {
                 font-size: 20px;
                 font-weight: 700;
-                color: #4dd0e1;
+                color: var(--accent-tertiary);
                 margin-bottom: 5px;
             }
 
             .metric-label {
-                font-size: 12px;
-                color: #5f6b76;
+                font-size: 11px;
+                color: var(--text-tertiary);
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
             }
@@ -191,11 +195,11 @@
             }
 
             .chart-container {
-                background: #ffffff;
-                padding: 20px;
-                border-radius: 12px;
-                border: 1px solid #dfe4ea;
-                box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+                background: var(--bg-panel);
+                padding: 28px;
+                border-radius: var(--radius-md);
+                border: 1px solid var(--border-subtle);
+                box-shadow: var(--shadow-md);
                 width: 100%;
                 min-width: 0;
                 overflow: hidden;
@@ -223,7 +227,7 @@
 
             .chart-container h3 {
                 margin-bottom: 15px;
-                color: #17363a;
+                color: var(--text-primary);
                 font-size: 16px;
                 font-weight: 600;
             }
@@ -264,17 +268,17 @@
             }
 
             .stats-section {
-                background: #ffffff;
-                padding: 20px;
-                border-radius: 12px;
-                border: 1px solid #dfe4ea;
-                box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+                background: var(--bg-panel);
+                padding: 28px;
+                border-radius: var(--radius-md);
+                border: 1px solid var(--border-subtle);
+                box-shadow: var(--shadow-md);
                 margin-bottom: 30px;
             }
 
             .stats-section h3 {
                 margin-bottom: 14px;
-                color: #17363a;
+                color: var(--text-primary);
                 font-size: 18px;
                 font-weight: 700;
             }
@@ -287,22 +291,22 @@
 
             .stat-item {
                 text-align: center;
-                padding: 15px;
-                background: #f7fbff;
-                border: 1px solid #e1ebf3;
-                border-radius: 10px;
+                padding: 20px;
+                background: var(--bg-glass);
+                border: 1px solid var(--border-subtle);
+                border-radius: var(--radius-md);
             }
 
             .stat-value {
                 font-size: 18px;
                 font-weight: 700;
-                color: #4dd0e1;
+                color: var(--accent-tertiary);
                 margin-bottom: 5px;
             }
 
             .stat-label {
                 font-size: 12px;
-                color: #61717b;
+                color: var(--text-tertiary);
             }
         </style>
 {% endblock %}

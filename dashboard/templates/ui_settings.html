@@ -5,21 +5,75 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         <style>
-            body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f3f7ff; color:#1f2d3d; }
-            .wrap { max-width: 980px; margin: 24px auto; padding: 0 14px; }
-            .top { background: linear-gradient(120deg,#2f5bd2,#2048b8); color:white; border-radius:12px; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
-            .card { background:white; border:1px solid #dbe4f2; border-radius:12px; padding:14px; margin-bottom:14px; box-shadow:0 5px 16px rgba(22,35,58,.07); }
-            .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-            .themes { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:14px; margin-top:16px; }
-            .theme { border:1px solid var(--theme-line, #dbe4f2); border-radius:12px; padding:12px; cursor:pointer; background:var(--theme-surface, white); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; justify-content: space-between; min-height: 50px; }
-            .theme:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 16px var(--theme-glow, rgba(0,0,0,0.1)); border-color: var(--theme-accent, #2f5bd2); }
-            .theme.active { border:2px solid var(--theme-accent, #2f5bd2); box-shadow: 0 0 15px var(--theme-glow, rgba(0,0,0,0.1)); transform: scale(1.02); background: var(--theme-surface-alt, #f9f9f9); }
-            .chips { display:flex; gap:8px; margin-top:10px; }
-            .chip { width:22px; height:22px; border-radius:50%; border:1px solid rgba(0,0,0,0.1); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-            button, select { border:1px solid #cbd7ea; border-radius:8px; padding:8px 10px; }
-            button { background:#2f5bd2; color:white; border-color:#2f5bd2; font-weight:600; cursor:pointer; }
-            button.secondary { background:white; color:#2f5bd2; }
-            .status { display:none; margin-top:10px; padding:8px 10px; border-radius:8px; font-size:13px; }
+            .wrap { max-width: 980px; margin: 24px auto; padding: 0 24px; }
+            .top { 
+                background: var(--bg-panel); 
+                color: var(--text-primary); 
+                border-radius: var(--radius-md); 
+                padding: 24px 32px; 
+                display:flex; 
+                justify-content:space-between; 
+                align-items:center; 
+                margin-bottom: 24px; 
+                box-shadow: var(--shadow-lg);
+                border: 1px solid var(--border-subtle);
+                position: relative;
+            }
+            .top::before {
+                content: "";
+                position: absolute;
+                inset: 0 auto 0 0;
+                width: 6px;
+                background: var(--accent-grad);
+                border-radius: var(--radius-md) 0 0 var(--radius-md);
+            }
+            .card { 
+                background: var(--bg-panel); 
+                border: 1px solid var(--border-subtle); 
+                border-radius: var(--radius-md); 
+                padding: 24px; 
+                margin-bottom: 24px; 
+                box-shadow: var(--shadow-md); 
+            }
+            .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+            .themes { display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 24px; }
+            .theme { 
+                border: 1px solid var(--border-subtle); 
+                border-radius: var(--radius-md); 
+                padding: 24px; 
+                cursor:pointer; 
+                background: var(--bg-glass); 
+                transition: var(--transition-normal); 
+                display: flex; 
+                flex-direction: column; 
+                justify-content: space-between; 
+                min-height: 120px; 
+            }
+            .theme:hover { transform: translateY(-4px); border-color: var(--border-focus); box-shadow: var(--shadow-lg); }
+            .theme.active { border: 2px solid var(--accent-primary); box-shadow: 0 0 0 4px var(--glow-primary); background: var(--bg-glass-hover); }
+            .chips { display:flex; gap:8px; margin-top:16px; }
+            .chip { width:24px; height:24px; border-radius:50%; border:1px solid var(--border-subtle); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+            .theme strong { display: block; color: var(--text-primary); font-size: 16px; margin-bottom: 6px; }
+            .theme small { display:block; color: var(--text-tertiary); font-size:12px; line-height:1.5; }
+            button, select { 
+                border: 1px solid var(--border-subtle); 
+                border-radius: var(--radius-sm); 
+                padding: 10px 16px; 
+                font-size: 14px;
+                transition: var(--transition-normal);
+            }
+            select { background: var(--bg-glass); color: var(--text-primary); }
+            button { 
+                background: var(--accent-primary); 
+                color: white; 
+                border: none;
+                font-weight: 700; 
+                cursor: pointer; 
+            }
+            button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px var(--glow-primary); }
+            button.secondary { background: var(--bg-glass); color: var(--text-primary); border: 1px solid var(--border-subtle); }
+            button.secondary:hover { background: var(--bg-glass-hover); }
+            .status { display:none; margin-top:16px; padding:12px 16px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; }
         </style>
 {% endblock %}
 {% block content %}
@@ -36,49 +90,24 @@
                 <div class="row">
                     <label for="themeSelect"><strong>Theme</strong></label>
                     <select id="themeSelect">
-                        <option value="ocean">Ocean</option>
-                        <option value="graphite">Graphite</option>
-                        <option value="emerald">Emerald</option>
-                        <option value="sunset">Sunset</option>
-                        <option value="cyberpunk">Cyberpunk</option>
-                        <option value="vaporwave">Vaporwave</option>
-                        <option value="midnight">Midnight Glass</option>
-                        <option value="aurora">Aurora</option>
+                        <option value="dark_glass">Dark Glass</option>
+                        <option value="soft_editorial">Soft Editorial</option>
+                        <option value="midnight_gradient">Midnight Gradient</option>
                     </select>
                     <button onclick="saveTheme()">Apply Theme</button>
                 </div>
                 <div class="themes">
-                    <div class="theme" data-theme="ocean" onclick="pickTheme('ocean')">
-                        <div><strong style="font-size: 15px;">Ocean</strong></div>
-                        <div class="chips"><span class="chip" style="background:#eef3ff"></span><span class="chip" style="background:#2f5bd2"></span></div>
+                    <div class="theme" data-theme="dark_glass" onclick="pickTheme('dark_glass')">
+                        <div><strong style="font-size: 15px;">Dark Glass</strong><small>Futuristic executive layout with deep glass panels and neon accents.</small></div>
+                        <div class="chips"><span class="chip" style="background:#0B0B0F"></span><span class="chip" style="background:#111116"></span><span class="chip" style="background:#5B5BFF"></span><span class="chip" style="background:#A855F7"></span></div>
                     </div>
-                    <div class="theme" data-theme="graphite" onclick="pickTheme('graphite')">
-                        <div><strong style="font-size: 15px;">Graphite</strong></div>
-                        <div class="chips"><span class="chip" style="background:#f1f2f4"></span><span class="chip" style="background:#3a4a5f"></span></div>
+                    <div class="theme" data-theme="soft_editorial" onclick="pickTheme('soft_editorial')">
+                        <div><strong style="font-size: 15px;">Soft Editorial</strong><small>Notion-inspired luxury with crisp white cards and charcoal accents.</small></div>
+                        <div class="chips"><span class="chip" style="background:#F7F5F0"></span><span class="chip" style="background:#FFFFFF"></span><span class="chip" style="background:#1A1A1A"></span><span class="chip" style="background:#E5E5E5"></span></div>
                     </div>
-                    <div class="theme" data-theme="emerald" onclick="pickTheme('emerald')">
-                        <div><strong style="font-size: 15px;">Emerald</strong></div>
-                        <div class="chips"><span class="chip" style="background:#edf8f2"></span><span class="chip" style="background:#1f8f63"></span></div>
-                    </div>
-                    <div class="theme" data-theme="sunset" onclick="pickTheme('sunset')">
-                        <div><strong style="font-size: 15px;">Sunset</strong></div>
-                        <div class="chips"><span class="chip" style="background:#fff2eb"></span><span class="chip" style="background:#d46a3a"></span></div>
-                    </div>
-                    <div class="theme" data-theme="cyberpunk" onclick="pickTheme('cyberpunk')">
-                        <div><strong style="font-size: 15px;">Cyberpunk</strong></div>
-                        <div class="chips"><span class="chip" style="background:#0d0221"></span><span class="chip" style="background:#00ffcc"></span></div>
-                    </div>
-                    <div class="theme" data-theme="vaporwave" onclick="pickTheme('vaporwave')">
-                        <div><strong style="font-size: 15px;">Vaporwave</strong></div>
-                        <div class="chips"><span class="chip" style="background:#2b0f4c"></span><span class="chip" style="background:#ff61d8"></span></div>
-                    </div>
-                    <div class="theme" data-theme="midnight" onclick="pickTheme('midnight')">
-                        <div><strong style="font-size: 15px;">Midnight Glass</strong></div>
-                        <div class="chips"><span class="chip" style="background:#0B1021"></span><span class="chip" style="background:#38bdf8"></span></div>
-                    </div>
-                    <div class="theme" data-theme="aurora" onclick="pickTheme('aurora')">
-                        <div><strong style="font-size: 15px;">Aurora</strong></div>
-                        <div class="chips"><span class="chip" style="background:#0b2b26"></span><span class="chip" style="background:#4ade80"></span><span class="chip" style="background:#e0f2fe"></span></div>
+                    <div class="theme" data-theme="midnight_gradient" onclick="pickTheme('midnight_gradient')">
+                        <div><strong style="font-size: 15px;">Midnight Gradient</strong><small>Rich dark canvas with vibrant gradients and glowing cards.</small></div>
+                        <div class="chips"><span class="chip" style="background:#060411"></span><span class="chip" style="background:#0F0B29"></span><span class="chip" style="background:#FF3366"></span><span class="chip" style="background:#7C3AED"></span></div>
                     </div>
                 </div>
                 <div id="status" class="status"></div>
@@ -109,7 +138,7 @@
             async function loadTheme() {
                 const r = await fetch('/api/ui-theme', { cache: 'no-store' });
                 const d = await r.json();
-                const theme = d.theme || 'ocean';
+                const theme = d.theme || 'dark_glass';
                 document.getElementById('themeSelect').value = theme;
                 markActive(theme);
             }

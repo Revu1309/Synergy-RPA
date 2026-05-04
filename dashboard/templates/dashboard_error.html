@@ -4,26 +4,34 @@
 <style>
     .error-wrap {
         max-width: 720px;
-        margin: 40px auto;
-        background: #ffffff;
-        border: 1px solid #e0e6f2;
-        border-radius: 14px;
-        padding: 24px 26px;
-        box-shadow: 0 10px 26px rgba(15, 32, 60, 0.08);
+        margin: 64px auto;
+        background: var(--bg-panel);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 32px 40px;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+    }
+    .error-wrap::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 6px;
+        background: var(--accent-grad);
+        border-radius: var(--radius-md) 0 0 var(--radius-md);
     }
     .error-title {
-        margin: 0 0 10px 0;
-        font-size: 22px;
-        color: #1f2d3d;
+        margin: 0 0 12px 0;
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--text-primary);
+        letter-spacing: -0.5px;
     }
     .error-body {
-        margin: 0;
-        color: #4a5a70;
-        font-size: 14px;
-        line-height: 1.5;
-        white-space: pre-wrap;
-    }
-</style>
+        color: var(--text-secondary);
+        font-size: 15px;
+        line-height: 1.6;
+    }</style>
 {% endblock %}
 {% block content %}
 <div class="error-wrap">

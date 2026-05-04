@@ -197,7 +197,10 @@ class CryptoVisualizer:
             yaxis_title='Price (USD)',
             xaxis_title='Time',
             height=500,
-            template='plotly_white'
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='rgba(255,255,255,0.7)'),
+            showlegend=False
         )
 
         return fig
@@ -241,7 +244,9 @@ class CryptoVisualizer:
         fig.update_layout(
             title='Cryptocurrency Price Correlation Matrix',
             height=600,
-            template='plotly_white'
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='rgba(255,255,255,0.7)')
         )
 
         return fig
@@ -293,8 +298,11 @@ class CryptoVisualizer:
             xaxis_title='Cryptocurrency',
             yaxis_title='Price Change (%)',
             height=500,
-            template='plotly_white',
-            showlegend=False
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='rgba(255,255,255,0.7)'),
+            showlegend=False,
+            margin=dict(l=10, r=10, t=50, b=10)
         )
 
         return fig
@@ -372,7 +380,9 @@ class CryptoVisualizer:
         fig.update_layout(
             height=500,
             title_text='Cryptocurrency Risk Metrics Analysis',
-            template='plotly_white',
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='rgba(255,255,255,0.7)'),
             showlegend=False
         )
 
@@ -429,7 +439,9 @@ class CryptoVisualizer:
             xaxis_title='Time',
             yaxis_title='Price (USD)',
             height=500,
-            template='plotly_white',
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='rgba(255,255,255,0.7)'),
             hovermode='x unified'
         )
 
@@ -479,7 +491,9 @@ class CryptoVisualizer:
             xaxis_title='Cryptocurrency',
             yaxis_title='Volume/Price Ratio',
             height=500,
-            template='plotly_white',
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='rgba(255,255,255,0.7)'),
             showlegend=False
         )
 
@@ -509,7 +523,9 @@ class CryptoVisualizer:
             xaxis_title='Price (USD)',
             yaxis_title='Frequency',
             height=500,
-            template='plotly_white',
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='rgba(255,255,255,0.7)'),
             showlegend=False
         )
 
@@ -687,7 +703,11 @@ class CryptoVisualizer:
         fig.update_layout(
             height=1200,
             title_text='Advanced Cryptocurrency Analytics Dashboard',
-            template='plotly_white',
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='rgba(255,255,255,0.7)'),
+            xaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
+            yaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
             showlegend=True
         )
 
@@ -718,6 +738,9 @@ class CryptoVisualizer:
             xaxis_title='Time',
             yaxis_title='Price (USD)',
             height=400,
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='rgba(255,255,255,0.7)'),
             showlegend=True
         )
 
@@ -746,6 +769,9 @@ class CryptoVisualizer:
             xaxis_title='Time',
             yaxis_title='Volume (24h)',
             height=400,
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='rgba(255,255,255,0.7)'),
             showlegend=True
         )
 
@@ -765,7 +791,12 @@ class CryptoVisualizer:
             title='Market Cap Distribution'
         )])
 
-        fig.update_layout(height=400)
+        fig.update_layout(
+            height=400,
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='rgba(255,255,255,0.7)')
+        )
 
         return fig
 

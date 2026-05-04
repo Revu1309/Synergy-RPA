@@ -12,12 +12,7 @@
                 box-sizing: border-box;
             }
 
-            body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-                min-height: 100vh;
-                padding: 20px;
-            }
+            
 
             .dashboard-container {
                 max-width: 1600px;
@@ -31,133 +26,150 @@
                 margin-bottom: 30px;
                 flex-wrap: wrap;
                 gap: 20px;
-                background: white;
-                padding: 25px;
-                border-radius: 12px;
-                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-                border-left: 5px solid #2a5298;
+                background: var(--bg-panel);
+                padding: 24px 32px;
+                border-radius: var(--radius-md);
+                box-shadow: var(--shadow-lg);
+                border: 1px solid var(--border-subtle);
+                position: relative;
+            }
+            .dashboard-header::before {
+                content: "";
+                position: absolute;
+                inset: 0 auto 0 0;
+                width: 6px;
+                background: var(--accent-grad);
+                border-radius: var(--radius-md) 0 0 var(--radius-md);
             }
 
             .header-left h1 {
-                font-size: 28px;
-                color: #1e3c72;
-                margin-bottom: 10px;
+                font-size: 26px;
+                font-weight: 800;
+                color: var(--text-primary);
+                margin-bottom: 8px;
             }
 
             .header-left p {
-                color: #7f8c8d;
+                color: var(--text-tertiary);
                 font-size: 14px;
             }
 
             .header-right {
                 display: flex;
-                gap: 10px;
+                gap: 12px;
                 align-items: center;
                 flex-wrap: wrap;
             }
 
             .city-selector {
-                padding: 10px 15px;
-                border: 2px solid #2a5298;
-                border-radius: 8px;
-                font-size: 14px;
+                padding: 10px 16px;
+                border: 1px solid var(--border-subtle);
+                border-radius: var(--radius-sm);
+                font-size: 13px;
                 font-weight: 600;
-                color: #1e3c72;
+                color: var(--text-primary);
                 cursor: pointer;
-                background: white;
-                transition: all 0.3s ease;
-                min-width: 150px;
+                background: var(--bg-glass);
+                transition: var(--transition-normal);
+                min-width: 180px;
             }
 
             .city-selector:hover {
-                background: #f0f3f7;
-                box-shadow: 0 4px 12px rgba(42, 82, 152, 0.2);
+                background: var(--bg-glass-hover);
+                border-color: var(--border-focus);
             }
 
             .btn {
                 padding: 10px 20px;
                 border: none;
-                border-radius: 8px;
+                border-radius: var(--radius-sm);
                 font-weight: 600;
                 cursor: pointer;
-                transition: all 0.3s ease;
+                transition: var(--transition-normal);
                 font-size: 14px;
             }
 
             .btn-refresh {
-                background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+                background: var(--accent-primary);
                 color: white;
             }
 
             .btn-refresh:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 8px 20px rgba(42, 82, 152, 0.3);
+                box-shadow: 0 4px 12px var(--glow-primary);
             }
 
             .btn-menu {
-                background: #ecf0f1;
-                color: #2c3e50;
+                background: var(--bg-glass);
+                color: var(--text-primary);
+                border: 1px solid var(--border-subtle);
             }
 
             .btn-menu:hover {
-                background: #bdc3c7;
+                background: var(--bg-glass-hover);
             }
 
             .stats-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-                gap: 15px;
+                gap: 16px;
                 margin-bottom: 30px;
             }
 
             .stat-card {
-                background: white;
-                padding: 20px;
-                border-radius: 10px;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-                border-top: 3px solid #2a5298;
+                background: var(--bg-panel);
+                padding: 24px;
+                border-radius: var(--radius-md);
+                box-shadow: var(--shadow-md);
+                border: 1px solid var(--border-subtle);
+                transition: var(--transition-normal);
+            }
+            .stat-card:hover {
+                transform: translateY(-4px);
+                border-color: var(--border-focus);
             }
 
             .stat-label {
-                font-size: 12px;
-                color: #95a5a6;
+                font-size: 11px;
+                color: var(--text-tertiary);
                 text-transform: uppercase;
-                letter-spacing: 0.5px;
-                margin-bottom: 8px;
+                letter-spacing: 1px;
+                margin-bottom: 12px;
+                font-weight: 600;
             }
 
             .stat-value {
-                font-size: 24px;
-                font-weight: 700;
-                color: #1e3c72;
+                font-size: 26px;
+                font-weight: 800;
+                color: var(--accent-tertiary);
             }
 
             .stat-secondary {
                 font-size: 12px;
-                color: #7f8c8d;
-                margin-top: 5px;
+                color: var(--text-tertiary);
+                margin-top: 6px;
             }
 
             .charts-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(550px, 1fr));
-                gap: 20px;
+                gap: 24px;
                 margin-bottom: 30px;
             }
 
             .chart-container {
-                background: white;
-                padding: 25px;
-                border-radius: 12px;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-                border-left: 4px solid #2a5298;
+                background: var(--bg-panel);
+                padding: 28px;
+                border-radius: var(--radius-md);
+                box-shadow: var(--shadow-md);
+                border: 1px solid var(--border-subtle);
             }
 
             .chart-container h3 {
-                margin-bottom: 15px;
-                color: #1e3c72;
+                margin-bottom: 20px;
+                color: var(--text-primary);
                 font-size: 16px;
-                font-weight: 600;
+                font-weight: 700;
             }
 
             .full-width {
@@ -167,12 +179,12 @@
             .loading {
                 text-align: center;
                 padding: 40px;
-                color: white;
+                color: var(--text-primary);
             }
 
             .spinner {
-                border: 4px solid rgba(255,255,255,0.3);
-                border-top: 4px solid white;
+                border: 4px solid var(--bg-glass);
+                border-top: 4px solid var(--accent-primary);
                 border-radius: 50%;
                 width: 40px;
                 height: 40px;
@@ -186,11 +198,12 @@
             }
 
             .no-data {
-                background: white;
-                padding: 40px;
-                border-radius: 12px;
+                background: var(--bg-panel);
+                padding: 48px;
+                border-radius: var(--radius-md);
                 text-align: center;
-                color: #7f8c8d;
+                color: var(--text-tertiary);
+                border: 1px solid var(--border-subtle);
             }
         </style>
 {% endblock %}

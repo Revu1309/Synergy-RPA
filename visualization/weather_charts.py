@@ -73,7 +73,9 @@ class WeatherVisualizer:
             height=400,
             margin=dict(l=150, r=50, t=50, b=50),
             hovermode='closest',
-            plot_bgcolor='rgba(240, 240, 240, 0.5)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='rgba(255,255,255,0.7)'),
         )
         
         return fig.to_html(div_id="temp_comparison_chart", include_plotlyjs=False)
@@ -109,7 +111,9 @@ class WeatherVisualizer:
             height=400,
             margin=dict(l=50, r=50, t=50, b=80),
             hovermode='x',
-            plot_bgcolor='rgba(240, 240, 240, 0.5)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='rgba(255,255,255,0.7)'),
         )
         
         return fig.to_html(div_id="humidity_chart", include_plotlyjs=False)
@@ -143,7 +147,9 @@ class WeatherVisualizer:
             height=400,
             margin=dict(l=50, r=50, t=80, b=80),
             hovermode='x',
-            plot_bgcolor='rgba(240, 240, 240, 0.5)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='rgba(255,255,255,0.7)'),
         )
         
         return fig.to_html(div_id="wind_chart", include_plotlyjs=False)
@@ -166,6 +172,9 @@ class WeatherVisualizer:
         fig.update_layout(
             title='Weather Conditions Distribution',
             height=400,
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='rgba(255,255,255,0.7)'),
         )
         
         return fig.to_html(div_id="weather_dist_chart", include_plotlyjs=False)
@@ -197,7 +206,11 @@ class WeatherVisualizer:
             yaxis_title='Temperature (°C)',
             height=400,
             hovermode='x unified',
-            plot_bgcolor='rgba(240, 240, 240, 0.5)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='rgba(255,255,255,0.7)'),
+            xaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
+            yaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
         )
         
         return fig.to_html(div_id="temp_trend_chart", include_plotlyjs=False)
@@ -229,7 +242,11 @@ class WeatherVisualizer:
             yaxis_title='Humidity (%)',
             height=400,
             hovermode='x unified',
-            plot_bgcolor='rgba(240, 240, 240, 0.5)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='rgba(255,255,255,0.7)'),
+            xaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
+            yaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
         )
         
         return fig.to_html(div_id="humidity_trend_chart", include_plotlyjs=False)
@@ -280,7 +297,11 @@ class WeatherVisualizer:
             title=f'{location} - Weather Parameters (Last {days} Days)',
             height=700,
             hovermode='x unified',
-            plot_bgcolor='rgba(240, 240, 240, 0.5)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='rgba(255,255,255,0.7)'),
+            xaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
+            yaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
         )
         
         return fig.to_html(div_id="multi_param_chart", include_plotlyjs=False)

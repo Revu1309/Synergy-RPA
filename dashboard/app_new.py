@@ -61,95 +61,108 @@ CORS(app)
 app.config['ENABLE_MENU_REDIRECT'] = True
 
 THEME_PRESETS = {
-    "ocean": {
-        "bg": "#e5ecff",
-        "bg2": "#d8e4ff",
-        "surface": "rgba(255,255,255,0.88)",
-        "surface_alt": "rgba(243,248,255,0.95)",
-        "text": "#152338",
-        "muted": "#526882",
-        "line": "rgba(70,108,176,0.22)",
-        "accent": "#2554c7",
-        "glow": "rgba(49,99,224,0.23)",
+    "dark_glass": {
+        "colors": {
+            "bg_base": "#0A0A0E",
+            "bg_secondary": "#111116",
+            "bg_panel": "rgba(17, 17, 22, 0.65)",
+            "bg_glass": "rgba(255, 255, 255, 0.03)",
+            "bg_glass_hover": "rgba(255, 255, 255, 0.06)",
+            "accent_primary": "#5B5BFF",
+            "accent_secondary": "#A855F7",
+            "accent_tertiary": "#14F1D9",
+            "accent_grad": "linear-gradient(135deg, #5B5BFF, #A855F7)",
+            "text_primary": "#FFFFFF",
+            "text_secondary": "#9CA3AF",
+            "text_tertiary": "#6B7280",
+            "text_inverse": "#FFFFFF",
+            "border_subtle": "rgba(255, 255, 255, 0.06)",
+            "border_focus": "rgba(91, 91, 255, 0.4)",
+            "glow_primary": "rgba(91, 91, 255, 0.25)",
+            "glow_secondary": "rgba(168, 85, 247, 0.25)",
+            "ambient_primary": "rgba(91, 91, 255, 0.15)",
+            "ambient_secondary": "rgba(168, 85, 247, 0.12)"
+        },
+        "typography": {
+            "font_primary": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+            "font_heading": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+            "font_weight_heading": "700"
+        },
+        "geometry": {
+            "radius_sm": "6px",
+            "radius_md": "12px",
+            "radius_lg": "24px",
+            "radius_xl": "32px",
+            "radius_full": "9999px",
+            "glass_blur": "blur(24px)",
+            "shadow_sm": "0 2px 8px rgba(0,0,0,0.4)",
+            "shadow_md": "0 8px 24px rgba(0,0,0,0.5)",
+            "shadow_lg": "0 16px 40px rgba(0,0,0,0.6)",
+            "shadow_xl": "0 24px 60px rgba(0,0,0,0.7)"
+        }
     },
-    "graphite": {
-        "bg": "#e9edf2",
-        "bg2": "#dde3ea",
-        "surface": "rgba(255,255,255,0.9)",
-        "surface_alt": "rgba(246,248,251,0.95)",
-        "text": "#1f2935",
-        "muted": "#596675",
-        "line": "rgba(67,83,105,0.22)",
-        "accent": "#31455f",
-        "glow": "rgba(58,74,95,0.20)",
-    },
-    "emerald": {
-        "bg": "#e6f5ec",
-        "bg2": "#d8efe3",
-        "surface": "rgba(255,255,255,0.9)",
-        "surface_alt": "rgba(243,252,247,0.96)",
-        "text": "#173028",
-        "muted": "#47675b",
-        "line": "rgba(41,128,92,0.22)",
-        "accent": "#1f8f63",
-        "glow": "rgba(31,143,99,0.2)",
-    },
-    "sunset": {
-        "bg": "#ffebe0",
-        "bg2": "#ffe0d0",
-        "surface": "rgba(255,255,255,0.9)",
-        "surface_alt": "rgba(255,246,239,0.96)",
-        "text": "#3d2a23",
-        "muted": "#7b5a50",
-        "line": "rgba(190,98,56,0.24)",
-        "accent": "#cb6031",
-        "glow": "rgba(212,106,58,0.22)",
-    },
-    "cyberpunk": {
-        "bg": "#0d0221",
-        "bg2": "#260c38",
-        "surface": "rgba(20,6,36,0.85)",
-        "surface_alt": "rgba(35,10,50,0.95)",
-        "text": "#00ffcc",
-        "muted": "#ff007f",
-        "line": "rgba(255,0,127,0.3)",
-        "accent": "#00ffcc",
-        "glow": "rgba(0,255,204,0.35)",
-    },
-    "vaporwave": {
-        "bg": "#2b0f4c",
-        "bg2": "#4b1d52",
-        "surface": "rgba(43,15,76,0.85)",
-        "surface_alt": "rgba(75,29,82,0.95)",
-        "text": "#ffd1dc",
-        "muted": "#8bd6ff",
-        "line": "rgba(139,214,255,0.25)",
-        "accent": "#ff61d8",
-        "glow": "rgba(255,97,216,0.3)",
-    },
-    "midnight": {
-        "bg": "#0B1021",
-        "bg2": "#1A1D36",
-        "surface": "rgba(18,24,43,0.85)",
-        "surface_alt": "rgba(25,32,54,0.95)",
-        "text": "#e2e8f0",
-        "muted": "#94a3b8",
-        "line": "rgba(56,189,248,0.2)",
-        "accent": "#38bdf8",
-        "glow": "rgba(56,189,248,0.25)",
-    },
-    "aurora": {
-        "bg": "#0b2b26",
-        "bg2": "#164d42",
-        "surface": "rgba(16,39,34,0.85)",
-        "surface_alt": "rgba(25,58,51,0.95)",
-        "text": "#e0f2fe",
-        "muted": "#86efac",
-        "line": "rgba(74,222,128,0.25)",
-        "accent": "#4ade80",
-        "glow": "rgba(74,222,128,0.3)",
-    },
+    "midnight_gradient": {
+        "colors": {
+            "bg_base": "#060411",
+            "bg_secondary": "#0A0818",
+            "bg_panel": "rgba(10, 8, 24, 0.6)",
+            "bg_glass": "rgba(255, 255, 255, 0.04)",
+            "bg_glass_hover": "rgba(255, 255, 255, 0.08)",
+            "accent_primary": "#FF3366",
+            "accent_secondary": "#7C3AED",
+            "accent_tertiary": "#06B6D4",
+            "accent_grad": "linear-gradient(135deg, #FF3366, #7C3AED)",
+            "text_primary": "#FFFFFF",
+            "text_secondary": "#A78BFA",
+            "text_tertiary": "#6D28D9",
+            "text_inverse": "#FFFFFF",
+            "border_subtle": "rgba(124, 58, 237, 0.15)",
+            "border_focus": "rgba(255, 51, 102, 0.5)",
+            "glow_primary": "rgba(255, 51, 102, 0.3)",
+            "glow_secondary": "rgba(124, 58, 237, 0.3)",
+            "ambient_primary": "rgba(255, 51, 102, 0.15)",
+            "ambient_secondary": "rgba(124, 58, 237, 0.15)"
+        },
+        "typography": {
+            "font_primary": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+            "font_heading": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+            "font_weight_heading": "700"
+        },
+        "geometry": {
+            "radius_sm": "8px",
+            "radius_md": "16px",
+            "radius_lg": "32px",
+            "radius_xl": "48px",
+            "radius_full": "9999px",
+            "glass_blur": "blur(32px)",
+            "shadow_sm": "0 4px 12px rgba(0,0,0,0.3)",
+            "shadow_md": "0 8px 24px rgba(0,0,0,0.4)",
+            "shadow_lg": "0 16px 48px rgba(0,0,0,0.5)",
+            "shadow_glow": "0 8px 32px rgba(255, 51, 102, 0.25)"
+        }
+    }
 }
+def get_plotly_dark_layout(title, xaxis_title=None, yaxis_title=None, height=350, hovermode='x unified'):
+    layout = {
+        'title': title,
+        'height': height,
+        'hovermode': hovermode,
+        'paper_bgcolor': 'rgba(0,0,0,0)',
+        'plot_bgcolor': 'rgba(0,0,0,0)',
+        'font': {'color': 'rgba(255,255,255,0.7)', 'family': 'Inter'},
+        'margin': {'l': 50, 'r': 50, 't': 50, 'b': 50},
+        'xaxis': {
+            'gridcolor': 'rgba(255,255,255,0.05)',
+            'zerolinecolor': 'rgba(255,255,255,0.1)',
+            'title': xaxis_title if xaxis_title else ''
+        },
+        'yaxis': {
+            'gridcolor': 'rgba(255,255,255,0.05)',
+            'zerolinecolor': 'rgba(255,255,255,0.1)',
+            'title': yaxis_title if yaxis_title else ''
+        }
+    }
+    return layout
 
 
 # Lazy initialization - Crypto
@@ -447,6 +460,19 @@ def no_cache(f):
         return response_obj
     return decorated_function
 
+@app.route('/set_theme', methods=['POST'])
+@login_required
+def set_theme_route():
+    theme = request.json.get('theme')
+    if theme in THEME_PRESETS:
+        session['current_theme'] = theme
+        if 'user_id' in session:
+            set_user_theme(session['user_id'], theme)
+        return jsonify({'status': 'success'})
+    return jsonify({'status': 'error', 'message': 'Invalid theme'}), 400
+
+def get_db_connection():
+    return create_connection()
 
 def current_username():
     token = request.cookies.get('auth_token')
@@ -459,8 +485,8 @@ def current_username():
 
 def get_active_theme():
     username = current_username()
-    theme = get_user_theme(username) if username else "ocean"
-    return theme if theme in THEME_PRESETS else "ocean"
+    theme = get_user_theme(username) if username else "dark_glass"
+    return theme if theme in THEME_PRESETS else "dark_glass"
 
 
 def get_global_menu():
@@ -538,73 +564,65 @@ def render_legacy_template(template_source, **context):
 
 
 def build_theme_style(theme_key):
-    t = THEME_PRESETS.get(theme_key, THEME_PRESETS["ocean"])
+    t = THEME_PRESETS.get(theme_key, THEME_PRESETS["dark_glass"])
+    c = t["colors"]
+    ty = t["typography"]
+    g = t["geometry"]
+    
     return f"""
 <style id="global-theme-vars">
 :root {{
-  --theme-bg: {t['bg']};
-  --theme-bg2: {t.get('bg2', t['bg'])};
-  --theme-surface: {t['surface']};
-  --theme-surface-alt: {t['surface_alt']};
-  --theme-text: {t['text']};
-  --theme-muted: {t['muted']};
-  --theme-line: {t['line']};
-  --theme-accent: {t['accent']};
-  --theme-glow: {t.get('glow', 'rgba(0,0,0,0.12)')};
-}}
-html, body {{
-  background:
-    radial-gradient(1200px 700px at 12% -8%, var(--theme-glow), transparent 55%),
-    radial-gradient(1000px 640px at 110% 0%, color-mix(in srgb, var(--theme-accent) 14%, transparent), transparent 50%),
-    linear-gradient(135deg, var(--theme-bg) 0%, var(--theme-bg2) 100%) !important;
-  color: var(--theme-text) !important;
-  background-attachment: fixed !important;
-  transition: background 0.6s ease, color 0.6s ease;
-}}
-.card, .section, .module, .users, .alerts-form, .summary, .insight-card, .menu-card,
-table, .u, .page-line, .item, .topbar, .top, .panel, .dashboard-card {{
-  background: var(--theme-surface) !important;
-  border-color: var(--theme-line) !important;
-  color: var(--theme-text) !important;
-  box-shadow: 0 10px 24px color-mix(in srgb, var(--theme-glow) 45%, transparent) !important;
-  backdrop-filter: blur(14px) saturate(1.15) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(1.15) !important;
-  transition: background 0.6s ease, border-color 0.6s ease, box-shadow 0.6s ease, transform 0.3s ease;
-}}
-.card:hover, .menu-card:hover, .insight-card:hover, .dashboard-card:hover, .panel:hover {{
-  transform: translateY(-2px);
-  box-shadow: 0 14px 32px color-mix(in srgb, var(--theme-glow) 60%, transparent) !important;
-}}
-th, .module-h, .section h3 {{ background: var(--theme-surface-alt) !important; color: var(--theme-text) !important; transition: background 0.6s ease; }}
-a, .menu-item-title, .name, h1, h2, h3, h4, .gl-brand {{ color: var(--theme-text) !important; transition: color 0.6s ease; }}
-.desc, .hint, .page-path, .summary-label, .topbar-sub, .gl-section h4 {{ color: var(--theme-muted) !important; transition: color 0.6s ease; }}
-button, .btn, .menu-button, .btn-primary {{
-  background: var(--theme-accent) !important;
-  border-color: var(--theme-accent) !important;
-  color: #fff !important;
-  box-shadow: 0 6px 16px color-mix(in srgb, var(--theme-accent) 35%, transparent) !important;
-  transition: all 0.3s ease;
-}}
-button:hover, .btn:hover, .menu-button:hover, .btn-primary:hover {{
-  filter: brightness(1.15);
-  box-shadow: 0 8px 20px color-mix(in srgb, var(--theme-accent) 55%, transparent) !important;
-  transform: translateY(-1px);
-}}
-button.secondary, .btn-secondary {{
-  background: color-mix(in srgb, var(--theme-surface) 85%, transparent) !important;
-  color: var(--theme-accent) !important;
-  border: 1px solid var(--theme-accent) !important;
-}}
-input, select, textarea {{
-  background: color-mix(in srgb, var(--theme-surface) 92%, white) !important;
-  color: var(--theme-text) !important;
-  border-color: var(--theme-line) !important;
-  transition: background 0.6s ease, border-color 0.6s ease, color 0.6s ease, box-shadow 0.3s ease;
-}}
-input:focus, select:focus, textarea:focus {{
-  border-color: var(--theme-accent) !important;
-  outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-accent) 20%, transparent) !important;
+  /* Colors */
+  --bg-base: {c['bg_base']};
+  --bg-secondary: {c['bg_secondary']};
+  --bg-panel: {c['bg_panel']};
+  --bg-glass: {c['bg_glass']};
+  --bg-glass-hover: {c['bg_glass_hover']};
+  --accent-primary: {c['accent_primary']};
+  --accent-secondary: {c['accent_secondary']};
+  --accent-tertiary: {c['accent_tertiary']};
+  --accent-grad: {c['accent_grad']};
+  --text-primary: {c['text_primary']};
+  --text-secondary: {c['text_secondary']};
+  --text-tertiary: {c['text_tertiary']};
+  --text-inverse: {c['text_inverse']};
+  --border-subtle: {c['border_subtle']};
+  --border-focus: {c['border_focus']};
+  --glow-primary: {c['glow_primary']};
+  --glow-secondary: {c['glow_secondary']};
+  --ambient-primary: {c['ambient_primary']};
+  --ambient-secondary: {c['ambient_secondary']};
+
+  /* Typography */
+  --font-primary: {ty['font_primary']};
+  --font-heading: {ty['font_heading']};
+  --font-weight-heading: {ty['font_weight_heading']};
+
+  /* Geometry / Spacing / Radius */
+  --radius-sm: {g['radius_sm']};
+  --radius-md: {g['radius_md']};
+  --radius-lg: {g['radius_lg']};
+  --radius-xl: {g['radius_xl']};
+  --radius-full: {g['radius_full']};
+  --glass-blur: {g['glass_blur']};
+  
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+
+  /* Shadows */
+  --shadow-sm: {g['shadow_sm']};
+  --shadow-md: {g['shadow_md']};
+  --shadow-lg: {g['shadow_lg']};
+  --shadow-glow: {g['shadow_glow']};
+
+  /* Motion */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.4, 0, 0.2, 1);
 }}
 </style>
 """
@@ -645,7 +663,7 @@ def _build_global_menu_html(path):
         """
 <style id="global-unified-menu-style">
 .gum-root{position:fixed;top:14px;left:14px;z-index:9999}
-.gum-toggle{background:var(--theme-accent,#2f5bd2);color:#fff;border:none;border-radius:10px;padding:9px 12px;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.2)}
+.gum-toggle{background:var(--theme-accent,#853953);color:#fff;border:none;border-radius:10px;padding:9px 12px;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.2)}
 .gum-drawer{position:fixed;left:14px;top:54px;bottom:14px;width:280px;overflow:auto;display:none;padding:12px;border-radius:12px;background:var(--theme-surface,#fff);border:1px solid var(--theme-line,#dbe4f2);box-shadow:0 12px 32px rgba(0,0,0,.2)}
 .gum-drawer.open{display:block}
 .gum-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
@@ -653,7 +671,7 @@ def _build_global_menu_html(path):
 .gum-section-title{margin:12px 0 6px 0;font-size:12px;font-weight:700;color:var(--theme-muted,#5f7288);text-transform:uppercase;letter-spacing:.4px}
 .gum-link{display:block;text-decoration:none;padding:8px 10px;border-radius:8px;color:var(--theme-text,#1f2d3d);font-size:13px}
 .gum-link:hover{background:var(--theme-surface-alt,#f5f8ff)}
-.gum-link.gum-active{background:color-mix(in srgb, var(--theme-accent,#2f5bd2) 16%, transparent);color:var(--theme-accent,#2f5bd2);font-weight:700}
+.gum-link.gum-active{background:color-mix(in srgb, var(--theme-accent,#853953) 16%, transparent);color:var(--theme-accent,#853953);font-weight:700}
 </style>
 <script id="global-unified-menu-script">
 window.__gumToggle = function(force){
@@ -671,33 +689,33 @@ window.__gumToggle = function(force){
     return "".join(parts)
 
 
-@app.after_request
-def inject_unified_menu(response):
-    try:
-        if not response.content_type or 'text/html' not in response.content_type or response.status_code != 200:
-            return response
-        if request.path.startswith('/api/') or request.path == '/login':
-            return response
-        if not current_username():
-            return response
-
-        html = response.get_data(as_text=True)
-        if 'id="global-unified-menu"' in html:
-            return response
-
-        body_idx = html.lower().find("<body")
-        if body_idx == -1:
-            return response
-        tag_end = html.find(">", body_idx)
-        if tag_end == -1:
-            return response
-
-        snippet = _build_global_menu_html(request.path)
-        html = html[: tag_end + 1] + snippet + html[tag_end + 1 :]
-        response.set_data(html)
-    except Exception:
-        pass
-    return response
+# @app.after_request
+# def inject_unified_menu(response):
+#     try:
+#         if not response.content_type or 'text/html' not in response.content_type or response.status_code != 200:
+#             return response
+#         if request.path.startswith('/api/'):
+#             return response
+#         if request.path == '/login' or not current_username():
+#             return response
+# 
+#         html = response.get_data(as_text=True)
+#         if 'id="global-unified-menu"' in html:
+#             return response
+# 
+#         body_idx = html.lower().find("<body")
+#         if body_idx == -1:
+#             return response
+#         tag_end = html.find(">", body_idx)
+#         if tag_end == -1:
+#             return response
+# 
+#         snippet = _build_global_menu_html(request.path)
+#         html = html[: tag_end + 1] + snippet + html[tag_end + 1 :]
+#         response.set_data(html)
+#     except Exception:
+#         pass
+#     return response
 
 
 def admin_required(f):
@@ -731,7 +749,7 @@ def enforce_page_permissions():
         return None
 
     # Always allow session/navigation endpoints.
-    unrestricted = {'/menu', '/menu-v2', '/api/user-landing-page', '/api/logout'}
+    unrestricted = {'/menu', '/menu-v2', '/api/user-landing-page', '/api/logout', '/ui-settings', '/api/ui-theme'}
     if path in unrestricted:
         return None
 
@@ -1408,6 +1426,8 @@ def data_freshness_monitor_page():
 
 # ==================== DASHBOARD ROUTES ====================
 
+
+
 @app.route('/')
 @login_required
 def dashboard():
@@ -1416,6 +1436,7 @@ def dashboard():
 
 @app.route('/dashboard')
 @login_required
+@no_cache
 def dashboard_standard():
 
     try:
@@ -1751,7 +1772,7 @@ def get_asset_data(symbol):
                 'type': 'scatter',
                 'mode': 'lines',
                 'name': f'{symbol} Price',
-                'line': {'color': '#667eea', 'width': 2}
+                'line': {'color': '#853953', 'width': 3}
             }
             charts.append({
                 'title': f'{symbol} Price Trend',
@@ -1759,9 +1780,11 @@ def get_asset_data(symbol):
                 'layout': {
                     'hovermode': 'x unified',
                     'margin': {'l': 50, 'r': 50, 't': 30, 'b': 30},
-                    'plot_bgcolor': '#f8f9fa',
-                    'xaxis': {'title': 'Time'},
-                    'yaxis': {'title': f'Price (USD)'}
+                    'plot_bgcolor': '#F3F4F4',
+                    'paper_bgcolor': '#F3F4F4',
+                    'font': {'color': '#2C2C2C'},
+                    'xaxis': {'title': 'Time', 'gridcolor': 'rgba(44,44,44,0.1)'},
+                    'yaxis': {'title': f'Price (USD)', 'gridcolor': 'rgba(44,44,44,0.1)'}
                 }
             })
         
@@ -1772,7 +1795,7 @@ def get_asset_data(symbol):
                 'y': volumes,
                 'type': 'bar',
                 'name': f'{symbol} Volume',
-                'marker': {'color': '#764ba2', 'opacity': 0.8}
+                'marker': {'color': '#612D53', 'opacity': 0.88}
             }
             charts.append({
                 'title': f'{symbol} Trading Volume',
@@ -1780,9 +1803,11 @@ def get_asset_data(symbol):
                 'layout': {
                     'hovermode': 'x unified',
                     'margin': {'l': 50, 'r': 50, 't': 30, 'b': 30},
-                    'plot_bgcolor': '#f8f9fa',
-                    'xaxis': {'title': 'Time'},
-                    'yaxis': {'title': 'Volume'}
+                    'plot_bgcolor': '#F3F4F4',
+                    'paper_bgcolor': '#F3F4F4',
+                    'font': {'color': '#2C2C2C'},
+                    'xaxis': {'title': 'Time', 'gridcolor': 'rgba(44,44,44,0.1)'},
+                    'yaxis': {'title': 'Volume', 'gridcolor': 'rgba(44,44,44,0.1)'}
                 }
             })
         
@@ -1794,8 +1819,8 @@ def get_asset_data(symbol):
                 'type': 'scatter',
                 'mode': 'lines+markers',
                 'name': f'{symbol} Market Cap',
-                'line': {'color': '#f39c12', 'width': 2},
-                'marker': {'size': 4}
+                'line': {'color': '#2C2C2C', 'width': 3},
+                'marker': {'size': 5, 'color': '#853953'}
             }
             charts.append({
                 'title': f'{symbol} Market Cap',
@@ -1803,9 +1828,11 @@ def get_asset_data(symbol):
                 'layout': {
                     'hovermode': 'x unified',
                     'margin': {'l': 50, 'r': 50, 't': 30, 'b': 30},
-                    'plot_bgcolor': '#f8f9fa',
-                    'xaxis': {'title': 'Time'},
-                    'yaxis': {'title': 'Market Cap (USD)'}
+                    'plot_bgcolor': '#F3F4F4',
+                    'paper_bgcolor': '#F3F4F4',
+                    'font': {'color': '#2C2C2C'},
+                    'xaxis': {'title': 'Time', 'gridcolor': 'rgba(44,44,44,0.1)'},
+                    'yaxis': {'title': 'Market Cap (USD)', 'gridcolor': 'rgba(44,44,44,0.1)'}
                 }
             })
         
@@ -2130,28 +2157,28 @@ def get_weather_city_data(city):
         # Temperature Trend
         if temperatures:
             temp_trace = {'x': timestamps, 'y': temperatures, 'type': 'scatter', 'mode': 'lines', 'name': 'Temperature', 'fill': 'tozeroy', 'line': {'color': '#ff6b6b', 'width': 2}, 'fillcolor': 'rgba(255, 107, 107, 0.2)'}
-            charts.append({'title': city + ' Temperature Trend', 'data': [temp_trace], 'layout': {'hovermode': 'x unified', 'margin': {'l': 50, 'r': 50, 't': 30, 'b': 30}, 'plot_bgcolor': '#f8f9fa', 'xaxis': {'title': 'Time'}, 'yaxis': {'title': 'Temperature (C)'}}})
+            charts.append({'title': city + ' Temperature Trend', 'data': [temp_trace], 'layout': get_plotly_dark_layout(city + ' Temperature Trend', 'Time', 'Temperature (C)')})
         
         # Humidity Trend
         if humidity:
             humidity_trace = {'x': timestamps, 'y': humidity, 'type': 'scatter', 'mode': 'lines', 'name': 'Humidity', 'fill': 'tozeroy', 'line': {'color': '#4ecdc4', 'width': 2}, 'fillcolor': 'rgba(78, 205, 196, 0.2)'}
-            charts.append({'title': city + ' Humidity Trend', 'data': [humidity_trace], 'layout': {'hovermode': 'x unified', 'margin': {'l': 50, 'r': 50, 't': 30, 'b': 30}, 'plot_bgcolor': '#f8f9fa', 'xaxis': {'title': 'Time'}, 'yaxis': {'title': 'Humidity (%)'}}})
+            charts.append({'title': city + ' Humidity Trend', 'data': [humidity_trace], 'layout': get_plotly_dark_layout(city + ' Humidity Trend', 'Time', 'Humidity (%)')})
         
         # Wind Speed
         if wind_speeds:
             wind_trace = {'x': timestamps, 'y': wind_speeds, 'type': 'bar', 'name': 'Wind Speed', 'marker': {'color': '#ffd93d'}}
-            charts.append({'title': city + ' Wind Speed', 'data': [wind_trace], 'layout': {'hovermode': 'x unified', 'margin': {'l': 50, 'r': 50, 't': 30, 'b': 30}, 'plot_bgcolor': '#f8f9fa', 'xaxis': {'title': 'Time'}, 'yaxis': {'title': 'Wind Speed (m/s)'}}})
+            charts.append({'title': city + ' Wind Speed', 'data': [wind_trace], 'layout': get_plotly_dark_layout(city + ' Wind Speed', 'Time', 'Wind Speed (m/s)')})
         
         # Rainfall
         if any(rainfall):
             rainfall_trace = {'x': timestamps, 'y': rainfall, 'type': 'bar', 'name': 'Rainfall', 'marker': {'color': '#6bcf7f'}}
-            charts.append({'title': city + ' Rainfall', 'data': [rainfall_trace], 'layout': {'hovermode': 'x unified', 'margin': {'l': 50, 'r': 50, 't': 30, 'b': 30}, 'plot_bgcolor': '#f8f9fa', 'xaxis': {'title': 'Time'}, 'yaxis': {'title': 'Rainfall (mm)'}}})
+            charts.append({'title': city + ' Rainfall', 'data': [rainfall_trace], 'layout': get_plotly_dark_layout(city + ' Rainfall', 'Time', 'Rainfall (mm)')})
         
         # Temperature vs Feels Like
         if temperatures and feels_like:
             temp_comparison = {'x': timestamps, 'y': temperatures, 'type': 'scatter', 'mode': 'lines', 'name': 'Actual Temp', 'line': {'color': '#ff6b6b', 'width': 2}}
             feels_trace = {'x': timestamps, 'y': feels_like, 'type': 'scatter', 'mode': 'lines', 'name': 'Feels Like', 'line': {'color': '#ff9ff3', 'width': 2, 'dash': 'dash'}}
-            charts.append({'title': city + ' Temperature Comparison', 'data': [temp_comparison, feels_trace], 'layout': {'hovermode': 'x unified', 'margin': {'l': 50, 'r': 50, 't': 30, 'b': 30}, 'plot_bgcolor': '#f8f9fa', 'xaxis': {'title': 'Time'}, 'yaxis': {'title': 'Temperature (C)'}}})
+            charts.append({'title': city + ' Temperature Comparison', 'data': [temp_comparison, feels_trace], 'layout': get_plotly_dark_layout(city + ' Temperature Comparison', 'Time', 'Temperature (C)')})
         
         # Calculate metrics
         metrics = {
@@ -2247,33 +2274,37 @@ def get_advanced_weather_data(city):
         # 1. Temperature Distribution Histogram
         if temperatures:
             temp_hist = {'x': temperatures, 'type': 'histogram', 'name': 'Temperature', 'nbinsx': 15, 'marker': {'color': '#ff6b6b', 'opacity': 0.7}}
-            charts.append({'title': 'Temperature Distribution', 'data': [temp_hist], 'layout': {'hovermode': 'x', 'margin': {'l': 50, 'r': 50, 't': 30, 'b': 30}, 'plot_bgcolor': '#f8f9fa', 'xaxis': {'title': 'Temperature (C)'}, 'yaxis': {'title': 'Frequency'}}, 'type': 'histogram'})
+            charts.append({'title': 'Temperature Distribution', 'data': [temp_hist], 'layout': get_plotly_dark_layout('Temperature Distribution', 'Temperature (C)', 'Frequency', hovermode='x'), 'type': 'histogram'})
         
         # 2. Pressure Trend
         if pressure:
             pressure_trace = {'x': timestamps, 'y': pressure, 'type': 'scatter', 'mode': 'lines', 'name': 'Pressure', 'line': {'color': '#4ecdc4', 'width': 2}}
-            charts.append({'title': 'Atmospheric Pressure Trend', 'data': [pressure_trace], 'layout': {'hovermode': 'x unified', 'margin': {'l': 50, 'r': 50, 't': 30, 'b': 30}, 'plot_bgcolor': '#f8f9fa', 'xaxis': {'title': 'Time'}, 'yaxis': {'title': 'Pressure (hPa)'}}, 'type': 'pressure'})
+            charts.append({'title': 'Atmospheric Pressure Trend', 'data': [pressure_trace], 'layout': get_plotly_dark_layout('Atmospheric Pressure Trend', 'Time', 'Pressure (hPa)'), 'type': 'pressure'})
         
         # 3. Humidity vs Temperature Scatter
         if temperatures and humidity:
             scatter = {'x': temperatures, 'y': humidity, 'mode': 'markers', 'type': 'scatter', 'name': 'Correlation', 'marker': {'size': 6, 'color': temperatures, 'colorscale': 'Viridis', 'showscale': True, 'colorbar': {'title': 'Temp (C)'}}}
-            charts.append({'title': 'Temperature-Humidity Correlation', 'data': [scatter], 'layout': {'hovermode': 'closest', 'margin': {'l': 50, 'r': 50, 't': 30, 'b': 30}, 'plot_bgcolor': '#f8f9fa', 'xaxis': {'title': 'Temperature (C)'}, 'yaxis': {'title': 'Humidity (%)'}}, 'type': 'correlation'})
+            charts.append({'title': 'Temperature-Humidity Correlation', 'data': [scatter], 'layout': get_plotly_dark_layout('Temperature-Humidity Correlation', 'Temperature (C)', 'Humidity (%)', hovermode='closest'), 'type': 'correlation'})
         
         # 4. Wind Speed Distribution
         if wind_speeds:
             wind_hist = {'x': wind_speeds, 'type': 'histogram', 'name': 'Wind Speed', 'nbinsx': 12, 'marker': {'color': '#ffd93d', 'opacity': 0.7}}
-            charts.append({'title': 'Wind Speed Distribution', 'data': [wind_hist], 'layout': {'hovermode': 'x', 'margin': {'l': 50, 'r': 50, 't': 30, 'b': 30}, 'plot_bgcolor': '#f8f9fa', 'xaxis': {'title': 'Wind Speed (m/s)'}, 'yaxis': {'title': 'Frequency'}}, 'type': 'histogram'})
+            charts.append({'title': 'Wind Speed Distribution', 'data': [wind_hist], 'layout': get_plotly_dark_layout('Wind Speed Distribution', 'Wind Speed (m/s)', 'Frequency', hovermode='x'), 'type': 'histogram'})
         
         # 5. Multi-Parameter Time Series
         if temperatures and humidity and pressure:
             temp_trace2 = {'x': timestamps, 'y': temperatures, 'type': 'scatter', 'mode': 'lines', 'name': 'Temperature', 'line': {'color': '#ff6b6b'}, 'yaxis': 'y1'}
             humidity_trace2 = {'x': timestamps, 'y': humidity, 'type': 'scatter', 'mode': 'lines', 'name': 'Humidity', 'line': {'color': '#4ecdc4'}, 'yaxis': 'y2'}
-            charts.append({'title': 'Temperature & Humidity Over Time', 'data': [temp_trace2, humidity_trace2], 'layout': {'hovermode': 'x unified', 'margin': {'l': 50, 'r': 50, 't': 30, 'b': 30}, 'plot_bgcolor': '#f8f9fa', 'xaxis': {'title': 'Time'}, 'yaxis': {'title': 'Temperature (C)', 'titlefont': {'color': '#ff6b6b'}, 'tickfont': {'color': '#ff6b6b'}}, 'yaxis2': {'title': 'Humidity (%)', 'titlefont': {'color': '#4ecdc4'}, 'tickfont': {'color': '#4ecdc4'}, 'overlaying': 'y', 'side': 'right'}}, 'type': 'multi'})
+            layout = get_plotly_dark_layout('Temperature & Humidity Over Time', 'Time', 'Temperature (C)')
+            layout['yaxis2'] = {'title': 'Humidity (%)', 'titlefont': {'color': '#4ecdc4'}, 'tickfont': {'color': '#4ecdc4'}, 'overlaying': 'y', 'side': 'right', 'gridcolor': 'rgba(255,255,255,0.05)'}
+            layout['yaxis']['titlefont'] = {'color': '#ff6b6b'}
+            layout['yaxis']['tickfont'] = {'color': '#ff6b6b'}
+            charts.append({'title': 'Temperature & Humidity Over Time', 'data': [temp_trace2, humidity_trace2], 'layout': layout, 'type': 'multi'})
         
         # 6. Rainfall Pattern
         if any(rainfall):
             rainfall_trace = {'x': timestamps, 'y': rainfall, 'type': 'bar', 'name': 'Rainfall', 'marker': {'color': '#6bcf7f'}}
-            charts.append({'title': 'Rainfall Pattern', 'data': [rainfall_trace], 'layout': {'hovermode': 'x', 'margin': {'l': 50, 'r': 50, 't': 30, 'b': 30}, 'plot_bgcolor': '#f8f9fa', 'xaxis': {'title': 'Time'}, 'yaxis': {'title': 'Rainfall (mm)'}}, 'type': 'rainfall'})
+            charts.append({'title': 'Rainfall Pattern', 'data': [rainfall_trace], 'layout': get_plotly_dark_layout('Rainfall Pattern', 'Time', 'Rainfall (mm)', hovermode='x'), 'type': 'rainfall'})
         
         return jsonify({'statistics': statistics, 'charts': charts})
     except Exception as e:
@@ -2848,4 +2879,5 @@ if __name__ == '__main__':
     print("="*60 + "\n")
 
     # Start Flask app; scheduler should be started separately by the main process
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    port = int(os.environ.get("FLASK_RUN_PORT", 5000))
+    app.run(debug=True, host='0.0.0.0', port=port)

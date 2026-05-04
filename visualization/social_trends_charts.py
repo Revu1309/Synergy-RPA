@@ -28,11 +28,12 @@ class SocialTrendsVisualizer:
             }],
             'layout': {
                 'title': 'Top Trending Topics by Engagement Score',
-                'xaxis': {'title': 'Trend Name'},
-                'yaxis': {'title': 'Engagement Score'},
+                'xaxis': {'title': 'Trend Name', 'gridcolor': 'rgba(255,255,255,0.05)'},
+                'yaxis': {'title': 'Engagement Score', 'gridcolor': 'rgba(255,255,255,0.05)'},
                 'hovermode': 'closest',
-                'plot_bgcolor': '#f8f9fa',
-                'paper_bgcolor': '#ffffff',
+                'plot_bgcolor': 'rgba(0,0,0,0)',
+                'paper_bgcolor': 'rgba(0,0,0,0)',
+                'font': {'color': 'rgba(255,255,255,0.7)'},
                 'margin': {'l': 50, 'r': 50, 't': 50, 'b': 100}
             }
         }
@@ -69,12 +70,13 @@ class SocialTrendsVisualizer:
             ],
             'layout': {
                 'title': 'Emerging vs Declining Trends by Platform',
-                'xaxis': {'title': 'Platform'},
-                'yaxis': {'title': 'Number of Trends'},
+                'xaxis': {'title': 'Platform', 'gridcolor': 'rgba(255,255,255,0.05)'},
+                'yaxis': {'title': 'Number of Trends', 'gridcolor': 'rgba(255,255,255,0.05)'},
                 'barmode': 'group',
                 'hovermode': 'closest',
-                'plot_bgcolor': '#f8f9fa',
-                'paper_bgcolor': '#ffffff',
+                'plot_bgcolor': 'rgba(0,0,0,0)',
+                'paper_bgcolor': 'rgba(0,0,0,0)',
+                'font': {'color': 'rgba(255,255,255,0.7)'},
                 'margin': {'l': 50, 'r': 50, 't': 50, 'b': 50}
             }
         }
@@ -110,8 +112,9 @@ class SocialTrendsVisualizer:
             'layout': {
                 'title': 'Sentiment Distribution Across Trends',
                 'height': 500,
-                'paper_bgcolor': '#ffffff',
-                'plot_bgcolor': '#f8f9fa'
+                'paper_bgcolor': 'rgba(0,0,0,0)',
+                'plot_bgcolor': 'rgba(0,0,0,0)',
+                'font': {'color': 'rgba(255,255,255,0.7)'}
             }
         }
     
@@ -157,11 +160,12 @@ class SocialTrendsVisualizer:
             }],
             'layout': {
                 'title': 'Trend Rank vs Engagement Score',
-                'xaxis': {'title': 'Rank Position (lower is better)'},
-                'yaxis': {'title': 'Engagement Score'},
+                'xaxis': {'title': 'Rank Position (lower is better)', 'gridcolor': 'rgba(255,255,255,0.05)'},
+                'yaxis': {'title': 'Engagement Score', 'gridcolor': 'rgba(255,255,255,0.05)'},
                 'hovermode': 'closest',
-                'plot_bgcolor': '#f8f9fa',
-                'paper_bgcolor': '#ffffff',
+                'plot_bgcolor': 'rgba(0,0,0,0)',
+                'paper_bgcolor': 'rgba(0,0,0,0)',
+                'font': {'color': 'rgba(255,255,255,0.7)'},
                 'margin': {'l': 50, 'r': 50, 't': 50, 'b': 50}
             }
         }
@@ -204,8 +208,9 @@ class SocialTrendsVisualizer:
             'layout': {
                 'title': 'Trend Distribution Across Platforms',
                 'height': 500,
-                'paper_bgcolor': '#ffffff',
-                'plot_bgcolor': '#f8f9fa'
+                'paper_bgcolor': 'rgba(0,0,0,0)',
+                'plot_bgcolor': 'rgba(0,0,0,0)',
+                'font': {'color': 'rgba(255,255,255,0.7)'}
             }
         }
     
@@ -233,11 +238,12 @@ class SocialTrendsVisualizer:
             }],
             'layout': {
                 'title': 'Top Trends by Growth Rate (%)',
-                'xaxis': {'title': 'Trend Name'},
-                'yaxis': {'title': 'Growth Rate (%)'},
+                'xaxis': {'title': 'Trend Name', 'gridcolor': 'rgba(255,255,255,0.05)'},
+                'yaxis': {'title': 'Growth Rate (%)', 'gridcolor': 'rgba(255,255,255,0.05)'},
                 'hovermode': 'closest',
-                'plot_bgcolor': '#f8f9fa',
-                'paper_bgcolor': '#ffffff',
+                'plot_bgcolor': 'rgba(0,0,0,0)',
+                'paper_bgcolor': 'rgba(0,0,0,0)',
+                'font': {'color': 'rgba(255,255,255,0.7)'},
                 'margin': {'l': 50, 'r': 50, 't': 50, 'b': 100}
             }
         }

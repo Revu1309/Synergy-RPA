@@ -1,267 +1,212 @@
 {% extends "base.html" %}
-{% block title %}Login - RPA Framework{% endblock %}
+{% block title %}Login - Synergy RPA{% endblock %}
+{% block page_title %}Sign In{% endblock %}
+
 {% block head_extra %}
-<meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<style>
+.login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+}
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  padding: var(--space-2xl) var(--space-xl);
+}
+.logo-mark {
+  width: 56px;
+  height: 56px;
+  background: var(--accent-grad);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-lg);
+  box-shadow: var(--glow-primary);
+  animation: logoPulse 3s ease-in-out infinite;
+}
+@keyframes logoPulse {
+  0%, 100% { box-shadow: 0 0 10px var(--glow-primary); transform: scale(1); }
+  50% { box-shadow: 0 0 30px var(--glow-primary); transform: scale(1.05); }
+}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+/* ── ENTRANCE ANIMATIONS ─────────────── */
+.login-card {
+  animation: cardEnter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes cardEnter {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-        .login-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 450px;
-            padding: 60px 40px;
-            backdrop-filter: blur(10px);
-            animation: slideIn 0.6s ease-out;
-        }
+.login-header > *, .form-group, .login-btn, .demo-hint {
+  opacity: 0;
+  animation: itemFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+.login-header > div { animation-delay: 0.2s; }
+.login-header > h1 { animation-delay: 0.3s; }
+.login-header > p { animation-delay: 0.4s; }
+.form-group:nth-child(1) { animation-delay: 0.5s; }
+.form-group:nth-child(2) { animation-delay: 0.6s; }
+.login-btn { animation-delay: 0.7s; }
+.demo-hint { animation-delay: 0.8s; }
 
-        .login-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
+@keyframes itemFadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-        .logo {
-            font-size: 48px;
-            margin-bottom: 20px;
-        }
-
-        .project-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-
-        .project-subtitle {
-            font-size: 14px;
-            color: #7f8c8d;
-            line-height: 1.6;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #2c3e50;
-            font-weight: 600;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #ecf0f1;
-            border-radius: 10px;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .form-group input::placeholder {
-            color: #bdc3c7;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 10px;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .login-btn:active {
-            transform: translateY(0);
-        }
-
-        .error-message {
-            display: none;
-            background: #fee;
-            color: #c0392b;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #e74c3c;
-            font-size: 14px;
-        }
-
-        .demo-credentials {
-            background: #ecf0f1;
-            padding: 16px;
-            border-radius: 10px;
-            margin-top: 25px;
-            text-align: center;
-            font-size: 12px;
-            color: #7f8c8d;
-        }
-
-        .demo-credentials strong {
-            color: #2c3e50;
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            margin-top: 15px;
-        }
-
-        .spinner {
-            border: 3px solid #ecf0f1;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+.form-group {
+  margin-bottom: var(--space-lg);
+}
+.form-input {
+  width: 100%;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg) var(--space-md) var(--space-xl);
+  transition: all var(--transition-normal);
+}
+.form-input:focus {
+  border-color: var(--border-focus);
+  box-shadow: var(--glow-primary);
+}
+.login-btn {
+  width: 100%;
+  padding: var(--space-md);
+  background: var(--accent-grad);
+  color: var(--text-inverse);
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), var(--glow-primary);
+}
+.error-message {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid var(--border-focus);
+  color: var(--text-primary);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-lg);
+  font-size: 13px;
+}
+.demo-hint {
+  margin-top: var(--space-lg);
+  padding: var(--space-md);
+  background: var(--bg-glass);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+</style>
 {% endblock %}
+
 {% block content %}
-<div class="login-container">
-        <div class="login-header">
-            <div class="logo"></div>
-            <div class="project-title">An Intelligent RPA Framework</div>
-            <div class="project-subtitle">For Real-Time Data Monitoring and Alerting</div>
-        </div>
-
-        <form id="loginForm">
-            <div id="errorMessage" class="error-message"></div>
-            
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input 
-                    type="text" 
-                    id="username" 
-                    name="username" 
-                    placeholder="Enter your username"
-                    required
-                    autocomplete="username"
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    placeholder="Enter your password"
-                    required
-                    autocomplete="current-password"
-                >
-            </div>
-
-            <button type="submit" class="login-btn">Sign In</button>
-
-            <div class="loading">
-                <div class="spinner"></div>
-            </div>
-
-            <div class="demo-credentials">
-                <strong>Demo Credentials</strong>
-                Username: <strong>admin</strong><br>
-                Password: <strong>admin</strong>
-            </div>
-        </form>
+<div class="login-wrapper">
+  <div class="card login-card">
+    <div class="login-header" style="text-align: center; margin-bottom: var(--space-2xl);">
+      <div class="logo-mark">
+        <svg viewBox="0 0 100 100" style="width: 70%; height: 70%;">
+            <defs>
+                <linearGradient id="synergy-grad-login" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:white;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:rgba(255,255,255,0.7);stop-opacity:1" />
+                </linearGradient>
+            </defs>
+            <path d="M50 10 L90 30 L90 70 L50 90 L10 70 L10 30 Z" fill="none" stroke="url(#synergy-grad-login)" stroke-width="8" stroke-linejoin="round" />
+            <path d="M50 25 L75 37.5 L75 62.5 L50 75 L25 62.5 L25 37.5 Z" fill="url(#synergy-grad-login)" opacity="0.9" />
+            <circle cx="50" cy="50" r="10" fill="white" />
+        </svg>
+      </div>
+      <h1 style="font-size: 28px; font-weight: 800; margin-bottom: var(--space-xs); letter-spacing: -0.5px;">Synergy RPA</h1>
+      <p style="font-size: 14px; color: var(--text-tertiary); letter-spacing: 1px; text-transform: uppercase;">Obsidian Protocol Active</p>
     </div>
 
-    <script>
-        const form = document.getElementById('loginForm');
-        const errorMessage = document.getElementById('errorMessage');
-        const loading = document.querySelector('.loading');
+    <div id="errorMessage" class="error-message" style="display: none;"></div>
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+    <form id="loginForm">
+      <div class="form-group">
+        <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: var(--space-sm);">Username</label>
+        <input class="form-input" type="text" id="username" placeholder="Enter username" required autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: var(--space-sm);">Password</label>
+        <input class="form-input" type="password" id="password" placeholder="Enter password" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="login-btn">Sign In</button>
+    </form>
 
-            loading.style.display = 'block';
-            errorMessage.style.display = 'none';
+    <div class="demo-hint">
+      <strong>Demo:</strong> admin / admin
+    </div>
+    <div id="particles" class="bg-particles"></div>
+  </div>
+</div>
+{% endblock %}
 
-            try {
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username, password })
-                });
+{% block scripts_extra %}
+<script>
+// Generate subtle background particles
+const particleCount = 24;
+const container = document.getElementById('particles');
+for(let i=0; i<particleCount; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  const size = Math.random() * 6 + 3;
+  p.style.width = `${size}px`;
+  p.style.height = `${size}px`;
+  p.style.left = `${Math.random() * 100}vw`;
+  p.style.setProperty('--x', `${(Math.random() - 0.5) * 300}px`);
+  p.style.setProperty('--d', `${Math.random() * 10 + 10}s`);
+  p.style.animationDelay = `${Math.random() * 8}s`;
+  container.appendChild(p);
+}
+const form = document.getElementById('loginForm');
+const errorEl = document.getElementById('errorMessage');
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const btn = form.querySelector('button');
 
-                const data = await response.json();
+  btn.innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:2px;"></div> Signing in...';
+  btn.disabled = true;
+  errorEl.style.display = 'none';
 
-                if (data.success) {
-                    window.location.href = data.landing_page || '/dashboard';
-                } else {
-                    errorMessage.style.display = 'block';
-                    errorMessage.textContent = data.message || 'Invalid credentials';
-                }
-            } catch (error) {
-                errorMessage.style.display = 'block';
-                errorMessage.textContent = 'An error occurred. Please try again.';
-            } finally {
-                loading.style.display = 'none';
-            }
-        });
-
-        // Auto-focus on page load
-        document.getElementById('username').focus();
-    </script>
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({username, password})
+    });
+    const data = await res.json();
+    if (data.success) {
+      location.href = data.landing_page || '/dashboard';
+    } else {
+      errorEl.textContent = data.message;
+      errorEl.style.display = 'block';
+    }
+  } catch (err) {
+    errorEl.textContent = 'Connection error. Try again.';
+    errorEl.style.display = 'block';
+  } finally {
+    btn.innerHTML = 'Sign In';
+    btn.disabled = false;
+    document.getElementById('username').focus();
+  }
+});
+document.getElementById('username').focus();
+</script>
 {% endblock %}

@@ -1,362 +1,455 @@
 {% extends "base.html" %}
 
+{% block title %}RPA Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
 {% block content %}
+<div class="premium-dashboard">
+    <header class="dashboard-header">
+        <div>
+            <span class="card-kicker">Operations overview</span>
+            <h1>Automation command center</h1>
+            <p>Live market, weather, sentiment, and job activity in one luminous workspace.</p>
+        </div>
+    </header>
 
-<div class="dashboard">
-
-    <!-- KPI METRICS -->
-    <div class="metrics-grid">
-
+    <section class="metrics-grid">
         <div class="metric-card">
-            <div class="metric-value">{{ crypto_count or 12 }}</div>
-            <div class="metric-label">Crypto Assets</div>
+            <div class="metric-top">
+                <div class="metric-icon">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+                </div>
+                <span class="metric-trend">+4.2%</span>
+            </div>
+            <div>
+                <div class="metric-value">{{ crypto_count or 12 }}</div>
+                <div class="metric-label">Crypto Assets</div>
+            </div>
         </div>
 
         <div class="metric-card">
-            <div class="metric-value">{{ weather_temp or "28°C" }}</div>
-            <div class="metric-label">Weather</div>
+            <div class="metric-top">
+                <div class="metric-icon">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M2 12h2"/><path d="m4.93 19.07 1.41-1.41"/><path d="M12 20v2"/><path d="m17.66 17.66 1.41 1.41"/><path d="M20 12h2"/><path d="m17.66 6.34 1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+                </div>
+                <span class="metric-trend">Stable</span>
+            </div>
+            <div>
+                <div class="metric-value">{{ weather_temp or "28°C" }}</div>
+                <div class="metric-label">Current Weather</div>
+            </div>
         </div>
 
         <div class="metric-card">
-            <div class="metric-value">{{ sentiment_score or "72%" }}</div>
-            <div class="metric-label">Sentiment</div>
+            <div class="metric-top">
+                <div class="metric-icon">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <span class="metric-trend">Healthy</span>
+            </div>
+            <div>
+                <div class="metric-value">{{ sentiment_score or "72%" }}</div>
+                <div class="metric-label">Social Sentiment</div>
+            </div>
         </div>
 
         <div class="metric-card">
-            <div class="metric-value">{{ running_jobs or 3 }}</div>
-            <div class="metric-label">Running Jobs</div>
+            <div class="metric-top">
+                <div class="metric-icon">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                </div>
+                <span class="metric-trend">Active</span>
+            </div>
+            <div>
+                <div class="metric-value">{{ running_jobs or 3 }}</div>
+                <div class="metric-label">Running Tasks</div>
+            </div>
         </div>
+    </section>
 
-    </div>
-
-
-    <!-- MAIN CHART AREA -->
-    <div class="charts-grid">
-
-        <div class="card large-chart">
-            <h3>Crypto Market Trend</h3>
-            <div class="chart-container">
+    <section class="charts-grid">
+        <div class="card">
+            <div class="card-head">
+                <div>
+                    <span class="card-kicker">Market intelligence</span>
+                    <h2>Crypto Market Trend</h2>
+                </div>
+                <span class="period-chip">24h History</span>
+            </div>
+            <div style="min-height: 300px;">
                 {{ crypto_chart | safe }}
             </div>
         </div>
 
         <div class="card">
-            <h3>Sentiment Trend</h3>
-            <div class="chart-container" style="position: relative; width: 100%; height: 260px;">
+            <div class="card-head">
+                <div>
+                    <span class="card-kicker">Signal quality</span>
+                    <h2>Sentiment Distribution</h2>
+                </div>
+                <span class="period-chip">Live</span>
+            </div>
+            <div style="height: 300px; display: flex; align-items: center; justify-content: center;">
                 <canvas id="sentimentChart"></canvas>
             </div>
         </div>
+    </section>
 
-    </div>
-
-
-    <!-- OPERATIONS PANELS -->
-    <div class="operations-grid">
-
+    <section class="operations-grid">
         <div class="card">
-
-            <h3>Weather Snapshot</h3>
-
-            <div class="weather-header" style="margin-bottom: 10px;">
-                <p style="margin: 0 0 3px 0; font-size: 13px; color: #64748b; font-weight: 500;">
-                    📍 Location: {{ weather_city or "Unknown location" }}
-                </p>
-                <p style="margin: 0; font-size: 11px; color: #94a3b8;">
-                    Current local weather conditions
-                </p>
+            <div class="card-head">
+                <div>
+                    <span class="card-kicker">Environment</span>
+                    <h2>Weather snapshot</h2>
+                </div>
+                <span class="period-chip">{{ weather_city or "Global" }}</span>
             </div>
 
-            <div class="weather-metrics" style="display: flex; gap: 24px; flex-wrap: wrap; margin: 8px 0;">
-                <div style="flex: 1; min-width: 80px;">
-                    <p style="margin: 0 0 4px 0; font-size: 11px; color: #94a3b8; font-weight: 500;">Temperature</p>
-                    <p style="margin: 0; font-size: 14px; color: #0f172a; font-weight: 600;">🌡 {{ weather_temp or "28°C" }}</p>
+            <div class="weather-grid">
+                <div class="weather-item">
+                    <span class="label-caps">Temp</span>
+                    <span class="weather-temp">{{ weather_temp or "28°C" }}</span>
+                    <span class="weather-city">{{ weather_city or "Locating..." }}</span>
                 </div>
-                <div style="flex: 1; min-width: 80px;">
-                    <p style="margin: 0 0 4px 0; font-size: 11px; color: #94a3b8; font-weight: 500;">Humidity</p>
-                    <p style="margin: 0; font-size: 14px; color: #0f172a; font-weight: 600;">💧 {{ weather_humidity or "65%" }}</p>
+                <div class="weather-item">
+                    <span class="label-caps">Humidity</span>
+                    <span class="weather-temp" style="color: var(--text-primary)">{{ weather_humidity or "65%" }}</span>
+                    <span class="weather-city">Outdoor</span>
                 </div>
-                <div style="flex: 1; min-width: 80px;">
-                    <p style="margin: 0 0 4px 0; font-size: 11px; color: #94a3b8; font-weight: 500;">Wind Speed</p>
-                    <p style="margin: 0; font-size: 14px; color: #0f172a; font-weight: 600;">🌬 {{ weather_wind or "8 km/h" }}</p>
+                <div class="weather-item">
+                    <span class="label-caps">Wind</span>
+                    <span class="weather-temp" style="color: var(--text-primary)">{{ weather_wind or "8 km/h" }}</span>
+                    <span class="weather-city">Breeze</span>
                 </div>
             </div>
-
-            <div class="weather-footer" style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #e5e7eb;">
-                <p style="margin: 0; font-size: 10px; color: #94a3b8;">
-                    Last updated: {{ weather_updated or "Just now" }}
-                </p>
-            </div>
-
         </div>
 
-
         <div class="card">
-
-            <h3>Automation Status</h3>
-
-            <div class="job-list-horizontal" style="display: flex; gap: 16px; flex-wrap: wrap; margin: 0;">
-                <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #1f2937; padding: 4px 0;">
-                    <span class="status-dot green" style="width: 8px; height: 8px; border-radius: 50%; background: #22c55e;"></span>
-                    Crypto Sync
+            <div class="card-head">
+                <div>
+                    <span class="card-kicker">Automation</span>
+                    <h2>Job status</h2>
                 </div>
-                <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #1f2937; padding: 4px 0;">
-                    <span class="status-dot green" style="width: 8px; height: 8px; border-radius: 50%; background: #22c55e;"></span>
-                    Weather Refresh
-                </div>
-                <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #1f2937; padding: 4px 0;">
-                    <span class="status-dot yellow" style="width: 8px; height: 8px; border-radius: 50%; background: #eab308;"></span>
-                    Social Scan
-                </div>
+                <span class="period-chip">3 Active</span>
             </div>
 
+            <div class="job-list">
+                <div class="job-item">
+                    <div class="status-dot active"></div>
+                    <div style="flex: 1">
+                        <h4 style="margin: 0; font-size: 14px;">Crypto Sync</h4>
+                        <span style="font-size: 12px; color: var(--text-tertiary)">Price feed & metadata refresh</span>
+                    </div>
+                    <span class="label-caps" style="margin: 0; color: var(--accent-secondary)">Running</span>
+                </div>
+                <div class="job-item">
+                    <div class="status-dot active"></div>
+                    <div style="flex: 1">
+                        <h4 style="margin: 0; font-size: 14px;">Weather API</h4>
+                        <span style="font-size: 12px; color: var(--text-tertiary)">Local conditions monitor</span>
+                    </div>
+                    <span class="label-caps" style="margin: 0; color: var(--accent-secondary)">Running</span>
+                </div>
+                <div class="job-item">
+                    <div class="status-dot pending"></div>
+                    <div style="flex: 1">
+                        <h4 style="margin: 0; font-size: 14px;">Social Scraper</h4>
+                        <span style="font-size: 12px; color: var(--text-tertiary)">Trend & sentiment analysis</span>
+                    </div>
+                    <span class="label-caps" style="margin: 0">Queued</span>
+                </div>
+            </div>
         </div>
+    </section>
 
-    </div>
-
-
-    <!-- ACTIVITY FEED -->
     <div class="card">
+        <div class="card-head">
+            <div>
+                <span class="card-kicker">System telemetry</span>
+                <h2>Recent activity log</h2>
+            </div>
+            <span class="period-chip">Real-time</span>
+        </div>
 
-        <h3>Recent Activity</h3>
-
-        <ul class="activity-list" style="gap: 4px;">
-            <li>Crypto prices updated</li>
-            <li>Weather forecast refreshed</li>
-            <li>Sentiment analysis completed</li>
-            <li>Automation job executed</li>
+        <ul class="activity-list">
+            <li>
+                <p style="flex: 1; margin: 0; font-weight: 500;">Crypto asset prices successfully synchronized with market feeds.</p>
+                <time style="font-size: 12px; color: var(--text-tertiary); font-family: monospace;">2m ago</time>
+            </li>
+            <li>
+                <p style="flex: 1; margin: 0; font-weight: 500;">Weather snapshot updated for {{ weather_city or "current location" }}.</p>
+                <time style="font-size: 12px; color: var(--text-tertiary); font-family: monospace;">8m ago</time>
+            </li>
+            <li>
+                <p style="flex: 1; margin: 0; font-weight: 500;">Social sentiment analysis batch #492 processed successfully.</p>
+                <time style="font-size: 12px; color: var(--text-tertiary); font-family: monospace;">15m ago</time>
+            </li>
         </ul>
-
     </div>
-
 </div>
 
-
-
 <style>
+    /* Content-specific layout tweaks */
+    .premium-dashboard {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xl);
+    }
 
-/* PAGE CONTAINER */
+    .dashboard-header {
+        padding: var(--space-2xl) var(--space-xl);
+        border-bottom: 1px solid var(--border-subtle);
+        margin-bottom: var(--space-md);
+    }
 
-.dashboard{
-max-width:1400px;
-margin:auto;
-padding:20px;
-}
+    .dashboard-header h1 {
+        margin: 12px 0;
+        font-size: clamp(32px, 5vw, 48px);
+        background: linear-gradient(to right, var(--text-primary), var(--text-tertiary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
 
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--space-lg);
+    }
 
+    .metric-card {
+        padding: var(--space-xl);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 160px;
+    }
 
-/* KPI GRID */
+    .metric-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-md);
+    }
 
-.metrics-grid{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:20px;
-margin-bottom:30px;
-}
+    .metric-icon {
+        width: 44px;
+        height: 44px;
+        background: var(--bg-glass);
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent-primary);
+        border: 1px solid var(--border-subtle);
+    }
 
-.metric-card{
-background:white;
-border:1px solid #e5e7eb;
-border-radius:12px;
-padding:18px;
-text-align:center;
-}
+    .metric-trend {
+        font-size: 12px;
+        font-weight: 700;
+        padding: 4px 10px;
+        background: rgba(20, 241, 217, 0.1);
+        color: var(--accent-secondary);
+        border-radius: var(--radius-full);
+    }
 
-.metric-value{
-font-size:26px;
-font-weight:600;
-}
+    .metric-value {
+        font-family: var(--font-header);
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--text-primary);
+        line-height: 1;
+    }
 
-.metric-label{
-font-size:13px;
-color:#6b7280;
-}
+    .metric-label {
+        font-size: 13px;
+        color: var(--text-tertiary);
+        margin-top: 4px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
 
+    .charts-grid {
+        display: grid;
+        grid-template-columns: 1.6fr 1fr;
+        gap: var(--space-lg);
+    }
 
+    .operations-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-lg);
+    }
 
-/* CHART GRID */
+    .card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: var(--space-xl);
+    }
 
-.charts-grid{
-display:grid;
-grid-template-columns:2fr 1fr;
-gap:24px;
-margin-bottom:30px;
-}
+    .card-kicker {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--accent-primary);
+        display: block;
+        margin-bottom: 6px;
+    }
 
+    .period-chip {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 12px;
+        background: var(--bg-glass);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-full);
+        color: var(--text-tertiary);
+    }
 
+    .weather-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr 1fr;
+        gap: var(--space-md);
+    }
 
-/* OPERATIONS GRID */
+    .weather-item {
+        padding: var(--space-md);
+        background: var(--bg-glass);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
 
-.operations-grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:24px;
-margin-bottom:30px;
-}
+    .weather-temp { font-size: 28px; font-weight: 800; color: var(--accent-secondary); }
+    .weather-city { font-size: 13px; color: var(--text-secondary); }
 
+    .job-list { display: flex; flex-direction: column; gap: var(--space-sm); }
+    .job-item {
+        padding: 14px;
+        background: var(--bg-glass);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+        transition: var(--transition-normal);
+    }
 
+    .job-item:hover { background: var(--bg-glass-hover); border-color: var(--border-focus); }
 
-/* CARDS */
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .status-dot.active { background: var(--accent-secondary); box-shadow: 0 0 12px var(--accent-secondary); }
+    .status-dot.pending { background: #f59e0b; }
 
-.card{
-background:white;
-border:1px solid #e5e7eb;
-border-radius:12px;
-padding:20px;
-}
+    .activity-list { list-style: none; display: flex; flex-direction: column; gap: 0; }
+    .activity-list li {
+        padding: 16px 0;
+        border-bottom: 1px solid var(--border-subtle);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
 
+    .activity-list li::before {
+        content: "";
+        width: 6px; height: 6px;
+        background: var(--accent-primary);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--accent-primary);
+    }
 
-
-/* CHART CONTAINER */
-
-.chart-container{
-height:320px;
-overflow:hidden;
-}
-
-
-
-/* WEATHER PANEL */
-
-.weather-list{
-list-style:none;
-padding:0;
-}
-
-.weather-list li{
-padding:6px 0;
-}
-
-
-
-/* JOB STATUS */
-
-.job-list{
-list-style:none;
-padding:0;
-}
-
-.status-dot{
-width:10px;
-height:10px;
-border-radius:50%;
-display:inline-block;
-margin-right:8px;
-}
-
-.green{
-background:#22c55e;
-}
-
-.yellow{
-background:#eab308;
-}
-
-
-
-/* ACTIVITY */
-
-.activity-list{
-list-style:none;
-padding:0;
-}
-
-.activity-list li{
-padding:8px 0;
-border-bottom:1px solid #f1f5f9;
-}
-
+    @media (max-width: 1024px) {
+        .charts-grid, .operations-grid { grid-template-columns: 1fr; }
+    }
 </style>
-
-
 {% endblock %}
 
 {% block scripts_extra %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-
 <script>
+    async function loadDashboardData() {
+        try {
+            const response = await fetch("/api/dashboard-data");
+            const data = await response.json();
+            console.log("Dashboard data:", data);
+        } catch (error) {
+            console.warn("Dashboard data fetch failed:", error);
+        }
+    }
 
-async function loadDashboardData() {
-    try {
-        const response = await fetch('/api/dashboard-data');
-        const data = await response.json();
-        console.log("Dashboard data:", data);
-    } catch (e) {
-        console.warn('Dashboard data fetch failed:', e);
-    }
-}
-
-// Initialize Sentiment Chart
-function initializeSentimentChart() {
-    // Wait for Chart.js to be available
-    if (typeof Chart === 'undefined') {
-        console.warn('Chart.js not loaded, retrying in 100ms...');
-        setTimeout(initializeSentimentChart, 100);
-        return;
-    }
-    
-    const chartElement = document.getElementById('sentimentChart');
-    if (!chartElement) {
-        console.error('sentimentChart canvas element not found');
-        return;
-    }
-    
-    try {
-        const ctx = chartElement.getContext('2d');
-        if (!ctx) {
-            console.error('Failed to get canvas context');
+    function initializeSentimentChart() {
+        if (typeof Chart === "undefined") {
+            setTimeout(initializeSentimentChart, 100);
             return;
         }
-        
+
+        const chartElement = document.getElementById("sentimentChart");
+        if (!chartElement) {
+            return;
+        }
+
+        const ctx = chartElement.getContext("2d");
+        const gradientPositive = ctx.createLinearGradient(0, 0, 0, 220);
+        gradientPositive.addColorStop(0, "#853953");
+        gradientPositive.addColorStop(1, "#612D53");
+
         new Chart(ctx, {
-            type: 'doughnut',
+            type: "doughnut",
             data: {
-                labels: ['Positive', 'Neutral', 'Negative'],
+                labels: ["Positive", "Neutral", "Negative"],
                 datasets: [{
                     data: [72, 18, 10],
-                    backgroundColor: [
-                        '#27ae60',
-                        '#bdc3c7',
-                        '#e74c3c'
-                    ],
-                    borderColor: '#ffffff',
-                    borderWidth: 2
+                    backgroundColor: [gradientPositive, "#D9DADA", "#2C2C2C"],
+                    borderColor: "#FBFAF8",
+                    borderWidth: 4,
+                    hoverOffset: 8
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                cutout: "68%",
+                animation: {
+                    duration: 700,
+                    easing: "easeInOutCubic"
+                },
                 plugins: {
                     legend: {
-                        position: 'bottom',
+                        position: "bottom",
                         labels: {
-                            font: { size: 12 },
-                            color: '#64748b',
-                            padding: 15,
-                            usePointStyle: true
+                            color: "rgba(44, 44, 44, 0.62)",
+                            font: { family: "Inter", size: 12, weight: "600" },
+                            padding: 18,
+                            usePointStyle: true,
+                            pointStyle: "circle"
                         }
                     },
                     tooltip: {
+                        backgroundColor: "#2C2C2C",
+                        titleColor: "#F3F4F4",
+                        bodyColor: "#F3F4F4",
+                        padding: 12,
+                        cornerRadius: 8,
                         callbacks: {
                             label: function(context) {
-                                return context.label + ': ' + context.parsed + '%';
+                                return context.label + ": " + context.parsed + "%";
                             }
                         }
                     }
                 }
             }
         });
-        console.log('Sentiment chart initialized successfully');
-    } catch (error) {
-        console.error('Error creating sentiment chart:', error);
     }
-}
 
-document.addEventListener("DOMContentLoaded", function() {
-    console.log('DOM Content Loaded - initializing charts');
-    loadDashboardData();
-    // Delay chart init slightly to ensure Chart.js is ready
-    setTimeout(initializeSentimentChart, 50);
-});
-
+    document.addEventListener("DOMContentLoaded", function() {
+        loadDashboardData();
+        initializeSentimentChart();
+    });
 </script>
 {% endblock %}

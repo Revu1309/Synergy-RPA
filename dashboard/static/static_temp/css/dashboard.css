@@ -72,29 +72,57 @@
 
 /* Theme: Soft Editorial (High-Contrast Designer Light) */
 [theme="soft_editorial"] {
-  --bg-base: #fcfcfd;
-  --bg-panel: rgba(255, 255, 255, 0.85);
-  --bg-glass: rgba(0, 0, 0, 0.02);
-  --bg-glass-hover: rgba(0, 0, 0, 0.04);
-  --bg-secondary: #f8f9fa;
-  --bg-active: rgba(13, 13, 17, 0.05);
+  --bg-base: #f4f4f7;
+  --bg-panel: rgba(255, 255, 255, 0.9);
+  --bg-glass: rgba(0, 0, 0, 0.03);
+  --bg-glass-hover: rgba(0, 0, 0, 0.06);
+  --bg-secondary: #ffffff;
+  --bg-active: rgba(0, 0, 0, 0.04);
 
-  --text-primary: #121212;
-  --text-secondary: #4a4a4a;
-  --text-tertiary: #8a8a8a;
+  --text-primary: #1a1a1e;
+  --text-secondary: #4a4a4e;
+  --text-tertiary: #8e8e93;
   
-  --border-subtle: rgba(0, 0, 0, 0.06);
-  --border-glass: rgba(0, 0, 0, 0.04);
-  --border-focus: rgba(18, 18, 18, 0.2);
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-glass: rgba(0, 0, 0, 0.06);
+  --border-focus: rgba(0, 0, 0, 0.15);
   --border-accent: rgba(0, 0, 0, 0.1);
 
-  --accent-primary: #121212;
-  --accent-secondary: #0070f3;
-  --accent-grad: linear-gradient(135deg, #121212 0%, #444 100%);
+  --accent-primary: #000000;
+  --accent-secondary: #5856d6;
+  --accent-tertiary: #ff2d55;
+  --accent-grad: linear-gradient(135deg, #1a1a1e 0%, #4a4a4e 100%);
   
   --glow-primary: rgba(0, 0, 0, 0.1);
-  --ambient-primary: rgba(0, 112, 243, 0.04);
-  --ambient-secondary: rgba(0, 0, 0, 0.02);
+  --ambient-primary: rgba(88, 86, 214, 0.05);
+  --ambient-secondary: rgba(255, 45, 85, 0.05);
+}
+
+/* Theme: Midnight Gradient (Deep Space Aesthetic) */
+[theme="midnight_gradient"] {
+  --bg-base: #050510;
+  --bg-panel: rgba(10, 10, 30, 0.8);
+  --bg-glass: rgba(20, 20, 50, 0.4);
+  --bg-glass-hover: rgba(30, 30, 70, 0.6);
+  --bg-secondary: #08081a;
+  --bg-active: rgba(20, 241, 217, 0.1);
+
+  --text-primary: #e0e0ff;
+  --text-secondary: #a0a0d0;
+  --text-tertiary: #7070a0;
+  
+  --border-subtle: rgba(100, 100, 255, 0.15);
+  --border-glass: rgba(100, 100, 255, 0.1);
+  --border-focus: rgba(20, 241, 217, 0.5);
+
+  --accent-primary: #14f1d9;
+  --accent-secondary: #5b5bff;
+  --accent-tertiary: #f114d9;
+  --accent-grad: linear-gradient(135deg, #14f1d9 0%, #5b5bff 100%);
+  
+  --glow-primary: rgba(20, 241, 217, 0.3);
+  --ambient-primary: rgba(20, 241, 217, 0.1);
+  --ambient-secondary: rgba(91, 91, 255, 0.1);
 }
 
 /* Reset & Base */

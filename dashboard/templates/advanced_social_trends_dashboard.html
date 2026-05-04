@@ -8,12 +8,7 @@
         box-sizing: border-box;
     }
 
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-        min-height: 100vh;
-        padding: 20px;
-    }
+    
 
     .container {
         max-width: 1400px;
@@ -21,101 +16,119 @@
     }
 
     .header {
-        background: white;
-        padding: 30px;
-        border-radius: 12px;
+        background: var(--bg-panel);
+        padding: 24px 32px;
+        border-radius: var(--radius-md);
         margin-bottom: 30px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        box-shadow: var(--shadow-lg);
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
         gap: 20px;
+        border: 1px solid var(--border-subtle);
+        position: relative;
+    }
+    .header::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 6px;
+        background: var(--accent-grad);
+        border-radius: var(--radius-md) 0 0 var(--radius-md);
     }
 
     .header h1 {
-        font-size: 32px;
-        color: #1e3c72;
-        margin-bottom: 5px;
+        font-size: 26px;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 8px;
     }
 
     .header p {
-        color: #7f8c8d;
+        color: var(--text-tertiary);
         font-size: 14px;
     }
 
     .buttons {
         display: flex;
-        gap: 10px;
+        gap: 12px;
     }
 
     .btn {
-        padding: 12px 24px;
+        padding: 10px 20px;
         border: none;
-        border-radius: 8px;
+        border-radius: var(--radius-sm);
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: var(--transition-normal);
         font-size: 14px;
     }
 
     .btn-primary {
-        background: #1e3c72;
+        background: var(--accent-primary);
         color: white;
     }
 
     .btn-primary:hover {
-        background: #152847;
         transform: translateY(-2px);
+        box-shadow: 0 4px 12px var(--glow-primary);
     }
 
     .insights {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
         margin-bottom: 30px;
     }
 
     .insight-card {
-        background: white;
-        padding: 25px;
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        border-left: 4px solid #2a5298;
+        background: var(--bg-panel);
+        padding: 28px;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border-subtle);
         text-align: center;
+        transition: var(--transition-normal);
+    }
+    .insight-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--border-focus);
     }
 
     .insight-label {
-        font-size: 12px;
-        color: #95a5a6;
+        font-size: 11px;
+        color: var(--text-tertiary);
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 10px;
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+        font-weight: 600;
     }
 
     .insight-value {
         font-size: 32px;
-        font-weight: 700;
-        color: #2a5298;
+        font-weight: 800;
+        color: var(--accent-tertiary);
     }
 
     .summary {
-        background: white;
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        border-left: 4px solid #2a5298;
+        background: var(--bg-panel);
+        padding: 32px;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border-subtle);
     }
 
     .summary h3 {
-        color: #1e3c72;
-        margin-bottom: 15px;
+        color: var(--text-primary);
+        margin-bottom: 20px;
         font-size: 18px;
+        font-weight: 700;
     }
 
     .summary-item {
-        padding: 10px 0;
-        border-bottom: 1px solid #ecf0f1;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--border-subtle);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -126,12 +139,12 @@
     }
 
     .summary-label {
-        color: #7f8c8d;
-        font-weight: 500;
+        color: var(--text-secondary);
+        font-weight: 600;
     }
 
     .summary-value {
-        color: #2c3e50;
+        color: var(--text-primary);
         font-weight: 700;
         font-size: 16px;
     }

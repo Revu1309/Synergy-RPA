@@ -5,31 +5,27 @@
         
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
         <style>
-            body { font-family: Arial, sans-serif; margin: 20px; background:#f5f6f8; color:#222; }
+            
             .container { max-width: 1200px; margin: 0 auto; }
-            .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
-            .alerts-form { margin-top: 16px; background:#fff; padding:16px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.08); }
-            .alerts-list { margin-top: 20px; }
-            table { width:100%; border-collapse:collapse; background:#fff; }
-            th, td { padding:10px; border-bottom:1px solid #eee; text-align:left; }
-            th { background:#fafafa; }
-            .btn { padding:8px 12px; border-radius:6px; border:none; cursor:pointer; }
-            .btn-primary { background:#3498db; color:#fff; }
-            .btn-danger { background:#e74c3c; color:#fff; }
+            .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; color: var(--text-primary); }
+            .alerts-form { margin-top: 16px; background: var(--bg-panel); padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-md); }
+            .alerts-list { margin-top: 32px; }
+            table { width:100%; border-collapse:collapse; background: var(--bg-panel); border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-subtle); }
+            th, td { padding: 14px; border-bottom: 1px solid var(--border-subtle); text-align: left; color: var(--text-primary); }
+            th { background: var(--bg-secondary); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-tertiary); }
+            .btn { padding: 10px 20px; border-radius: var(--radius-sm); border: none; cursor: pointer; font-weight: 600; font-size: 13px; transition: var(--transition-normal); }
+            .btn-primary { background: var(--accent-primary); color: white; }
+            .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px var(--glow-primary); }
+            .btn-danger { background: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.2); }
+            .btn-danger:hover { background: #e74c3c; color: white; }
             .sparkline { height:60px; }
-            .form-grid { display:grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap:12px; align-items:end; }
-            .field { display:flex; flex-direction:column; gap:4px; }
-            .field label { font-size:12px; color:#444; font-weight:600; }
-            .field input, .field select { height:34px; border:1px solid #d4d7dc; border-radius:6px; padding:0 10px; background:#fff; }
-            .hint { font-size:12px; color:#666; margin-top:8px; }
-            .section-title { margin:0 0 10px 0; }
-            .actions { display:flex; gap:8px; align-items:center; }
-            @media (max-width: 900px) {
-                .form-grid { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
-            }
-            @media (max-width: 520px) {
-                .form-grid { grid-template-columns: 1fr; }
-            }
+            .form-grid { display:grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 16px; align-items:end; }
+            .field { display:flex; flex-direction:column; gap:6px; }
+            .field label { font-size:11px; color: var(--text-tertiary); font-weight:600; text-transform: uppercase; letter-spacing: 0.5px; }
+            .field input, .field select { height:40px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0 12px; background: var(--bg-glass); color: var(--text-primary); transition: var(--transition-normal); }
+            .field input:focus, .field select:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px var(--glow-primary); }
+            .hint { font-size: 12px; color: var(--text-tertiary); margin-top: 12px; }
+            .section-title { margin:0 0 16px 0; color: var(--text-primary); font-weight: 700; }
         </style>
 {% endblock %}
 {% block content %}

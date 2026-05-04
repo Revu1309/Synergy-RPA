@@ -25,7 +25,11 @@
                 
                 fig.update_layout(
                     title=f'{symbol} Price Trend',
-                    template='plotly_white',
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    font=dict(color='rgba(255,255,255,0.7)'),
+                    xaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
+                    yaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
                     hovermode='x unified'
                 )
                 

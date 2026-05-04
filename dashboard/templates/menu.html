@@ -4,31 +4,18 @@
 <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
-        <style>
-            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 0; padding: 24px; color: #2c3e50; }
-            .wrap { max-width: 1300px; margin: 0 auto; }
-            .top { display: flex; justify-content: space-between; align-items: center; color: white; margin-bottom: 24px; }
-            .logout { background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.4); color: white; border-radius: 8px; padding: 8px 14px; cursor: pointer; }
-            .sections { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
-            .section { background: rgba(255,255,255,.95); border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.12); overflow: hidden; }
-            .section h3 { margin: 0; padding: 14px 16px; background: #2f5bd2; color: white; font-size: 16px; }
-            .item { display: block; padding: 14px 16px; border-bottom: 1px solid #eceff5; text-decoration: none; color: #1f2d3d; }
-            .item:last-child { border-bottom: none; }
-            .item:hover { background: #f6f8ff; }
-            .name { font-weight: 600; margin-bottom: 4px; }
-            .desc { font-size: 12px; color: #667; }
-            .empty { background: rgba(255,255,255,.95); border-radius: 12px; padding: 24px; text-align: center; }
-        </style>
+
 {% endblock %}
 {% block content %}
-<div class="wrap">
-            <div class="top">
-                <div><strong>RPA Framework</strong> | Welcome, {{ username }}</div>
-                <div style="display:flex; gap:8px;">
-                    <button class="logout" onclick="window.location.href='/ui-settings'">UI Settings</button>
-                    <button class="logout" onclick="logout()">Logout</button>
-                </div>
-            </div>
+<div class="content-scroll">
+  <div class="card" style="max-width: 1400px; margin: 0 auto;">
+    <header style="display: flex; justify-content: space-between; align-items: center; padding-bottom: var(--space-lg); border-bottom: 1px solid var(--border-subtle); margin-bottom: var(--space-xl);">
+      <h1>RPA Dashboard Menu</h1>
+      <div style="display: flex; gap: var(--space-md);">
+        <a href="/ui-settings" class="btn-secondary">UI Settings</a>
+        <button class="btn-secondary" onclick="logout()">Logout</button>
+      </div>
+    </header>
             {% if modules %}
             <div class="sections">
                 {% for m in modules %}

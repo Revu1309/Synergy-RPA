@@ -4,22 +4,23 @@
 <meta charset="utf-8" />
         
         <style>
-            body { font-family: Arial, sans-serif; margin: 20px; background:#f5f5f5; }
+            
             .container { max-width: 1200px; margin: 0 auto; }
-            .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-            .alerts-form { margin-top: 20px; background:#fff; padding:16px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.08); }
-            .alerts-list { margin-top: 20px; }
-            table { width:100%; border-collapse:collapse; background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.08); }
-            th, td { padding:12px; border-bottom:1px solid #eee; text-align:left; }
-            th { background:#f8f9fa; font-weight:600; }
-            .btn { padding:8px 12px; border-radius:6px; border:none; cursor:pointer; font-size:12px; }
-            .btn-primary { background:#27ae60; color:#fff; }
-            .btn-danger { background:#e74c3c; color:#fff; }
-            .btn-primary:hover { background:#229954; }
-            .btn-danger:hover { background:#c0392b; }
-            select, input { padding:8px 10px; border:1px solid #ddd; border-radius:4px; font-size:13px; }
-            .back-btn { padding:10px 16px; background:#95a5a6; color:#fff; border:none; border-radius:6px; cursor:pointer; text-decoration:none; display:inline-block; margin-bottom:15px; }
-            .back-btn:hover { background:#7f8c8d; }
+            .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; color: var(--text-primary); }
+            .alerts-form { margin-top: 20px; background: var(--bg-panel); padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-md); }
+            .alerts-list { margin-top: 32px; }
+            table { width:100%; border-collapse:collapse; background: var(--bg-panel); border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-md); }
+            th, td { padding: 14px; border-bottom: 1px solid var(--border-subtle); text-align: left; color: var(--text-primary); }
+            th { background: var(--bg-secondary); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-tertiary); font-weight: 600; }
+            .btn { padding: 10px 20px; border-radius: var(--radius-sm); border: none; cursor: pointer; font-weight: 600; font-size: 13px; transition: var(--transition-normal); }
+            .btn-primary { background: var(--accent-primary); color: white; }
+            .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px var(--glow-primary); }
+            .btn-danger { background: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.2); }
+            .btn-danger:hover { background: #e74c3c; color: white; }
+            select, input { height: 40px; padding: 0 12px; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-glass); color: var(--text-primary); font-size: 14px; transition: var(--transition-normal); }
+            select:focus, input:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px var(--glow-primary); }
+            .back-btn { padding: 10px 16px; background: var(--bg-glass); color: var(--text-primary); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); cursor: pointer; text-decoration: none; display: inline-block; margin-bottom: 20px; font-weight: 600; transition: var(--transition-normal); font-size: 13px; }
+            .back-btn:hover { background: var(--bg-glass-hover); border-color: var(--border-focus); }
         </style>
 {% endblock %}
 {% block content %}

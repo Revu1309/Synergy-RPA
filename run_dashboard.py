@@ -13,10 +13,13 @@ BASE_DIR = os.path.dirname(__file__)
 def resolve_python_executable():
     """Resolve python executable from .venv/venv with system fallback."""
     for env_dir in (".venv", "venv"):
+        candidate = os.path.join(BASE_DIR, env_dir, "bin", "python")
+        if os.path.exists(candidate):
+            return candidate
         candidate = os.path.join(BASE_DIR, env_dir, "Scripts", "python.exe")
         if os.path.exists(candidate):
             return candidate
-    return "python"
+    return "python3"
 
 
 def run_dashboard():
