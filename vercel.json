@@ -1,0 +1,18 @@
+{
+  "builds": [
+    {
+      "src": "dashboard/app_new.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
+      "src": "(.*)",
+      "dest": "dashboard/app_new.py"
+    }
+  ]
+}

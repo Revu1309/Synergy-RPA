@@ -10,7 +10,7 @@ import html as html_escape
 import re
 from datetime import timedelta, datetime
 
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from auth.auth import AuthManager
 from analysis.analyzer import CryptoAnalyzer
@@ -2810,6 +2810,33 @@ def advanced_social_trends_dashboard():
 
 # ==================== REDIRECT ====================
 
+@app.route('/api/cron/sync')
+def cron_sync():
+    """Trigger data sync for crypto, social media, and weather."""
+    # Check for Vercel Cron secret (recommended for security)
+    auth_header = request.headers.get('Authorization')
+    cron_secret = os.getenv('CRON_SECRET')
+    
+    if cron_secret and auth_header != f"Bearer {cron_secret}":
+        print("Unauthorized cron attempt")
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    try:
+        print("Starting scheduled sync via API...")
+        # Import inside the function to avoid circular imports
+        from scheduler.job import scrape_and_store, sync_social_media_trends
+        
+        # Run sync tasks
+        scrape_and_store()
+        sync_social_media_trends()
+        sync_weather_job()
+        
+        print("API sync complete.")
+        return jsonify({"status": "success", "message": "All data synchronized"})
+    except Exception as e:
+        print(f"Error during API sync: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def catch_all(path):
@@ -2819,65 +2846,68 @@ def catch_all(path):
         return redirect(url_for('menu'))
     return redirect(url_for('login'))
 
+def bootstrap_all():
+    """Initialize all database tables and settings."""
+    try:
+        print("Initializing database tables for serverless environment...")
+        
+        # Predefined cities
+        PredefinedCitiesManager.create_table()
+        PredefinedCitiesManager.initialize_default_cities()
+        
+        # Preferred assets
+        PreferredAssetsManager.create_table()
+        
+        # Weather tables
+        from database.connection import create_weather_table, create_weather_locations_table, create_crypto_latest_table, create_weather_latest_table, create_social_latest_table, create_signal_fusion_index_table
+        create_weather_table()
+        create_weather_locations_table()
+        create_crypto_latest_table()
+        create_weather_latest_table()
+        create_social_latest_table()
+        create_signal_fusion_index_table()
+        
+        # Weather Locations
+        WeatherLocationsManager.create_table()
+        
+        # Alert tables
+        from database.alert_models import create_alerts_table, create_weather_alerts_table, create_social_trend_alerts_table
+        create_alerts_table()
+        create_weather_alerts_table()
+        create_social_trend_alerts_table()
+        
+        # UI Settings
+        from database.ui_settings import create_ui_settings_table
+        create_ui_settings_table()
+        
+        # User preferences
+        from database.user_preferences import create_user_preferences_table, initialize_default_users
+        create_user_preferences_table()
+        initialize_default_users()
+
+        # Access control
+        create_access_control_tables()
+        seed_default_access_config()
+        
+        print("Database initialization complete.")
+    except Exception as e:
+        print(f"Error during bootstrap: {e}")
+
+# Call bootstrap when the app is initialized in Vercel
+if os.environ.get('VERCEL'):
+    bootstrap_all()
+
 if __name__ == '__main__':
     print("Starting RPA Framework...")
-    print("Initializing database tables...")
-    
-    # Create and initialize predefined cities table
-    print("\n Initializing predefined cities...")
-    PredefinedCitiesManager.create_table()
-    PredefinedCitiesManager.initialize_default_cities()
-    
-    # Create preferred assets table
-    PreferredAssetsManager.create_table()
-    
-    # Initialize crypto assets and data
-    # print(" Initializing cryptocurrency assets and test data...")
-    # init_crypto_assets()  # DISABLED - Uses real data from scheduler instead
-    
-    # Create weather tables
-    from database.connection import create_weather_table, create_weather_locations_table
-    create_weather_table()
-    create_weather_locations_table()
-    
-    # Initialize location manager
-    WeatherLocationsManager.create_table()
-    # print(" Clearing old weather locations...")
-    # WeatherLocationsManager.clear_weather_locations()  # DISABLED - Keep existing data
-    # print(" Initializing weather locations from predefined cities...")
-    # WeatherLocationsManager.initialize_default_locations()  # DISABLED - Keep existing data
-    
-    # Initialize alert tables
-    print("\n  Initializing alert tables...")
-    from database.alert_models import create_alerts_table, create_weather_alerts_table, create_social_trend_alerts_table
-    create_alerts_table()
-    create_weather_alerts_table()
-    create_social_trend_alerts_table()
-    from database.ui_settings import create_ui_settings_table
-    create_ui_settings_table()
-    
-    # Initialize user preferences table
-    print("\n Initializing user preferences...")
-    from database.user_preferences import create_user_preferences_table, initialize_default_users
-    create_user_preferences_table()
-    initialize_default_users()
-
-    # Initialize data-driven access control config
-    print("\n Initializing access control tables...")
-    create_access_control_tables()
-    seed_default_access_config()
-    
-    print(" Database tables initialized successfully")
+    bootstrap_all()
     
     print("\n" + "="*60)
     print(" RPA Framework is running!")
     print("="*60)
     print("Dashboard URL: http://localhost:5000")
     print("Default Login: admin / admin")
-    print("Weather sync interval: Configurable (scheduler starts from main process)")
-    print("Crypto Assets: 15 major cryptocurrencies")
     print("="*60 + "\n")
 
-    # Start Flask app; scheduler should be started separately by the main process
+    # Start Flask app
     port = int(os.environ.get("FLASK_RUN_PORT", 5000))
     app.run(debug=True, host='0.0.0.0', port=port)

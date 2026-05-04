@@ -18,6 +18,7 @@ ENV/
 
 # Environment and local secrets
 .env
+.vercel
 
 # Logs/runtime output
 logs/*.log
