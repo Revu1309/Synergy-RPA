@@ -53,7 +53,9 @@ from database.ui_settings import get_user_theme, set_user_theme
 from dashboard.menu_config import MENU_ITEMS, merge_menu_with_db_modules
 import data_store
 
-app = Flask(__name__)
+app = Flask(__name__, 
+            static_folder=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'static'),
+            template_folder='templates')
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'rpa-framework-dev-secret')
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
@@ -630,14 +632,21 @@ def build_theme_style(theme_key):
 
 @app.after_request
 def apply_user_theme(response):
+    """Inject dynamic theme CSS variables into the response HTML."""
     try:
-        if response.content_type and 'text/html' in response.content_type and response.status_code == 200:
+        # Only process successful HTML responses
+        if (response.content_type and 'text/html' in response.content_type and 
+            response.status_code == 200 and not request.path.startswith('/api/')):
+            
             html = response.get_data(as_text=True)
             if "</head>" in html and "id=\"global-theme-vars\"" not in html:
-                themed = html.replace("</head>", build_theme_style(get_active_theme()) + "\n</head>", 1)
-                response.set_data(themed)
-    except Exception:
-        pass
+                theme_style = build_theme_style(get_active_theme())
+                themed_html = html.replace("</head>", f"{theme_style}\n</head>", 1)
+                response.set_data(themed_html)
+                # Remove Content-Length so Flask/WSGI recalculates it
+                response.headers.pop('Content-Length', None)
+    except Exception as e:
+        print(f"Theme injection error: {e}")
     return response
 
 
