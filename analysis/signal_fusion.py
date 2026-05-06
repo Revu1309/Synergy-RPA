@@ -29,7 +29,7 @@ def _compute_crypto_score(cursor) -> Tuple[float, bool]:
         """
         SELECT symbol, price_usd, volume_24h, timestamp
         FROM crypto_assets
-        WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+        WHERE timestamp >= NOW() - INTERVAL '24 HOURS'
           AND price_usd IS NOT NULL
           AND volume_24h IS NOT NULL
         """
@@ -82,11 +82,11 @@ def _compute_social_score(cursor) -> Tuple[float, bool]:
     cursor.execute(
         """
         SELECT
-            SUM(CASE WHEN data_collected_at >= DATE_SUB(NOW(), INTERVAL 1 HOUR) THEN 1 ELSE 0 END) AS recent_count,
-            SUM(CASE WHEN data_collected_at >= DATE_SUB(NOW(), INTERVAL 2 HOUR)
-                      AND data_collected_at < DATE_SUB(NOW(), INTERVAL 1 HOUR) THEN 1 ELSE 0 END) AS prev_count
+            SUM(CASE WHEN data_collected_at >= NOW() - INTERVAL '1 HOURS' THEN 1 ELSE 0 END) AS recent_count,
+            SUM(CASE WHEN data_collected_at >= NOW() - INTERVAL '2 HOURS'
+                      AND data_collected_at < NOW() - INTERVAL '1 HOURS' THEN 1 ELSE 0 END) AS prev_count
         FROM social_trends
-        WHERE data_collected_at >= DATE_SUB(NOW(), INTERVAL 2 HOUR)
+        WHERE data_collected_at >= NOW() - INTERVAL '2 HOURS'
         """
     )
     recent_count, prev_count = cursor.fetchone()

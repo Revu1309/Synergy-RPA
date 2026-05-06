@@ -1556,7 +1556,7 @@ def get_dashboard_data():
         cursor.execute("""
             SELECT symbol, name, price_usd, market_cap, volume_24h, timestamp 
             FROM crypto_assets 
-            WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+            WHERE timestamp >= NOW() - INTERVAL '24 HOURS'
             ORDER BY timestamp DESC 
         """)
         latest = cursor.fetchall()
@@ -1661,7 +1661,7 @@ def get_advanced_dashboard_data():
         cursor.execute("""
             SELECT symbol, name, price_usd, market_cap, volume_24h, timestamp 
             FROM crypto_assets 
-            WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+            WHERE timestamp >= NOW() - INTERVAL '24 HOURS'
             ORDER BY timestamp DESC
         """)
         latest = cursor.fetchall()
@@ -1773,7 +1773,7 @@ def get_asset_data(symbol):
         cursor.execute("""
             SELECT timestamp, price_usd, market_cap, volume_24h 
             FROM crypto_assets 
-            WHERE symbol = %s AND timestamp >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+            WHERE symbol = %s AND timestamp >= NOW() - INTERVAL '24 HOURS'
             ORDER BY timestamp ASC
         """, (symbol,))
         

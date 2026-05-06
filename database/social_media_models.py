@@ -347,7 +347,7 @@ def get_emerging_trends(hours=24, limit=20):
                        avg_sentiment, analyzed_at
                 FROM trend_analysis
                 WHERE is_emerging = TRUE
-                AND analyzed_at >= DATE_SUB(NOW(), INTERVAL %s HOUR)
+                AND analyzed_at >= NOW() - (INTERVAL '1 hour' * %s)
                 ORDER BY growth_rate DESC, engagement_score DESC
                 LIMIT %s
             """, (hours, limit))
@@ -404,7 +404,7 @@ def get_trend_history(trend_name, platform, days=30):
                        engagement_at_time, sentiment_at_time, recorded_at
                 FROM trend_history
                 WHERE trend_name = %s AND source_platform = %s
-                AND recorded_at >= DATE_SUB(NOW(), INTERVAL %s DAY)
+                AND recorded_at >= NOW() - (INTERVAL '1 day' * %s)
                 ORDER BY recorded_at ASC
             """, (trend_name, platform, days))
             
@@ -425,7 +425,7 @@ def clear_old_trends(days=30):
         try:
             cursor.execute("""
                 DELETE FROM social_trends
-                WHERE data_collected_at < DATE_SUB(NOW(), INTERVAL %s DAY)
+                WHERE data_collected_at < NOW() - (INTERVAL '1 day' * %s)
             """, (days,))
             
             deleted = cursor.rowcount

@@ -22,7 +22,7 @@ class CryptoAnalyzer:
         try:
             query = """
                 SELECT * FROM crypto_assets
-                WHERE timestamp >= DATE_SUB(NOW(), INTERVAL %s HOUR)
+                WHERE timestamp >= NOW() - (INTERVAL '1 hour' * %s)
             """
             params = [hours_back]
 

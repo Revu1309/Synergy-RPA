@@ -36,6 +36,9 @@ class PreferredAssetsManager:
     @staticmethod
     def get_all_assets():
         """Get all preferred assets."""
+        # Hyper-resilience: Ensure table exists
+        PreferredAssetsManager.create_table()
+        
         conn = create_connection()
         if not conn:
             return []
@@ -55,6 +58,9 @@ class PreferredAssetsManager:
     @staticmethod
     def add_asset(symbol, name):
         """Add a new preferred asset."""
+        # Hyper-resilience: Ensure table exists
+        PreferredAssetsManager.create_table()
+        
         conn = create_connection()
         if not conn:
             return False, "Database connection failed"

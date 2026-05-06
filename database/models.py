@@ -275,14 +275,14 @@ def get_weather_history(location_name, days=7):
             query = """
                 SELECT * FROM weather_data 
                 WHERE location_name = %s 
-                AND timestamp >= CURRENT_TIMESTAMP - INTERVAL '%s day'
+                AND timestamp >= CURRENT_TIMESTAMP - (INTERVAL '1 day' * %s)
                 ORDER BY timestamp DESC
             """
         else:
             query = """
                 SELECT * FROM weather_data 
                 WHERE location_name = %s 
-                AND timestamp >= DATE_SUB(NOW(), INTERVAL %s DAY)
+                AND timestamp >= NOW() - INTERVAL '1 DAY' * %s
                 ORDER BY timestamp DESC
             """
         cursor.execute(query, (location_name, days))
@@ -326,14 +326,14 @@ def get_signal_fusion_index(hours=24):
                 query = """
                 SELECT timestamp, crypto_score, social_score, weather_score, fusion_score, confidence_level
                 FROM signal_fusion_index
-                WHERE timestamp >= CURRENT_TIMESTAMP - INTERVAL '%s hour'
+                WHERE timestamp >= CURRENT_TIMESTAMP - (INTERVAL '1 hour' * %s)
                 ORDER BY timestamp ASC
                 """
             else:
                 query = """
                 SELECT timestamp, crypto_score, social_score, weather_score, fusion_score, confidence_level
                 FROM signal_fusion_index
-                WHERE timestamp >= DATE_SUB(NOW(), INTERVAL %s HOUR)
+                WHERE timestamp >= NOW() - (INTERVAL '1 hour' * %s)
                 ORDER BY timestamp ASC
                 """
             cursor.execute(query, (hours,))

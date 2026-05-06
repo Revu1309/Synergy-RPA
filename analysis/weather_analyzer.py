@@ -24,7 +24,7 @@ class WeatherAnalyzer:
 
         query = """
             SELECT * FROM weather_data
-            WHERE timestamp >= DATE_SUB(NOW(), INTERVAL %s HOUR)
+            WHERE timestamp >= NOW() - (INTERVAL '1 hour' * %s)
         """
         params = [hours_back]
 
@@ -78,7 +78,7 @@ class WeatherAnalyzer:
         query = """
             SELECT * FROM weather_data
             WHERE location_name = %s
-            AND timestamp >= DATE_SUB(NOW(), INTERVAL %s DAY)
+            AND timestamp >= NOW() - (INTERVAL '1 day' * %s)
             ORDER BY timestamp DESC
         """
 
