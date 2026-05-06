@@ -2921,8 +2921,9 @@ def bootstrap_all():
         WeatherLocationsManager.create_table()
         WeatherLocationsManager.initialize_default_locations()
         
-        # Weather tables
-        from database.connection import create_weather_table, create_weather_locations_table, create_crypto_latest_table, create_weather_latest_table, create_social_latest_table, create_signal_fusion_index_table
+        # Core crypto_assets table (THE MAIN TABLE - must be created first)
+        from database.connection import create_table, create_weather_table, create_weather_locations_table, create_crypto_latest_table, create_weather_latest_table, create_social_latest_table, create_signal_fusion_index_table
+        create_table()  # crypto_assets table
         create_weather_table()
         create_weather_locations_table()
         create_crypto_latest_table()
