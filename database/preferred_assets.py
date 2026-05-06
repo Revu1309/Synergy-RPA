@@ -153,30 +153,30 @@ class PreferredAssetsManager:
             count = cursor.fetchone()[0]
             
             if count == 0:
-            # Major crypto assets in the $0.01-$1 price range
-            default_assets = [
-                ('XLM', 'Stellar Lumens'),
-                ('TRX', 'TRON'),
-                ('ADA', 'Cardano'),
-                ('DOGE', 'Dogecoin'),
-                ('VET', 'VeChain'),
-                ('ALGO', 'Algorand'),
-                ('XTZ', 'Tezos'),
-                ('ZIL', 'Zilliqa'),
-                ('ONE', 'Harmony One'),
-                ('GRT', 'The Graph'),
-                ('LRC', 'Loopring'),
-                ('ICP', 'Internet Computer'),
-                ('ARB', 'Arbitrum'),
-                ('OP', 'Optimism'),
-                ('APE', 'ApeCoin'),
-            ]
-            
-            for symbol, name in default_assets:
-                PreferredAssetsManager.add_asset(symbol, name)
-            
-            print(f"Initialized {len(default_assets)} default cryptocurrency assets")
-            conn.commit()
+                # Major crypto assets in the $0.01-$1 price range
+                default_assets = [
+                    ('XLM', 'Stellar Lumens'),
+                    ('TRX', 'TRON'),
+                    ('ADA', 'Cardano'),
+                    ('DOGE', 'Dogecoin'),
+                    ('VET', 'VeChain'),
+                    ('ALGO', 'Algorand'),
+                    ('XTZ', 'Tezos'),
+                    ('ZIL', 'Zilliqa'),
+                    ('ONE', 'Harmony One'),
+                    ('GRT', 'The Graph'),
+                    ('LRC', 'Loopring'),
+                    ('ICP', 'Internet Computer'),
+                    ('ARB', 'Arbitrum'),
+                    ('OP', 'Optimism'),
+                    ('APE', 'ApeCoin'),
+                ]
+                
+                for symbol, name in default_assets:
+                    PreferredAssetsManager.add_asset(symbol, name)
+                
+                print(f"Initialized {len(default_assets)} default cryptocurrency assets")
+                conn.commit()
         except Exception as e:
             print(f"Error seeding assets: {e}")
         finally:
