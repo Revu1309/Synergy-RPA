@@ -1,7 +1,6 @@
 """Weather locations management model."""
 
-from database.connection import create_connection
-
+from database.connection import create_connection, get_cursor, is_postgres
 
 class WeatherLocationsManager:
     """Manage weather monitoring locations."""
@@ -11,22 +10,38 @@ class WeatherLocationsManager:
         """Create weather_locations table if it doesn't exist."""
         connection = create_connection()
         if connection:
-            cursor = connection.cursor()
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS weather_locations (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    location_name VARCHAR(100) NOT NULL UNIQUE,
-                    country VARCHAR(100),
-                    latitude DECIMAL(10, 6) NOT NULL,
-                    longitude DECIMAL(10, 6) NOT NULL,
-                    is_active BOOLEAN DEFAULT TRUE,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    notes TEXT,
-                    INDEX idx_active (is_active),
-                    INDEX idx_location_name (location_name)
-                )
-            """)
+            cursor = get_cursor(connection)
+            if is_postgres(connection):
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS weather_locations (
+                        id SERIAL PRIMARY KEY,
+                        location_name VARCHAR(100) NOT NULL UNIQUE,
+                        country VARCHAR(100),
+                        latitude DECIMAL(10, 6) NOT NULL,
+                        longitude DECIMAL(10, 6) NOT NULL,
+                        is_active BOOLEAN DEFAULT TRUE,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        notes TEXT
+                    )
+                """)
+                cursor.execute("CREATE INDEX IF NOT EXISTS idx_wloc_active ON weather_locations(is_active)")
+            else:
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS weather_locations (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        location_name VARCHAR(100) NOT NULL UNIQUE,
+                        country VARCHAR(100),
+                        latitude DECIMAL(10, 6) NOT NULL,
+                        longitude DECIMAL(10, 6) NOT NULL,
+                        is_active BOOLEAN DEFAULT TRUE,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        notes TEXT,
+                        INDEX idx_active (is_active),
+                        INDEX idx_location_name (location_name)
+                    )
+                """)
             connection.commit()
             cursor.close()
             connection.close()
@@ -36,7 +51,7 @@ class WeatherLocationsManager:
         """Add a new weather location."""
         connection = create_connection()
         if connection:
-            cursor = connection.cursor()
+            cursor = get_cursor(connection)
             try:
                 query = """
                     INSERT INTO weather_locations 
@@ -60,7 +75,7 @@ class WeatherLocationsManager:
         """Get all weather locations."""
         connection = create_connection()
         if connection:
-            cursor = connection.cursor()
+            cursor = get_cursor(connection)
             if active_only:
                 query = "SELECT * FROM weather_locations WHERE is_active = TRUE ORDER BY location_name"
                 cursor.execute(query)
@@ -94,7 +109,7 @@ class WeatherLocationsManager:
         """Get a specific location by ID."""
         connection = create_connection()
         if connection:
-            cursor = connection.cursor()
+            cursor = get_cursor(connection)
             query = "SELECT * FROM weather_locations WHERE id = %s"
             cursor.execute(query, (location_id,))
             result = cursor.fetchone()
@@ -121,7 +136,7 @@ class WeatherLocationsManager:
         """Update a location."""
         connection = create_connection()
         if connection:
-            cursor = connection.cursor()
+            cursor = get_cursor(connection)
             
             # Build dynamic update query
             updates = []
@@ -172,7 +187,7 @@ class WeatherLocationsManager:
         """Delete a location (soft delete via is_active)."""
         connection = create_connection()
         if connection:
-            cursor = connection.cursor()
+            cursor = get_cursor(connection)
             query = "UPDATE weather_locations SET is_active = FALSE WHERE id = %s"
             try:
                 cursor.execute(query, (location_id,))
@@ -192,7 +207,7 @@ class WeatherLocationsManager:
         """Clear all weather locations (for reinitializing)."""
         connection = create_connection()
         if connection:
-            cursor = connection.cursor()
+            cursor = get_cursor(connection)
             try:
                 # Delete all weather locations
                 query = "DELETE FROM weather_locations"
@@ -229,4 +244,3 @@ class WeatherLocationsManager:
             print(f"✓ Initialized {len(predefined_cities)} weather locations from predefined cities")
         else:
             print("⚠ No predefined cities found to initialize weather locations")
-

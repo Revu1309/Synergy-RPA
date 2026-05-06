@@ -1,6 +1,6 @@
 """Preferred Assets Management Module"""
 
-from database.connection import create_connection
+from database.connection import create_connection, get_cursor, is_postgres
 
 class PreferredAssetsManager:
     """Manage user preferred cryptocurrency assets."""
@@ -10,15 +10,25 @@ class PreferredAssetsManager:
         """Create the preferred_assets table if it doesn't exist."""
         conn = create_connection()
         if conn:
-            cursor = conn.cursor()
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS preferred_assets (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    symbol VARCHAR(10) NOT NULL UNIQUE,
-                    name VARCHAR(100) NOT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-            """)
+            cursor = get_cursor(conn)
+            if is_postgres(conn):
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS preferred_assets (
+                        id SERIAL PRIMARY KEY,
+                        symbol VARCHAR(10) NOT NULL UNIQUE,
+                        name VARCHAR(100) NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+            else:
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS preferred_assets (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        symbol VARCHAR(10) NOT NULL UNIQUE,
+                        name VARCHAR(100) NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
             conn.commit()
             cursor.close()
             conn.close()
@@ -31,7 +41,7 @@ class PreferredAssetsManager:
             return []
         
         try:
-            cursor = conn.cursor()
+            cursor = get_cursor(conn)
             cursor.execute("SELECT id, symbol, name FROM preferred_assets ORDER BY symbol ASC")
             assets = cursor.fetchall()
             cursor.close()
@@ -50,7 +60,7 @@ class PreferredAssetsManager:
             return False, "Database connection failed"
         
         try:
-            cursor = conn.cursor()
+            cursor = get_cursor(conn)
             cursor.execute(
                 "INSERT INTO preferred_assets (symbol, name) VALUES (%s, %s)",
                 (symbol.upper(), name)
@@ -70,7 +80,7 @@ class PreferredAssetsManager:
             return False, "Database connection failed"
         
         try:
-            cursor = conn.cursor()
+            cursor = get_cursor(conn)
             cursor.execute(
                 "UPDATE preferred_assets SET symbol = %s, name = %s WHERE id = %s",
                 (symbol.upper(), name, asset_id)
@@ -90,7 +100,7 @@ class PreferredAssetsManager:
             return False, "Database connection failed"
         
         try:
-            cursor = conn.cursor()
+            cursor = get_cursor(conn)
             cursor.execute("DELETE FROM preferred_assets WHERE id = %s", (asset_id,))
             conn.commit()
             cursor.close()
@@ -110,7 +120,7 @@ class PreferredAssetsManager:
         """Clear all preferred assets from the table."""
         conn = create_connection()
         if conn:
-            cursor = conn.cursor()
+            cursor = get_cursor(conn)
             try:
                 cursor.execute("DELETE FROM preferred_assets")
                 conn.commit()
@@ -129,25 +139,24 @@ class PreferredAssetsManager:
         if not assets:
             # Major crypto assets in the $0.01-$1 price range
             default_assets = [
-                ('XLM', 'Stellar Lumens'),         # ~$0.08-0.12
-                ('TRX', 'TRON'),                   # ~$0.05-0.10
-                ('ADA', 'Cardano'),                # ~$0.35-0.50
-                ('DOGE', 'Dogecoin'),              # ~$0.08-0.15
-                ('VET', 'VeChain'),                # ~$0.02-0.05
-                ('ALGO', 'Algorand'),              # ~$0.15-0.40
-                ('XTZ', 'Tezos'),                  # ~$0.80-1.20
-                ('ZIL', 'Zilliqa'),                # ~$0.02-0.05
-                ('ONE', 'Harmony One'),            # ~$0.01-0.05
-                ('GRT', 'The Graph'),              # ~$0.08-0.30
-                ('LRC', 'Loopring'),               # ~$0.20-0.60
-                ('ICP', 'Internet Computer'),      # ~$3-8 (some range overlap)
-                ('ARB', 'Arbitrum'),               # ~$0.50-1.50
-                ('OP', 'Optimism'),                # ~$0.50-1.50
-                ('APE', 'ApeCoin'),                # ~$0.50-2.00
+                ('XLM', 'Stellar Lumens'),
+                ('TRX', 'TRON'),
+                ('ADA', 'Cardano'),
+                ('DOGE', 'Dogecoin'),
+                ('VET', 'VeChain'),
+                ('ALGO', 'Algorand'),
+                ('XTZ', 'Tezos'),
+                ('ZIL', 'Zilliqa'),
+                ('ONE', 'Harmony One'),
+                ('GRT', 'The Graph'),
+                ('LRC', 'Loopring'),
+                ('ICP', 'Internet Computer'),
+                ('ARB', 'Arbitrum'),
+                ('OP', 'Optimism'),
+                ('APE', 'ApeCoin'),
             ]
             
             for symbol, name in default_assets:
                 PreferredAssetsManager.add_asset(symbol, name)
             
-            print(f"Initialized {len(default_assets)} default cryptocurrency assets (price range: $0.01-$1)")
-
+            print(f"Initialized {len(default_assets)} default cryptocurrency assets")
