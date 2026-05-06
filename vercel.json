@@ -14,5 +14,11 @@
       "src": "(.*)",
       "dest": "dashboard/app_new.py"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/sync",
+      "schedule": "*/10 * * * *"
+    }
   ]
 }
