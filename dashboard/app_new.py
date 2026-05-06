@@ -2825,6 +2825,10 @@ def api_force_sync():
     """Manually trigger data sync for crypto, social media, and weather (requires login)."""
     try:
         print("Starting manual force sync via UI...")
+        
+        # Ensure database is initialized with default assets/cities if empty
+        bootstrap_all()
+        
         from scheduler.job import scrape_and_store, sync_social_media_trends
         
         # Run sync tasks
