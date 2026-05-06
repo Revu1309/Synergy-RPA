@@ -266,6 +266,7 @@
                         <option value="">Loading assets...</option>
                     </select>
                     <button class="btn btn-refresh" onclick="loadAssetData()"> Refresh</button>
+                    <button class="btn btn-refresh" id="syncBtn" onclick="forceSync()" style="background: var(--accent-secondary);"> Force Sync</button>
                     <button class="btn btn-menu" onclick="goToMenu()"> Menu</button>
                 </div>
             </div>
@@ -321,6 +322,39 @@
                 } catch (error) {
                     console.error('Error loading assets:', error);
                     document.getElementById('loading').innerHTML = '<p>Error loading assets. Please refresh.</p>';
+                }
+            }
+
+            async function forceSync() {
+                const syncBtn = document.getElementById('syncBtn');
+                const originalText = syncBtn.textContent;
+                
+                if (!confirm("This will fetch live data from all sources. It may take 15-30 seconds. Continue?")) {
+                    return;
+                }
+
+                syncBtn.disabled = true;
+                syncBtn.textContent = ' Syncing...';
+                
+                try {
+                    const response = await fetch('/api/force-sync', { 
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        alert("Synchronization complete! Data is now live.");
+                        loadAssetData(); // Refresh the current view
+                    } else {
+                        alert("Sync failed: " + data.message);
+                    }
+                } catch (error) {
+                    console.error('Manual sync error:', error);
+                    alert("An error occurred during synchronization.");
+                } finally {
+                    syncBtn.disabled = false;
+                    syncBtn.textContent = originalText;
                 }
             }
 

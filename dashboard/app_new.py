@@ -2819,6 +2819,24 @@ def advanced_social_trends_dashboard():
 
 # ==================== REDIRECT ====================
 
+@app.route('/api/force-sync', methods=['POST'])
+@login_required
+def api_force_sync():
+    """Manually trigger data sync for crypto, social media, and weather (requires login)."""
+    try:
+        print("Starting manual force sync via UI...")
+        from scheduler.job import scrape_and_store, sync_social_media_trends
+        
+        # Run sync tasks
+        scrape_and_store()
+        sync_social_media_trends()
+        sync_weather_job()
+        
+        return jsonify({"success": True, "message": "Data synchronization complete!"})
+    except Exception as e:
+        print(f"Error during manual sync: {e}")
+        return jsonify({"success": False, "message": str(e)}), 500
+
 @app.route('/api/cron/sync')
 def cron_sync():
     """Trigger data sync for crypto, social media, and weather."""
