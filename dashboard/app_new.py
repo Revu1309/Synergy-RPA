@@ -1242,6 +1242,13 @@ def social_trend_alerts_page():
 @app.route('/asset-management', methods=['GET'])
 @login_required
 def asset_management():
+    # Ensure database is seeded
+    if os.environ.get('VERCEL'):
+        try:
+            bootstrap_all()
+        except Exception as e:
+            print(f"Management bootstrap error: {e}")
+            
     """Display asset management page."""
     return render_template("asset_management.html")
 
