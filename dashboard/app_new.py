@@ -798,8 +798,18 @@ def handle_exception(e):
 # ==================== LOGIN & AUTHENTICATION ====================
 
 
-@app.route('/login', methods=['GET'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    # Proactively ensure DB is initialized on Vercel
+    if os.environ.get('VERCEL'):
+        try:
+            bootstrap_all()
+        except Exception as e:
+            print(f"Login bootstrap failed: {e}")
+
+    if request.method == 'POST':
+        return redirect(url_for('login'))
+        
     """Display login page."""
     return render_template("login.html")
 
