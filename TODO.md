@@ -1,38 +1,14 @@
-# Glassmorphic UI System Implementation
-Status: In Progress
+# TODO - Realtime data not showing
 
-## Phase 1: Core System ✅ Complete
-- [x] Create TODO.md
-- [x] Update static/css/dashboard.css: Glass vars, 3 themes, component resets
-- [x] Enhance dashboard/templates/base.html: Theme switching, full overrides
-- [x] Migrate dashboard.html to base + glass
-- [x] Migrate login.html to base vars
-- [x] Migrate analytics_dashboard.html to glass
-- [x] Test Phase 1: All 5 pages consistent glass, theme switch works
+## Plan confirmation
+- Add real-time UI integration so `dashboard.html` actually loads `static/js/realtime-data-manager.js`.
+- Add missing DOM containers used by the JS (`crypto-container`, `weather-container`, `social-container`, `signal-fusion-container`).
+- Minimal integration: show the latest received payloads.
+- Keep existing `/api/dashboard-data` snapshot/cards.
 
-## Phase 2: Full Migration
-- [ ] asset_management.html, weather_dashboard.html, social_trends_dashboard.html
-- [ ] admin_*.html (users, alerts, access)
-- [ ] All remaining *_dashboard.html
-
-## Phase 3: Polish & Test
-- [ ] Theme persistence localStorage
-- [ ] Chart glass wrappers everywhere
-- [ ] Full responsive/mobile test
-- [ ] attempt_completion
-
-## Phase 2: Full Migration
-- [ ] asset_management.html, weather_dashboard.html, social_trends_dashboard.html
-- [ ] admin_*.html (users, alerts, access)
-- [ ] All remaining *_dashboard.html
-- [ ] Backend: app_new.py theme session support
-
-## Phase 3: Polish & Test
-- [ ] Theme persistence (localStorage + DB)
-- [ ] Chart glass wrappers (Plotly/SVG)
-- [ ] Motion system (global easings)
-- [ ] Full responsive testing
-- [ ] attempt_completion with demo command
-
-Updated: Automatically by BLACKBOXAI
+## Steps
+1. Inspect and update `dashboard/templates/dashboard.html`.
+2. (If needed) update `static/js/realtime-data-manager.js` so it updates the existing dashboard DOM rather than relying on missing helpers.
+3. Run `test_realtime_integration.py` (and/or manual curl/EventSource checks).
+4. Verify in browser Network tab: ensure EventSource connections hit `/api/realtime/*`.
 

@@ -54,6 +54,35 @@
     <section class="metrics-grid" id="metrics">
       <!-- Dynamic metrics cards -->
     </section>
+
+    <!-- Real-time containers (SSE + polling fallback via static/js/realtime-data-manager.js) -->
+    <section class="charts-grid" style="grid-template-columns: 1fr;" id="realtime">
+      <div class="card chart-container" style="min-height: 160px;">
+        <h3 style="margin-bottom: 12px;">Crypto (real-time)</h3>
+        <div id="crypto-container"></div>
+      </div>
+      <div class="card chart-container" style="min-height: 160px;">
+        <h3 style="margin-bottom: 12px;">Weather (real-time)</h3>
+        <div id="weather-container"></div>
+      </div>
+      <div class="card chart-container" style="min-height: 160px;">
+        <h3 style="margin-bottom: 12px;">Social Trends (real-time)</h3>
+        <div id="social-container"></div>
+      </div>
+      <div class="card chart-container" style="min-height: 140px;">
+        <h3 style="margin-bottom: 12px;">Signal Fusion (real-time)</h3>
+        <div id="signal-fusion-container"></div>
+      </div>
+
+      <div class="card" style="margin-top: var(--space-md); padding: var(--space-lg);">
+        <h3 style="margin-bottom: 10px;">Connection</h3>
+        <div id="connection-indicator" style="display:flex;align-items:center;gap:10px;">
+          <span class="connection-indicator disconnected"></span>
+          <span style="color: var(--text-secondary);">Waiting for stream...</span>
+        </div>
+      </div>
+    </section>
+
     <section class="charts-grid" id="charts">
       <!-- Dynamic charts -->
     </section>
@@ -65,6 +94,7 @@
 {% endblock %}
 
 {% block scripts_extra %}
+<script src="{{ url_for('static', filename='js/realtime-data-manager.js') }}"></script>
 <script>
 async function loadDashboard() {
   const loading = document.getElementById('loading');
@@ -142,6 +172,7 @@ function setTheme(theme) {
 
 // Load on start
 document.addEventListener('DOMContentLoaded', () => {
+  // real-time containers should be visible once first snapshot loads
   loadDashboard();
   // Auto-refresh every 5 min
   setInterval(loadDashboard, 300000);
