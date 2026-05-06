@@ -49,109 +49,120 @@ def create_alerts_table():
         print("Failed to create alerts table: DB connection failed")
         return
 
-    cur = conn.cursor()
+    cur = get_cursor(conn)
     try:
-        cur.execute(
-            """
-            CREATE TABLE IF NOT EXISTS crypto_alerts (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                symbol VARCHAR(20) NOT NULL,
-                `condition` ENUM('gt','lt','eq') NOT NULL,
-                threshold DECIMAL(30,8) NOT NULL,
-                is_active BOOLEAN DEFAULT TRUE,
-                notify_method VARCHAR(50) DEFAULT 'console',
-                description TEXT,
-                alert_mode VARCHAR(20) DEFAULT 'standard',
-                custom_metric VARCHAR(50) NULL,
-                custom_config TEXT NULL,
-                cooldown_minutes INT DEFAULT 15,
-                is_triggered BOOLEAN DEFAULT FALSE,
-                last_trigger_message TEXT NULL,
-                last_evaluated TIMESTAMP NULL,
-                last_triggered TIMESTAMP NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                INDEX idx_symbol (symbol),
-                INDEX idx_active (is_active),
-                INDEX idx_alert_mode (alert_mode)
-            )
-        """
-        )
-
-        alter_statements = [
-            "ALTER TABLE crypto_alerts MODIFY `condition` ENUM('gt','lt','eq') NOT NULL",
-            "ALTER TABLE crypto_alerts ADD COLUMN alert_mode VARCHAR(20) DEFAULT 'standard'",
-            "ALTER TABLE crypto_alerts ADD COLUMN custom_metric VARCHAR(50) NULL",
-            "ALTER TABLE crypto_alerts ADD COLUMN custom_config TEXT NULL",
-            "ALTER TABLE crypto_alerts ADD COLUMN cooldown_minutes INT DEFAULT 15",
-            "ALTER TABLE crypto_alerts ADD COLUMN is_triggered BOOLEAN DEFAULT FALSE",
-            "ALTER TABLE crypto_alerts ADD COLUMN last_trigger_message TEXT NULL",
-            "ALTER TABLE crypto_alerts ADD COLUMN last_evaluated TIMESTAMP NULL",
-            "ALTER TABLE crypto_alerts ADD INDEX idx_alert_mode (alert_mode)",
-        ]
-        for stmt in alter_statements:
-            try:
-                cur.execute(stmt)
-            except Exception:
-                pass
-
-        cur.execute(
-            """
-            CREATE TABLE IF NOT EXISTS alert_notification_channels (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                channel_key VARCHAR(50) NOT NULL UNIQUE,
-                module_key VARCHAR(20) NOT NULL DEFAULT 'all',
-                channel_type VARCHAR(50) NOT NULL,
-                is_active BOOLEAN DEFAULT TRUE,
-                config_json TEXT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                INDEX idx_module_key (module_key),
-                INDEX idx_channel_type (channel_type),
-                INDEX idx_channel_active (is_active)
-            )
-        """
-        )
-        for stmt in [
-            "ALTER TABLE alert_notification_channels ADD COLUMN module_key VARCHAR(20) NOT NULL DEFAULT 'all'",
-            "ALTER TABLE alert_notification_channels ADD INDEX idx_module_key (module_key)",
-        ]:
-            try:
-                cur.execute(stmt)
-            except Exception:
-                pass
-
-        cur.execute(
-            """
-            CREATE TABLE IF NOT EXISTS crypto_alert_events (
-                id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                alert_id INT NOT NULL,
-                symbol VARCHAR(20) NOT NULL,
-                event_type VARCHAR(30) NOT NULL,
-                message TEXT,
-                observed_price DECIMAL(30,8) NULL,
-                metric_value DECIMAL(30,8) NULL,
-                payload_json TEXT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                INDEX idx_alert_id (alert_id),
-                INDEX idx_symbol (symbol),
-                INDEX idx_event_type (event_type),
-                INDEX idx_created_at (created_at)
-            )
-        """
-        )
-
-        cur.execute(
-            """
-            INSERT INTO alert_notification_channels (channel_key, module_key, channel_type, is_active, config_json)
-            VALUES (%s, %s, %s, %s, %s)
-            ON DUPLICATE KEY UPDATE channel_type = VALUES(channel_type), is_active = VALUES(is_active)
-        """,
-            ("console_default", "all", "console", True, "{}"),
-        )
+        if is_postgres(conn):
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS crypto_alerts (
+                    id SERIAL PRIMARY KEY,
+                    symbol VARCHAR(20) NOT NULL,
+                    "condition" VARCHAR(10) NOT NULL,
+                    threshold DECIMAL(30,8) NOT NULL,
+                    is_active BOOLEAN DEFAULT TRUE,
+                    notify_method VARCHAR(50) DEFAULT 'console',
+                    description TEXT,
+                    alert_mode VARCHAR(20) DEFAULT 'standard',
+                    custom_metric VARCHAR(50) NULL,
+                    custom_config TEXT NULL,
+                    cooldown_minutes INT DEFAULT 15,
+                    is_triggered BOOLEAN DEFAULT FALSE,
+                    last_trigger_message TEXT NULL,
+                    last_evaluated TIMESTAMP NULL,
+                    last_triggered TIMESTAMP NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            cur.execute("CREATE INDEX IF NOT EXISTS idx_crypto_alert_sym ON crypto_alerts(symbol)")
+            
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS alert_notification_channels (
+                    id SERIAL PRIMARY KEY,
+                    channel_key VARCHAR(50) NOT NULL UNIQUE,
+                    module_key VARCHAR(20) NOT NULL DEFAULT 'all',
+                    channel_type VARCHAR(50) NOT NULL,
+                    is_active BOOLEAN DEFAULT TRUE,
+                    config_json TEXT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS crypto_alert_events (
+                    id BIGSERIAL PRIMARY KEY,
+                    alert_id INT NOT NULL,
+                    symbol VARCHAR(20) NOT NULL,
+                    event_type VARCHAR(30) NOT NULL,
+                    message TEXT,
+                    observed_price DECIMAL(30,8) NULL,
+                    metric_value DECIMAL(30,8) NULL,
+                    payload_json TEXT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            
+            cur.execute("""
+                INSERT INTO alert_notification_channels (channel_key, module_key, channel_type, is_active, config_json)
+                VALUES (%s, %s, %s, %s, %s)
+                ON CONFLICT (channel_key) DO UPDATE SET channel_type = EXCLUDED.channel_type, is_active = EXCLUDED.is_active
+            """, ("console_default", "all", "console", True, "{}"))
+        else:
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS crypto_alerts (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    symbol VARCHAR(20) NOT NULL,
+                    `condition` VARCHAR(10) NOT NULL,
+                    threshold DECIMAL(30,8) NOT NULL,
+                    is_active BOOLEAN DEFAULT TRUE,
+                    notify_method VARCHAR(50) DEFAULT 'console',
+                    description TEXT,
+                    alert_mode VARCHAR(20) DEFAULT 'standard',
+                    custom_metric VARCHAR(50) NULL,
+                    custom_config TEXT NULL,
+                    cooldown_minutes INT DEFAULT 15,
+                    is_triggered BOOLEAN DEFAULT FALSE,
+                    last_trigger_message TEXT NULL,
+                    last_evaluated TIMESTAMP NULL,
+                    last_triggered TIMESTAMP NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    INDEX idx_symbol (symbol)
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS alert_notification_channels (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    channel_key VARCHAR(50) NOT NULL UNIQUE,
+                    module_key VARCHAR(20) NOT NULL DEFAULT 'all',
+                    channel_type VARCHAR(50) NOT NULL,
+                    is_active BOOLEAN DEFAULT TRUE,
+                    config_json TEXT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                )
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS crypto_alert_events (
+                    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                    alert_id INT NOT NULL,
+                    symbol VARCHAR(20) NOT NULL,
+                    event_type VARCHAR(30) NOT NULL,
+                    message TEXT,
+                    observed_price DECIMAL(30,8) NULL,
+                    metric_value DECIMAL(30,8) NULL,
+                    payload_json TEXT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    INDEX idx_alert_id (alert_id)
+                )
+            """)
+            cur.execute("""
+                INSERT INTO alert_notification_channels (channel_key, module_key, channel_type, is_active, config_json)
+                VALUES (%s, %s, %s, %s, %s)
+                ON DUPLICATE KEY UPDATE channel_type = VALUES(channel_type), is_active = VALUES(is_active)
+            """, ("console_default", "all", "console", True, "{}"))
 
         conn.commit()
-        print("crypto_alerts and alert support tables ensured")
     finally:
         cur.close()
         conn.close()
@@ -378,17 +389,25 @@ def get_price_minutes_ago(symbol, minutes=60):
         return None
     cur = conn.cursor()
     try:
-        cur.execute(
+        if is_postgres(conn):
+            query = """
+                SELECT price_usd, timestamp
+                FROM crypto_assets
+                WHERE symbol = %s
+                  AND timestamp <= CURRENT_TIMESTAMP - INTERVAL '%s minute'
+                ORDER BY timestamp DESC
+                LIMIT 1
             """
-            SELECT price_usd, timestamp
-            FROM crypto_assets
-            WHERE symbol = %s
-              AND timestamp <= DATE_SUB(UTC_TIMESTAMP(), INTERVAL %s MINUTE)
-            ORDER BY timestamp DESC
-            LIMIT 1
-        """,
-            (symbol, minutes),
-        )
+        else:
+            query = """
+                SELECT price_usd, timestamp
+                FROM crypto_assets
+                WHERE symbol = %s
+                  AND timestamp <= DATE_SUB(UTC_TIMESTAMP(), INTERVAL %s MINUTE)
+                ORDER BY timestamp DESC
+                LIMIT 1
+            """
+        cur.execute(query, (symbol, minutes))
         r = cur.fetchone()
         if not r:
             return None
@@ -531,8 +550,19 @@ def upsert_notification_channel(channel_key, channel_type, is_active=True, confi
         return False
     cur = conn.cursor()
     try:
-        cur.execute(
+        if is_postgres(conn):
+            query = """
+            INSERT INTO alert_notification_channels (channel_key, module_key, channel_type, is_active, config_json)
+            VALUES (%s,%s,%s,%s,%s)
+            ON CONFLICT (channel_key) DO UPDATE SET
+                module_key = EXCLUDED.module_key,
+                channel_type = EXCLUDED.channel_type,
+                is_active = EXCLUDED.is_active,
+                config_json = EXCLUDED.config_json,
+                updated_at = CURRENT_TIMESTAMP
             """
+        else:
+            query = """
             INSERT INTO alert_notification_channels (channel_key, module_key, channel_type, is_active, config_json)
             VALUES (%s,%s,%s,%s,%s)
             ON DUPLICATE KEY UPDATE
@@ -541,9 +571,8 @@ def upsert_notification_channel(channel_key, channel_type, is_active=True, confi
                 is_active = VALUES(is_active),
                 config_json = VALUES(config_json),
                 updated_at = CURRENT_TIMESTAMP
-        """,
-            (channel_key, module_key, channel_type, is_active, json.dumps(config or {})),
-        )
+            """
+        cur.execute(query, (channel_key, module_key, channel_type, is_active, json.dumps(config or {})))
         conn.commit()
         return True
     except Exception as e:
@@ -663,29 +692,43 @@ def update_alert_state(alert_id, is_triggered, message, triggered_now=False):
         return False
     cur = conn.cursor()
     try:
-        if triggered_now:
-            cur.execute(
+        if is_postgres(conn):
+            if triggered_now:
+                query = """
+                    UPDATE crypto_alerts
+                    SET is_triggered = %s,
+                        last_trigger_message = %s,
+                        last_evaluated = CURRENT_TIMESTAMP,
+                        last_triggered = CURRENT_TIMESTAMP
+                    WHERE id = %s
                 """
-                UPDATE crypto_alerts
-                SET is_triggered = %s,
-                    last_trigger_message = %s,
-                    last_evaluated = UTC_TIMESTAMP(),
-                    last_triggered = UTC_TIMESTAMP()
-                WHERE id = %s
-            """,
-                (is_triggered, message, alert_id),
-            )
+            else:
+                query = """
+                    UPDATE crypto_alerts
+                    SET is_triggered = %s,
+                        last_trigger_message = %s,
+                        last_evaluated = CURRENT_TIMESTAMP
+                    WHERE id = %s
+                """
         else:
-            cur.execute(
+            if triggered_now:
+                query = """
+                    UPDATE crypto_alerts
+                    SET is_triggered = %s,
+                        last_trigger_message = %s,
+                        last_evaluated = UTC_TIMESTAMP(),
+                        last_triggered = UTC_TIMESTAMP()
+                    WHERE id = %s
                 """
-                UPDATE crypto_alerts
-                SET is_triggered = %s,
-                    last_trigger_message = %s,
-                    last_evaluated = UTC_TIMESTAMP()
-                WHERE id = %s
-            """,
-                (is_triggered, message, alert_id),
-            )
+            else:
+                query = """
+                    UPDATE crypto_alerts
+                    SET is_triggered = %s,
+                        last_trigger_message = %s,
+                        last_evaluated = UTC_TIMESTAMP()
+                    WHERE id = %s
+                """
+        cur.execute(query, (is_triggered, message, alert_id))
         conn.commit()
         return True
     except Exception as e:
@@ -797,64 +840,83 @@ def create_weather_alerts_table():
     if not conn:
         print('Failed to create weather alerts table: DB connection failed')
         return
-    cur = conn.cursor()
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS weather_alerts (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            location_name VARCHAR(100) NOT NULL,
-            alert_type VARCHAR(50) NOT NULL,
-            `condition` ENUM('gt','lt','eq') NOT NULL,
-            threshold DECIMAL(10,2) NOT NULL,
-            metric_type VARCHAR(50) NOT NULL,
-            is_active BOOLEAN DEFAULT TRUE,
-            notify_method VARCHAR(50) DEFAULT 'console',
-            description TEXT,
-            alert_mode VARCHAR(20) DEFAULT 'standard',
-            custom_config TEXT NULL,
-            cooldown_minutes INT DEFAULT 15,
-            is_triggered BOOLEAN DEFAULT FALSE,
-            last_trigger_message TEXT NULL,
-            last_evaluated TIMESTAMP NULL,
-            last_triggered TIMESTAMP NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            INDEX idx_location (location_name),
-            INDEX idx_active (is_active),
-            INDEX idx_metric (metric_type)
-        )
-    """)
-    for stmt in [
-        "ALTER TABLE weather_alerts ADD COLUMN alert_mode VARCHAR(20) DEFAULT 'standard'",
-        "ALTER TABLE weather_alerts ADD COLUMN custom_config TEXT NULL",
-        "ALTER TABLE weather_alerts ADD COLUMN cooldown_minutes INT DEFAULT 15",
-        "ALTER TABLE weather_alerts ADD COLUMN is_triggered BOOLEAN DEFAULT FALSE",
-        "ALTER TABLE weather_alerts ADD COLUMN last_trigger_message TEXT NULL",
-        "ALTER TABLE weather_alerts ADD COLUMN last_evaluated TIMESTAMP NULL",
-    ]:
-        try:
-            cur.execute(stmt)
-        except Exception:
-            pass
-
-    cur.execute(
-        """
-        CREATE TABLE IF NOT EXISTS weather_alert_events (
-            id BIGINT AUTO_INCREMENT PRIMARY KEY,
-            alert_id INT NOT NULL,
-            location_name VARCHAR(100) NOT NULL,
-            event_type VARCHAR(30) NOT NULL,
-            message TEXT,
-            metric_type VARCHAR(50),
-            metric_value DECIMAL(20,6) NULL,
-            payload_json TEXT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            INDEX idx_alert_id (alert_id),
-            INDEX idx_location (location_name),
-            INDEX idx_event_type (event_type),
-            INDEX idx_created_at (created_at)
-        )
-    """
-    )
+    cur = get_cursor(conn)
+    if is_postgres(conn):
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS weather_alerts (
+                id SERIAL PRIMARY KEY,
+                location_name VARCHAR(100) NOT NULL,
+                alert_type VARCHAR(50) NOT NULL,
+                "condition" VARCHAR(10) NOT NULL,
+                threshold DECIMAL(10,2) NOT NULL,
+                metric_type VARCHAR(50) NOT NULL,
+                is_active BOOLEAN DEFAULT TRUE,
+                notify_method VARCHAR(50) DEFAULT 'console',
+                description TEXT,
+                alert_mode VARCHAR(20) DEFAULT 'standard',
+                custom_config TEXT NULL,
+                cooldown_minutes INT DEFAULT 15,
+                is_triggered BOOLEAN DEFAULT FALSE,
+                last_trigger_message TEXT NULL,
+                last_evaluated TIMESTAMP NULL,
+                last_triggered TIMESTAMP NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_weather_alert_loc ON weather_alerts(location_name)")
+        
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS weather_alert_events (
+                id BIGSERIAL PRIMARY KEY,
+                alert_id INT NOT NULL,
+                location_name VARCHAR(100) NOT NULL,
+                event_type VARCHAR(30) NOT NULL,
+                message TEXT,
+                metric_type VARCHAR(50),
+                metric_value DECIMAL(20,6) NULL,
+                payload_json TEXT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+    else:
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS weather_alerts (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                location_name VARCHAR(100) NOT NULL,
+                alert_type VARCHAR(50) NOT NULL,
+                `condition` VARCHAR(10) NOT NULL,
+                threshold DECIMAL(10,2) NOT NULL,
+                metric_type VARCHAR(50) NOT NULL,
+                is_active BOOLEAN DEFAULT TRUE,
+                notify_method VARCHAR(50) DEFAULT 'console',
+                description TEXT,
+                alert_mode VARCHAR(20) DEFAULT 'standard',
+                custom_config TEXT NULL,
+                cooldown_minutes INT DEFAULT 15,
+                is_triggered BOOLEAN DEFAULT FALSE,
+                last_trigger_message TEXT NULL,
+                last_evaluated TIMESTAMP NULL,
+                last_triggered TIMESTAMP NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                INDEX idx_location (location_name)
+            )
+        """)
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS weather_alert_events (
+                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                alert_id INT NOT NULL,
+                location_name VARCHAR(100) NOT NULL,
+                event_type VARCHAR(30) NOT NULL,
+                message TEXT,
+                metric_type VARCHAR(50),
+                metric_value DECIMAL(20,6) NULL,
+                payload_json TEXT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_alert_id (alert_id)
+            )
+        """)
     conn.commit()
     cur.close()
     conn.close()
@@ -979,68 +1041,87 @@ def create_social_trend_alerts_table():
     if not conn:
         print('Failed to create social trend alerts table: DB connection failed')
         return
-    cur = conn.cursor()
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS social_trend_alerts (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            trend_name VARCHAR(255) NOT NULL,
-            source_platform VARCHAR(50) NOT NULL,
-            alert_type VARCHAR(50) NOT NULL,
-            `condition` ENUM('gt','lt','eq') NOT NULL,
-            threshold INT NOT NULL,
-            metric_type VARCHAR(50) NOT NULL,
-            is_active BOOLEAN DEFAULT TRUE,
-            notify_method VARCHAR(50) DEFAULT 'console',
-            description TEXT,
-            alert_mode VARCHAR(20) DEFAULT 'standard',
-            custom_config TEXT NULL,
-            cooldown_minutes INT DEFAULT 15,
-            is_triggered BOOLEAN DEFAULT FALSE,
-            last_trigger_message TEXT NULL,
-            last_evaluated TIMESTAMP NULL,
-            last_triggered TIMESTAMP NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            INDEX idx_trend (trend_name),
-            INDEX idx_platform (source_platform),
-            INDEX idx_active (is_active),
-            INDEX idx_metric (metric_type)
-        )
-    """)
-    for stmt in [
-        "ALTER TABLE social_trend_alerts ADD COLUMN alert_mode VARCHAR(20) DEFAULT 'standard'",
-        "ALTER TABLE social_trend_alerts ADD COLUMN custom_config TEXT NULL",
-        "ALTER TABLE social_trend_alerts ADD COLUMN cooldown_minutes INT DEFAULT 15",
-        "ALTER TABLE social_trend_alerts ADD COLUMN is_triggered BOOLEAN DEFAULT FALSE",
-        "ALTER TABLE social_trend_alerts ADD COLUMN last_trigger_message TEXT NULL",
-        "ALTER TABLE social_trend_alerts ADD COLUMN last_evaluated TIMESTAMP NULL",
-    ]:
-        try:
-            cur.execute(stmt)
-        except Exception:
-            pass
-
-    cur.execute(
-        """
-        CREATE TABLE IF NOT EXISTS social_trend_alert_events (
-            id BIGINT AUTO_INCREMENT PRIMARY KEY,
-            alert_id INT NOT NULL,
-            trend_name VARCHAR(255) NOT NULL,
-            source_platform VARCHAR(50) NOT NULL,
-            event_type VARCHAR(30) NOT NULL,
-            message TEXT,
-            metric_type VARCHAR(50),
-            metric_value DECIMAL(20,6) NULL,
-            payload_json TEXT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            INDEX idx_alert_id (alert_id),
-            INDEX idx_trend (trend_name),
-            INDEX idx_platform (source_platform),
-            INDEX idx_event_type (event_type),
-            INDEX idx_created_at (created_at)
-        )
-    """
-    )
+    cur = get_cursor(conn)
+    if is_postgres(conn):
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS social_trend_alerts (
+                id SERIAL PRIMARY KEY,
+                trend_name VARCHAR(255) NOT NULL,
+                source_platform VARCHAR(50) NOT NULL,
+                alert_type VARCHAR(50) NOT NULL,
+                "condition" VARCHAR(10) NOT NULL,
+                threshold INT NOT NULL,
+                metric_type VARCHAR(50) NOT NULL,
+                is_active BOOLEAN DEFAULT TRUE,
+                notify_method VARCHAR(50) DEFAULT 'console',
+                description TEXT,
+                alert_mode VARCHAR(20) DEFAULT 'standard',
+                custom_config TEXT NULL,
+                cooldown_minutes INT DEFAULT 15,
+                is_triggered BOOLEAN DEFAULT FALSE,
+                last_trigger_message TEXT NULL,
+                last_evaluated TIMESTAMP NULL,
+                last_triggered TIMESTAMP NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_social_alert_trend ON social_trend_alerts(trend_name)")
+        
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS social_trend_alert_events (
+                id BIGSERIAL PRIMARY KEY,
+                alert_id INT NOT NULL,
+                trend_name VARCHAR(255) NOT NULL,
+                source_platform VARCHAR(50) NOT NULL,
+                event_type VARCHAR(30) NOT NULL,
+                message TEXT,
+                metric_type VARCHAR(50),
+                metric_value DECIMAL(20,6) NULL,
+                payload_json TEXT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+    else:
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS social_trend_alerts (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                trend_name VARCHAR(255) NOT NULL,
+                source_platform VARCHAR(50) NOT NULL,
+                alert_type VARCHAR(50) NOT NULL,
+                `condition` VARCHAR(10) NOT NULL,
+                threshold INT NOT NULL,
+                metric_type VARCHAR(50) NOT NULL,
+                is_active BOOLEAN DEFAULT TRUE,
+                notify_method VARCHAR(50) DEFAULT 'console',
+                description TEXT,
+                alert_mode VARCHAR(20) DEFAULT 'standard',
+                custom_config TEXT NULL,
+                cooldown_minutes INT DEFAULT 15,
+                is_triggered BOOLEAN DEFAULT FALSE,
+                last_trigger_message TEXT NULL,
+                last_evaluated TIMESTAMP NULL,
+                last_triggered TIMESTAMP NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                INDEX idx_trend (trend_name)
+            )
+        """)
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS social_trend_alert_events (
+                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                alert_id INT NOT NULL,
+                trend_name VARCHAR(255) NOT NULL,
+                source_platform VARCHAR(50) NOT NULL,
+                event_type VARCHAR(30) NOT NULL,
+                message TEXT,
+                metric_type VARCHAR(50),
+                metric_value DECIMAL(20,6) NULL,
+                payload_json TEXT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_alert_id (alert_id)
+            )
+        """)
     conn.commit()
     cur.close()
     conn.close()
@@ -1133,31 +1214,27 @@ def _update_weather_alert_state(alert_id, is_triggered, message, triggered_now=F
     conn = create_connection()
     if not conn:
         return False
-    cur = conn.cursor()
+    cur = get_cursor(conn)
     try:
+        now_sql = "CURRENT_TIMESTAMP" if is_postgres(conn) else "UTC_TIMESTAMP()"
         if triggered_now:
-            cur.execute(
-                """
+            query = f"""
                 UPDATE weather_alerts
                 SET is_triggered = %s,
                     last_trigger_message = %s,
-                    last_evaluated = UTC_TIMESTAMP(),
-                    last_triggered = UTC_TIMESTAMP()
+                    last_evaluated = {now_sql},
+                    last_triggered = {now_sql}
                 WHERE id = %s
-                """,
-                (is_triggered, message, alert_id),
-            )
+            """
         else:
-            cur.execute(
-                """
+            query = f"""
                 UPDATE weather_alerts
                 SET is_triggered = %s,
                     last_trigger_message = %s,
-                    last_evaluated = UTC_TIMESTAMP()
+                    last_evaluated = {now_sql}
                 WHERE id = %s
-                """,
-                (is_triggered, message, alert_id),
-            )
+            """
+        cur.execute(query, (is_triggered, message, alert_id))
         conn.commit()
         return True
     except Exception:
@@ -1347,31 +1424,27 @@ def _update_social_alert_state(alert_id, is_triggered, message, triggered_now=Fa
     conn = create_connection()
     if not conn:
         return False
-    cur = conn.cursor()
+    cur = get_cursor(conn)
     try:
+        now_sql = "CURRENT_TIMESTAMP" if is_postgres(conn) else "UTC_TIMESTAMP()"
         if triggered_now:
-            cur.execute(
-                """
+            query = f"""
                 UPDATE social_trend_alerts
                 SET is_triggered = %s,
                     last_trigger_message = %s,
-                    last_evaluated = UTC_TIMESTAMP(),
-                    last_triggered = UTC_TIMESTAMP()
+                    last_evaluated = {now_sql},
+                    last_triggered = {now_sql}
                 WHERE id = %s
-                """,
-                (is_triggered, message, alert_id),
-            )
+                """
         else:
-            cur.execute(
-                """
+            query = f"""
                 UPDATE social_trend_alerts
                 SET is_triggered = %s,
                     last_trigger_message = %s,
-                    last_evaluated = UTC_TIMESTAMP()
+                    last_evaluated = {now_sql}
                 WHERE id = %s
-                """,
-                (is_triggered, message, alert_id),
-            )
+                """
+        cur.execute(query, (is_triggered, message, alert_id))
         conn.commit()
         return True
     except Exception:

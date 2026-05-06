@@ -2917,7 +2917,11 @@ def bootstrap_all():
         initialize_default_users()
 
         # Access control
+        from database.access_control import create_access_control_tables, seed_default_access_config
         create_access_control_tables()
+        seed_default_access_config()
+        
+        print("✓ Database initialization complete.")
         seed_default_access_config()
         
         print("Database initialization complete.")
