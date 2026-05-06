@@ -2897,7 +2897,14 @@ def bootstrap_all():
         PredefinedCitiesManager.initialize_default_cities()
         
         # Preferred assets
+        from database.preferred_assets import PreferredAssetsManager
         PreferredAssetsManager.create_table()
+        PreferredAssetsManager.initialize_default_assets()
+        
+        # Weather Locations
+        from database.weather_locations import WeatherLocationsManager
+        WeatherLocationsManager.create_table()
+        WeatherLocationsManager.initialize_default_locations()
         
         # Weather tables
         from database.connection import create_weather_table, create_weather_locations_table, create_crypto_latest_table, create_weather_latest_table, create_social_latest_table, create_signal_fusion_index_table
@@ -2907,9 +2914,6 @@ def bootstrap_all():
         create_weather_latest_table()
         create_social_latest_table()
         create_signal_fusion_index_table()
-        
-        # Weather Locations
-        WeatherLocationsManager.create_table()
         
         # Alert tables
         from database.alert_models import create_alerts_table, create_weather_alerts_table, create_social_trend_alerts_table
