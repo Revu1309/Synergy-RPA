@@ -74,7 +74,8 @@ def get_user_landing_page(username):
         
         return landing_page
     except Exception as e:
-        print(f"Error getting user landing page for {username}: {e}")
+        # If table doesn't exist, return default instead of crashing
+        print(f"Note: Could not fetch landing page (table may not exist yet): {e}")
         return '/menu-v2' if username == 'admin' else '/menu'
     finally:
         cur.close()

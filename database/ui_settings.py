@@ -41,6 +41,10 @@ def get_user_theme(username):
         row = cur.fetchone()
         if not row or not row[0]: return DEFAULT_THEME
         return row[0]
+    except Exception as e:
+        # If table doesn't exist, just return default instead of crashing
+        print(f"Note: Could not fetch theme (table may not exist yet): {e}")
+        return DEFAULT_THEME
     finally:
         cur.close()
         conn.close()
