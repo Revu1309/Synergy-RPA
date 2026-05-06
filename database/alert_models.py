@@ -394,28 +394,19 @@ def get_price_minutes_ago(symbol, minutes=60):
                 SELECT price_usd, timestamp
                 FROM crypto_assets
                 WHERE symbol = %s
-                  AND timestamp <= CURRENT_TIMESTAMP - INTERVAL '%s minute'
+                  AND timestamp <= CURRENT_TIMESTAMP - (INTERVAL '1 minute' * %s)
                 ORDER BY timestamp DESC
                 LIMIT 1
             """
-                if is_postgres(connection):
-                    query = """
-                        SELECT price_usd, timestamp
-                        FROM crypto_assets
-                        WHERE symbol = %s
-                          AND timestamp <= CURRENT_TIMESTAMP - (INTERVAL '1 minute' * %s)
-                        ORDER BY timestamp DESC
-                        LIMIT 1
-                    """
-                else:
-                    query = """
-                        SELECT price_usd, timestamp
-                        FROM crypto_assets
-                        WHERE symbol = %s
-                          AND timestamp <= NOW() - (INTERVAL '1 minute' * %s)
-                        ORDER BY timestamp DESC
-                        LIMIT 1
-                    """
+        else:
+            query = """
+                SELECT price_usd, timestamp
+                FROM crypto_assets
+                WHERE symbol = %s
+                  AND timestamp <= NOW() - (INTERVAL '1 minute' * %s)
+                ORDER BY timestamp DESC
+                LIMIT 1
+            """
         cur.execute(query, (symbol, minutes))
         r = cur.fetchone()
         if not r:
