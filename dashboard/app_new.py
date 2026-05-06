@@ -1,3 +1,4 @@
+# SYNERGY RPA - Vercel Postgres Deployment (Build 1778082000)
 """Main Flask application with authentication and menu system."""
 
 from flask import Flask, render_template, request, jsonify, redirect, session, url_for
