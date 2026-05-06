@@ -54,6 +54,11 @@ from database.ui_settings import get_user_theme, set_user_theme
 from dashboard.menu_config import MENU_ITEMS, merge_menu_with_db_modules
 import data_store
 
+# Real-time data infrastructure
+from utils.realtime_data import get_realtime_cache
+from dashboard.realtime_api import create_realtime_endpoints
+from utils.data_service import DataService
+
 app = Flask(__name__, 
             static_folder=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'static'),
             template_folder='templates')
@@ -62,6 +67,10 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
 CORS(app)
 app.config['ENABLE_MENU_REDIRECT'] = True
+
+# Initialize real-time cache and register endpoints
+cache = get_realtime_cache()
+create_realtime_endpoints(app, cache, None)
 
 THEME_PRESETS = {
     "dark_glass": {
@@ -211,10 +220,11 @@ def get_weather_visualizer():
 # ==================== WEATHER SYNC SCHEDULER ====================
 
 def sync_weather_job():
-    """Background job to sync weather data with proper timestamps."""
+    """Background job to sync weather data with proper timestamps and real-time updates."""
     import logging
     start_ts = datetime.utcnow()
     logging.info(f"[WEATHER] Job start: {start_ts.isoformat()}Z")
+    
     try:
         # Get active locations from database
         locations = WeatherLocationsManager.get_all_locations(active_only=True)
@@ -223,56 +233,71 @@ def sync_weather_job():
             logging.info("[WEATHER] No active locations configured")
             return
 
-        # Fetch weather data for active locations configured in DB
+        # Fetch weather data for active locations
         weather_data = get_weather_data(locations)
 
-        # Insert into historical table
-        success_count = 0
-        for data in weather_data:
-            if 'error' not in data:
-                try:
-                    # Historical insert
-                    insert_weather_data(
-                        location_name=data['location_name'],
-                        country=data.get('country'),
-                        latitude=data.get('latitude'),
-                        longitude=data.get('longitude'),
-                        temperature=data.get('temperature'),
-                        feels_like=data.get('feels_like'),
-                        humidity=data.get('humidity'),
-                        pressure=data.get('pressure'),
-                        wind_speed=data.get('wind_speed'),
-                        wind_direction=data.get('wind_direction'),
-                        cloudiness=data.get('cloudiness'),
-                        weather_main=data.get('weather_main'),
-                        weather_description=data.get('weather_description'),
-                        visibility=data.get('visibility'),
-                        rainfall=data.get('rainfall'),
-                        snow=data.get('snow')
-                    )
-                    upsert_weather_latest(
-                        location_name=data['location_name'],
-                        country=data.get('country'),
-                        latitude=data.get('latitude'),
-                        longitude=data.get('longitude'),
-                        temperature=data.get('temperature'),
-                        feels_like=data.get('feels_like'),
-                        humidity=data.get('humidity'),
-                        pressure=data.get('pressure'),
-                        wind_speed=data.get('wind_speed'),
-                        wind_direction=data.get('wind_direction'),
-                        cloudiness=data.get('cloudiness'),
-                        weather_main=data.get('weather_main'),
-                        weather_description=data.get('weather_description'),
-                        visibility=data.get('visibility'),
-                        rainfall=data.get('rainfall'),
-                        snow=data.get('snow')
-                    )
-                    success_count += 1
-                except Exception as e:
-                    logging.error(f"[WEATHER] Error inserting data for {data.get('location_name')}: {e}")
+        # Normalize and validate data
+        try:
+            normalized_weather = DataService.WEATHER.normalize_weather_list(weather_data)
+            logging.info(f"[WEATHER] Normalized {len(normalized_weather)} weather records")
+        except Exception as normalize_err:
+            logging.warning(f"[WEATHER] Data normalization warning: {normalize_err}")
+            normalized_weather = weather_data
 
-        logging.info(f"[WEATHER] Weather sync completed! Inserted {success_count}/{len(weather_data)} records")
+        # Insert into database
+        success_count = 0
+        for data in normalized_weather:
+            try:
+                # Historical insert
+                insert_weather_data(
+                    location_name=data.get('location_name'),
+                    country=data.get('country'),
+                    latitude=data.get('latitude'),
+                    longitude=data.get('longitude'),
+                    temperature=data.get('temperature'),
+                    feels_like=data.get('feels_like'),
+                    humidity=data.get('humidity'),
+                    pressure=data.get('pressure'),
+                    wind_speed=data.get('wind_speed'),
+                    wind_direction=data.get('wind_direction'),
+                    cloudiness=data.get('cloudiness'),
+                    weather_main=data.get('weather_main'),
+                    weather_description=data.get('weather_description'),
+                    visibility=data.get('visibility'),
+                    rainfall=data.get('rainfall'),
+                    snow=data.get('snow', 0)
+                )
+                upsert_weather_latest(
+                    location_name=data.get('location_name'),
+                    country=data.get('country'),
+                    latitude=data.get('latitude'),
+                    longitude=data.get('longitude'),
+                    temperature=data.get('temperature'),
+                    feels_like=data.get('feels_like'),
+                    humidity=data.get('humidity'),
+                    pressure=data.get('pressure'),
+                    wind_speed=data.get('wind_speed'),
+                    wind_direction=data.get('wind_direction'),
+                    cloudiness=data.get('cloudiness'),
+                    weather_main=data.get('weather_main'),
+                    weather_description=data.get('weather_description'),
+                    visibility=data.get('visibility'),
+                    rainfall=data.get('rainfall'),
+                    snow=data.get('snow', 0)
+                )
+                success_count += 1
+            except Exception as e:
+                logging.warning(f"[WEATHER] Failed to insert {data.get('location_name')}: {e}")
+
+        # Update real-time cache with normalized data
+        try:
+            weather_dict = {w['location_name']: w for w in normalized_weather}
+            cache.update_weather(weather_dict)
+            logging.info(f"[WEATHER] Cache updated with {len(normalized_weather)} locations")
+        except Exception as cache_err:
+            logging.warning(f"[WEATHER] Failed to update cache: {cache_err}")
+
+        logging.info(f"[WEATHER] Weather sync completed! Inserted {success_count}/{len(normalized_weather)} records")
         try:
             from database.alert_models import evaluate_weather_alerts
             results = evaluate_weather_alerts(trigger_source="scheduler", dispatch_notifications=True)
@@ -425,11 +450,120 @@ def init_crypto_assets():
         conn.commit()
         print(f" Populated crypto test data (450 records: 15 assets  30 days)")
         
+        # Populate cache with current crypto data
+        try:
+            cursor.execute("""
+                SELECT symbol, name, price_usd, market_cap, volume_24h, timestamp
+                FROM crypto_assets
+                WHERE timestamp = (SELECT MAX(timestamp) FROM crypto_assets)
+            """)
+            rows = cursor.fetchall()
+            if rows:
+                crypto_data = {}
+                for row in rows:
+                    symbol, name, price_usd, market_cap, volume_24h, timestamp = row
+                    # Normalize with DataService
+                    normalized = DataService.CRYPTO.normalize_crypto({
+                        'symbol': symbol,
+                        'name': name,
+                        'price_usd': price_usd,
+                        'market_cap': market_cap,
+                        'volume_24h': volume_24h
+                    })
+                    crypto_data[symbol] = normalized
+                
+                # Update cache with latest crypto data
+                if cache:
+                    cache.update_crypto(crypto_data)
+                    print(f" Updated cache with {len(crypto_data)} crypto assets")
+        except Exception as cache_err:
+            print(f"Warning: Could not populate cache with crypto data: {cache_err}")
+        
         cursor.close()
         conn.close()
         
     except Exception as e:
         print(f"Error initializing crypto assets: {e}")
+        import traceback
+        traceback.print_exc()
+
+def load_initial_data_to_cache():
+    """Load initial data from database into cache on app startup."""
+    try:
+        from database.connection import create_connection
+        
+        if not cache:
+            print("Cache not available during initialization")
+            return
+        
+        conn = create_connection()
+        if not conn:
+            print("Failed to load initial data: Database connection failed")
+            return
+        
+        cursor = conn.cursor()
+        
+        # Load latest weather data into cache
+        try:
+            cursor.execute("""
+                SELECT location, temperature, humidity, pressure, wind_speed, timestamp
+                FROM weather_latest
+                ORDER BY timestamp DESC
+                LIMIT 50
+            """)
+            rows = cursor.fetchall()
+            if rows:
+                weather_data = {}
+                for row in rows:
+                    location, temp, humidity, pressure, wind, timestamp = row
+                    normalized = DataService.WEATHER.normalize_weather({
+                        'location_name': location,
+                        'temperature': temp,
+                        'humidity': humidity,
+                        'pressure': pressure,
+                        'wind_speed': wind
+                    })
+                    weather_data[location] = normalized
+                
+                if weather_data:
+                    cache.update_weather(weather_data)
+                    print(f" Loaded {len(weather_data)} weather locations into cache")
+        except Exception as w_err:
+            print(f"Warning: Could not load weather data into cache: {w_err}")
+        
+        # Load latest social trends data into cache
+        try:
+            cursor.execute("""
+                SELECT name, source, volume, sentiment_score, timestamp
+                FROM social_latest
+                ORDER BY timestamp DESC
+                LIMIT 100
+            """)
+            rows = cursor.fetchall()
+            if rows:
+                social_data = {}
+                for row in rows:
+                    name, source, volume, sentiment, timestamp = row
+                    key = f"{name}_{source}"
+                    normalized = DataService.SOCIAL_TRENDS.normalize_social_trend({
+                        'name': name,
+                        'source': source,
+                        'volume': volume,
+                        'sentiment_score': sentiment
+                    })
+                    social_data[key] = normalized
+                
+                if social_data:
+                    cache.update_social_trends(social_data)
+                    print(f" Loaded {len(social_data)} social trends into cache")
+        except Exception as s_err:
+            print(f"Warning: Could not load social trends into cache: {s_err}")
+        
+        cursor.close()
+        conn.close()
+        
+    except Exception as e:
+        print(f"Error loading initial data to cache: {e}")
         import traceback
         traceback.print_exc()
 
@@ -2950,6 +3084,10 @@ def bootstrap_all():
         from database.user_preferences import create_user_preferences_table, initialize_default_users
         create_user_preferences_table()
         initialize_default_users()
+        
+        # Initialize crypto assets and populate cache
+        init_crypto_assets()
+        load_initial_data_to_cache()
 
         print("✓ Database initialization complete.")
     except Exception as e:
