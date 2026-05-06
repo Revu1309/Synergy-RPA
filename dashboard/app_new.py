@@ -1699,7 +1699,14 @@ def get_advanced_dashboard_data():
 @app.route('/asset-dashboard')
 @login_required
 def asset_dashboard():
-    """Display interactive asset selection dashboard."""
+    # Ensure database is seeded even if login page was bypassed
+    if os.environ.get('VERCEL'):
+        try:
+            bootstrap_all()
+        except Exception as e:
+            print(f"Dashboard bootstrap error: {e}")
+
+    """Display cryptocurrency asset analytics dashboard."""
     return render_template("asset_dashboard.html")
 
 def get_asset_dashboard_html():
