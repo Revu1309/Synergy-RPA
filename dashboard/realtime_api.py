@@ -78,12 +78,38 @@ def _stream_from_cache(cache, subscribe_key: str, subscribe_fn, event_type: str,
 def create_realtime_endpoints(app, cache, db_connection):
     """Create real-time API endpoints for the Flask app."""
 
+    # Ensure we always have a cache instance
+    if cache is None:
+        try:
+            from utils.realtime_data import get_realtime_cache
+            cache = get_realtime_cache()
+        except Exception:
+            pass
+
+
     @app.route('/api/realtime/crypto-stream')
     def crypto_stream():
         """SSE stream for crypto updates."""
 
         def get_initial():
-            return cache.get_crypto()
+            # If cache is empty (first boot), return mock data so UI shows something.
+            try:
+                data = cache.get_crypto()
+                if data:
+                    return data
+            except Exception:
+                pass
+
+            return [
+                {
+                    'symbol': 'BTC',
+                    'name': 'Bitcoin',
+                    'price_usd': 65000.0,
+                    'market_cap': 1_200_000_000_000,
+                    'volume_24h': 35_000_000_000,
+                    'timestamp': datetime.now(timezone.utc).isoformat(),
+                }
+            ]
 
         def to_client(payload):
             # cache.get_crypto() returns list, but subscriber may deliver other shapes.

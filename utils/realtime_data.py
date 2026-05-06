@@ -231,11 +231,129 @@ _cache_instance: Optional[RealtimeDataCache] = None
 _cache_lock = threading.Lock()
 
 
+def _seed_mock_realtime_data(cache: RealtimeDataCache) -> None:
+    """Seed the realtime cache with mock data so the dashboard isn't empty
+    before the scheduler has run (useful for local dev / missing API keys).
+
+    This function is intentionally safe to call multiple times.
+    """
+    now = datetime.now(timezone.utc).isoformat()
+
+    # Crypto: few representative assets
+    crypto_seed = [
+        {
+            'symbol': 'BTC',
+            'name': 'Bitcoin',
+            'price_usd': 65000.0,
+            'market_cap': 1_200_000_000_000,
+            'volume_24h': 35_000_000_000,
+            'timestamp': now,
+        },
+        {
+            'symbol': 'ETH',
+            'name': 'Ethereum',
+            'price_usd': 3200.0,
+            'market_cap': 380_000_000_000,
+            'volume_24h': 18_000_000_000,
+            'timestamp': now,
+        },
+        {
+            'symbol': 'SOL',
+            'name': 'Solana',
+            'price_usd': 150.0,
+            'market_cap': 70_000_000_00,
+            'volume_24h': 3_500_000_000,
+            'timestamp': now,
+        },
+    ]
+
+    # Weather: two locations
+    weather_seed = {
+        'New York, US': {
+            'location_name': 'New York, US',
+            'latitude': 40.7128,
+            'longitude': -74.0060,
+            'temperature': 22.5,
+            'humidity': 65.0,
+            'wind_speed': 3.2,
+            'weather_main': 'Clear',
+            'timestamp': now,
+        },
+        'London, UK': {
+            'location_name': 'London, UK',
+            'latitude': 51.5072,
+            'longitude': -0.1276,
+            'temperature': 16.8,
+            'humidity': 72.0,
+            'wind_speed': 4.1,
+            'weather_main': 'Clouds',
+            'timestamp': now,
+        },
+    }
+
+    # Social trends: representative entries
+    social_seed = [
+        {
+            'name': '#Bitcoin',
+            'source': 'twitter',
+            'tweet_volume': 50000,
+            'sentiment': 0.42,
+            'timestamp': now,
+        },
+        {
+            'name': '#Ethereum',
+            'source': 'twitter',
+            'tweet_volume': 32000,
+            'sentiment': 0.35,
+            'timestamp': now,
+        },
+        {
+            'name': '#Weather',
+            'source': 'twitter',
+            'tweet_volume': 12000,
+            'sentiment': 0.10,
+            'timestamp': now,
+        },
+    ]
+
+    # Signal fusion: simple normalized structure
+    fusion_seed = {
+        'fusion_score': 0.71,
+        'crypto_score': 0.62,
+        'social_score': 0.74,
+        'weather_score': 0.80,
+        'confidence_level': 'medium',
+        'timestamp': now,
+    }
+
+    # Job status placeholder
+    job_seed = {
+        'state': 'idle',
+        'progress': 0,
+        'last_update': now,
+    }
+
+    with cache.lock:
+        # Only seed if the cache is empty-ish
+        if len(cache.data.get('crypto', {})) == 0 and len(cache.data.get('weather', {})) == 0 and len(cache.data.get('social_trends', [])) == 0:
+            cache.update_crypto(crypto_seed)
+            cache.update_weather(weather_seed)
+            cache.update_social_trends(social_seed)
+            cache.update_signal_fusion(fusion_seed)
+            cache.update_job_status('seed', job_seed)
+
+
 def get_realtime_cache() -> RealtimeDataCache:
-    """Get or create the global realtime data cache instance."""
+    """Get or create the global realtime data cache instance.
+
+    Additionally seeds mock data on first creation so the frontend can render
+    immediately in dev/testing environments where scrapers may not have run yet.
+    """
     global _cache_instance
     if _cache_instance is None:
         with _cache_lock:
             if _cache_instance is None:
                 _cache_instance = RealtimeDataCache()
+                _seed_mock_realtime_data(_cache_instance)
     return _cache_instance
+
