@@ -2917,6 +2917,11 @@ def bootstrap_all():
         create_weather_alerts_table()
         create_social_trend_alerts_table()
         
+        # Access control (MUST BE FIRST - others depend on app_users)
+        from database.access_control import create_access_control_tables, seed_default_access_config
+        create_access_control_tables()
+        seed_default_access_config()
+
         # UI Settings
         from database.ui_settings import create_ui_settings_table
         create_ui_settings_table()
@@ -2926,14 +2931,11 @@ def bootstrap_all():
         create_user_preferences_table()
         initialize_default_users()
 
-        # Access control
-        from database.access_control import create_access_control_tables, seed_default_access_config
-        create_access_control_tables()
-        seed_default_access_config()
-        
         print("✓ Database initialization complete.")
     except Exception as e:
+        import traceback
         print(f"Error during bootstrap: {e}")
+        traceback.print_exc()
 
 # Call bootstrap when the app is initialized in Vercel
 if os.environ.get('VERCEL'):
