@@ -2922,9 +2922,6 @@ def bootstrap_all():
         seed_default_access_config()
         
         print("✓ Database initialization complete.")
-        seed_default_access_config()
-        
-        print("Database initialization complete.")
     except Exception as e:
         print(f"Error during bootstrap: {e}")
 
