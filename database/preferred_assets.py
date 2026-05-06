@@ -142,9 +142,17 @@ class PreferredAssetsManager:
     @staticmethod
     def initialize_default_assets():
         """Initialize with default assets if table is empty."""
-        assets = PreferredAssetsManager.get_all_assets()
-        
-        if not assets:
+        conn = create_connection()
+        if not conn:
+            return
+            
+        try:
+            cursor = get_cursor(conn)
+            # Check if empty WITHOUT calling get_all_assets (to avoid recursion)
+            cursor.execute("SELECT COUNT(*) FROM preferred_assets")
+            count = cursor.fetchone()[0]
+            
+            if count == 0:
             # Major crypto assets in the $0.01-$1 price range
             default_assets = [
                 ('XLM', 'Stellar Lumens'),
@@ -168,3 +176,9 @@ class PreferredAssetsManager:
                 PreferredAssetsManager.add_asset(symbol, name)
             
             print(f"Initialized {len(default_assets)} default cryptocurrency assets")
+            conn.commit()
+        except Exception as e:
+            print(f"Error seeding assets: {e}")
+        finally:
+            cursor.close()
+            conn.close()
