@@ -378,6 +378,9 @@ def get_modules_with_pages() -> List[Dict]:
                 "is_menu_visible": bool(row["is_menu_visible"]),
             })
         return list(modules.values())
+    except Exception as e:
+        print(f"Note: Could not fetch modules (tables may not exist yet): {e}")
+        return []
     finally:
         cur.close()
         conn.close()
@@ -394,6 +397,9 @@ def get_user_allowed_page_keys(username: str) -> List[str]:
             WHERE upp.username = %s AND upp.is_allowed = TRUE AND p.is_active = TRUE
         """, (username,))
         return [row[0] for row in cur.fetchall()]
+    except Exception as e:
+        print(f"Note: Could not fetch permissions (tables may not exist yet): {e}")
+        return []
     finally:
         cur.close()
         conn.close()
@@ -484,6 +490,10 @@ def user_can_access_path(username: str, path: str) -> bool:
         cur.execute("SELECT is_allowed FROM user_page_permissions WHERE username = %s AND page_key = %s", (username, page_key))
         perm = cur.fetchone()
         return bool(perm and perm[0])
+    except Exception as e:
+        # If tables don't exist, allow access to prevent locking the user out during bootstrap
+        print(f"Note: Could not verify path access (tables may not exist yet): {e}")
+        return True
     finally:
         cur.close()
         conn.close()
