@@ -59,9 +59,8 @@ class PreferredAssetsManager:
     @staticmethod
     def add_asset(symbol, name):
         """Add a new preferred asset."""
-        # Hyper-resilience: Ensure table exists and is seeded
+        # Ensure table exists (but do NOT call initialize_default_assets here - causes recursion)
         PreferredAssetsManager.create_table()
-        PreferredAssetsManager.initialize_default_assets()
         
         conn = create_connection()
         if not conn:
