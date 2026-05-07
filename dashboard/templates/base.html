@@ -730,7 +730,7 @@
     </div>
     <div id="global-unified-menu" style="display:none;"></div>
 
-    {% if global_menu and request.path != '/login' %}
+    {% if global_menu and request.path != '/login' and request.path != '/' %}
     <aside class="gl-sidebar">
         <div class="gl-brand">
             <div class="brand-icon">
@@ -779,6 +779,7 @@
     {% endif %}
 
     <main class="gl-main">
+        {% if request.path != '/' %}
         <header class="topbar">
             {% if request.path != '/login' %}
             <div class="breadcrumbs">
@@ -795,6 +796,7 @@
                 <div class="user-avatar" title="User Profile" onclick="toggleProfile()">AR</div>
             </div>
         </header>
+        {% endif %}
 
         <div class="content-scroll">
             <div class="ai-workspace">

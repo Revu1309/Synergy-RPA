@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Synergy RPA - Next-Gen Intelligence{% endblock %}
+
+{% block head_extra %}
+<!-- Styles moved to dashboard.css -->
+{% endblock %}
+
+{% block content %}
+<div class="hero-wrapper">
+    <div class="hero-glow"></div>
+    
+    <div class="hero-content">
+        <div class="hero-tagline">Obsidian Protocol v2.4 Active</div>
+        <h1 class="hero-title">Automate Everything.<br>Analyze Everywhere.</h1>
+        <p class="hero-description">
+            Experience the next generation of Robotic Process Automation. Synergy RPA combines high-fidelity market data, real-time social trends, and predictive analytics in one obsidian-glass interface.
+        </p>
+        
+        <div class="hero-actions">
+            {% if username %}
+            <a href="/dashboard" class="btn btn-hero btn-hero-primary">Launch Dashboard</a>
+            {% else %}
+            <a href="/login" class="btn btn-hero btn-hero-primary">Get Started Free</a>
+            {% endif %}
+            <a href="#features" class="btn btn-hero btn-hero-secondary">View Capabilities</a>
+        </div>
+
+        <div class="features-grid" id="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+                </div>
+                <h3 class="feature-title">Crypto Engine</h3>
+                <p class="feature-text">High-frequency data extraction from global exchanges with real-time volatility tracking.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v8"/><path d="m4.93 4.93 1.41 1.41"/><path d="M2 12h8"/><path d="m4.93 19.07 1.41-1.41"/><path d="M12 22v-8"/><path d="m19.07 19.07-1.41-1.41"/><path d="M22 12h-8"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                </div>
+                <h3 class="feature-title">Signal Fusion</h3>
+                <p class="feature-text">Cross-platform data aggregation engine that identifies market sentiment before it trends.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+                </div>
+                <h3 class="feature-title">Obsidian Security</h3>
+                <p class="feature-text">Enterprise-grade access control and encrypted pipeline monitoring for sensitive data flows.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="scroll-indicator">
+        <span>Initialize Protocol</span>
+        <svg class="icon-svg" viewBox="0 0 24 24" style="width: 12px; height: 12px;"><path d="M7 13l5 5 5-5M7 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+    </div>
+</div>
+
+<div id="particles" class="bg-particles"></div>
+
+<script>
+// Reuse existing particle system for continuity
+const particleCount = 40;
+const container = document.getElementById('particles');
+for(let i=0; i<particleCount; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  const size = Math.random() * 4 + 2;
+  p.style.width = `${size}px`;
+  p.style.height = `${size}px`;
+  p.style.left = `${Math.random() * 100}vw`;
+  p.style.setProperty('--x', `${(Math.random() - 0.5) * 400}px`);
+  p.style.setProperty('--d', `${Math.random() * 15 + 10}s`);
+  p.style.animationDelay = `${Math.random() * 10}s`;
+  container.appendChild(p);
+}
+
+// Add scroll behavior for topbar if needed
+document.body.classList.add('landing-page-active');
+</script>
+{% endblock %}

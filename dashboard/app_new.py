@@ -1597,10 +1597,11 @@ def data_freshness_monitor_page():
 
 
 @app.route('/')
-@login_required
-def dashboard():
-    """Legacy root route redirected to canonical dashboard route."""
-    return redirect(url_for('dashboard_standard'))
+def welcome():
+    """Public landing page."""
+    token = request.cookies.get('auth_token')
+    username = AuthManager.get_username(token) if token else None
+    return render_template("welcome.html", username=username)
 
 @app.route('/dashboard')
 @login_required

@@ -24,7 +24,7 @@ def resolve_python_executable():
 
 def run_dashboard():
     """Run the Flask dashboard."""
-    dashboard_path = os.path.join(BASE_DIR, "dashboard", "app.py")
+    dashboard_path = os.path.join(BASE_DIR, "dashboard", "app_new.py")
     python_exe = resolve_python_executable()
 
     try:
