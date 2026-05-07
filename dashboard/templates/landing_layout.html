@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" theme="{{ current_theme or 'dark_glass' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Synergy RPA{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            background: var(--bg-base);
+            color: var(--text-primary);
+        }
+        .landing-main {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Landing Nav */
+        .landing-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-glass);
+            background: rgba(10, 10, 14, 0.4);
+        }
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 20px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+        .nav-links {
+            display: flex;
+            gap: var(--space-xl);
+            align-items: center;
+        }
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition-normal);
+        }
+        .nav-link:hover {
+            color: var(--accent-primary);
+        }
+    </style>
+    {% block head_extra %}{% endblock %}
+</head>
+<body class="landing-page-active">
+    <nav class="landing-nav">
+        <a href="/" class="brand-logo">
+            <svg viewBox="0 0 100 100" style="width: 32px; height: 32px;">
+                <path d="M50 10 L90 30 L90 70 L50 90 L10 70 L10 30 Z" fill="none" stroke="var(--accent-primary)" stroke-width="8" />
+                <path d="M50 25 L75 37.5 L75 62.5 L50 75 L25 62.5 L25 37.5 Z" fill="var(--accent-grad)" opacity="0.8" />
+            </svg>
+            Synergy RPA
+        </a>
+        <div class="nav-links">
+            <a href="#features" class="nav-link">Features</a>
+            {% if username %}
+            <a href="/dashboard" class="btn btn-primary">Dashboard</a>
+            {% else %}
+            <a href="/login" class="btn btn-primary">Sign In</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="ambient-aura">
+        <div class="aura-1"></div>
+        <div class="aura-2"></div>
+    </div>
+
+    <main class="landing-main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <div id="particles" class="bg-particles"></div>
+
+    <script>
+    const particleCount = 50;
+    const container = document.getElementById('particles');
+    for(let i=0; i<particleCount; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = Math.random() * 4 + 2;
+      p.style.width = `${size}px`;
+      p.style.height = `${size}px`;
+      p.style.left = `${Math.random() * 100}vw`;
+      p.style.setProperty('--x', `${(Math.random() - 0.5) * 400}px`);
+      p.style.setProperty('--d', `${Math.random() * 15 + 10}s`);
+      p.style.animationDelay = `${Math.random() * 10}s`;
+      container.appendChild(p);
+    }
+    </script>
+    {% block scripts_extra %}{% endblock %}
+</body>
+</html>
