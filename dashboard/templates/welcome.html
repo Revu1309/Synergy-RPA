@@ -1,54 +1,210 @@
-{% extends "landing_layout.html" %}
-{% block title %}Synergy RPA - Intelligent Automation Platform{% endblock %}
-
-{% block content %}
-<section class="hero-wrapper">
-    <div class="hero-glow"></div>
-    
-    <div class="hero-content">
-        <div class="hero-tagline">Obsidian Protocol Active</div>
-        <h1 class="hero-title">Automate Everything.<br>Analyze Everywhere.</h1>
-        <p class="hero-description">
-            The next generation of Robotic Process Automation. Empowering engineers and founders with real-time intelligence, seamless data integration, and obsidian-grade security.
-        </p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synergy RPA - Intelligent Automation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #070709;
+            --accent: #5b5bff;
+            --accent-secondary: #14f1d9;
+            --text-main: #f8f9fa;
+            --text-dim: #adb5bd;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; letter-spacing: -0.02em; }
         
-        <div class="hero-actions">
+        /* Navbar */
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; height: 80px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 6%; z-index: 1000;
+            background: rgba(7, 7, 9, 0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .logo {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 20px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 2px; text-decoration: none; color: #fff;
+        }
+        .nav-actions { display: flex; align-items: center; gap: 32px; }
+        .nav-link { text-decoration: none; color: var(--text-dim); font-size: 14px; font-weight: 600; transition: 0.3s; }
+        .nav-link:hover { color: var(--accent); }
+        .btn-signin {
+            padding: 10px 24px; background: var(--accent); color: #fff;
+            border-radius: 8px; text-decoration: none; font-weight: 700;
+            font-size: 14px; box-shadow: 0 4px 15px rgba(91, 91, 255, 0.3);
+            transition: 0.3s;
+        }
+        .btn-signin:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(91, 91, 255, 0.5); }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+            padding: 120px 6% 80px; position: relative;
+        }
+        .hero-glow {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 80vw; height: 80vh; background: radial-gradient(circle, rgba(91, 91, 255, 0.15), transparent 70%);
+            z-index: -1; pointer-events: none;
+        }
+        .tagline {
+            display: inline-block; padding: 6px 16px; border: 1px solid var(--accent);
+            border-radius: 99px; font-size: 11px; font-weight: 800;
+            color: var(--accent-secondary); text-transform: uppercase; letter-spacing: 3px;
+            margin-bottom: 24px; background: rgba(20, 241, 217, 0.05);
+        }
+        .title {
+            font-size: clamp(40px, 8vw, 88px); line-height: 1.1; margin-bottom: 24px;
+            background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .desc {
+            font-size: clamp(16px, 2vw, 20px); color: var(--text-dim);
+            max-width: 680px; margin-bottom: 48px;
+        }
+        .hero-btns { display: flex; gap: 20px; }
+        .btn-main {
+            padding: 18px 48px; border-radius: 12px; font-size: 16px; font-weight: 800;
+            text-decoration: none; transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .btn-primary { background: linear-gradient(135deg, #5b5bff, #a855f7); color: #fff; border: none; }
+        .btn-primary:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(91, 91, 255, 0.4); }
+        .btn-secondary { background: var(--glass); border: 1px solid var(--glass-border); color: #fff; backdrop-filter: blur(10px); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.08); transform: translateY(-4px); }
+
+        /* Grid */
+        .grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px; width: 100%; max-width: 1200px; margin-top: 80px;
+        }
+        .card {
+            background: var(--glass); border: 1px solid var(--glass-border);
+            padding: 40px; border-radius: 24px; text-align: left;
+            transition: 0.4s; backdrop-filter: blur(20px);
+        }
+        .card:hover { transform: translateY(-8px); border-color: var(--accent); background: rgba(255,255,255,0.05); }
+        .card-icon {
+            width: 56px; height: 56px; background: rgba(91, 91, 255, 0.1);
+            border-radius: 14px; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 24px; color: var(--accent);
+        }
+        .card-icon svg { width: 28px; height: 28px; }
+        .card-title { font-size: 20px; margin-bottom: 12px; color: #fff; }
+        .card-text { font-size: 15px; color: var(--text-dim); }
+
+        /* Particles */
+        #particles { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+        .particle {
+            position: absolute; background: #fff; border-radius: 50%; opacity: 0.2;
+            animation: drift var(--d) linear infinite;
+        }
+        @keyframes drift {
+            from { transform: translateY(110vh) translateX(0); opacity: 0; }
+            50% { opacity: 0.3; }
+            to { transform: translateY(-10vh) translateX(var(--x)); opacity: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .nav { padding: 0 20px; }
+            .nav-actions .nav-link { display: none; }
+            .hero { padding-top: 140px; }
+            .hero-btns { flex-direction: column; width: 100%; max-width: 300px; }
+            .btn-main { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="/" class="logo">
+            <svg viewBox="0 0 100 100" style="width: 32px; height: 32px;">
+                <path d="M50 10 L90 30 L90 70 L50 90 L10 70 L10 30 Z" fill="none" stroke="currentColor" stroke-width="8" />
+                <path d="M50 25 L75 37.5 L75 62.5 L50 75 L25 62.5 L25 37.5 Z" fill="#5b5bff" opacity="0.8" />
+            </svg>
+            Synergy RPA
+        </a>
+        <div class="nav-actions">
+            <a href="#features" class="nav-link">Features</a>
             {% if username %}
-            <a href="/dashboard" class="btn btn-hero btn-hero-primary">Launch Dashboard</a>
+            <a href="/dashboard" class="btn-signin">Dashboard</a>
             {% else %}
-            <a href="/login" class="btn btn-hero btn-hero-primary">Get Started Free</a>
+            <a href="/login" class="btn-signin">Sign In</a>
             {% endif %}
-            <a href="#features" class="btn btn-hero btn-hero-secondary">Explore Capabilities</a>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="hero-glow"></div>
+        <div class="tagline">Obsidian Protocol Active</div>
+        <h1 class="title">Automate Everything.<br>Analyze Everywhere.</h1>
+        <p class="desc">The next generation of Robotic Process Automation. Empowering your workflow with real-time intelligence and obsidian-grade security.</p>
+        
+        <div class="hero-btns">
+            {% if username %}
+            <a href="/dashboard" class="btn-main btn-primary">Launch Dashboard</a>
+            {% else %}
+            <a href="/login" class="btn-main btn-primary">Get Started Free</a>
+            {% endif %}
+            <a href="#features" class="btn-main btn-secondary">Capabilities</a>
+        </div>
+
+        <div class="grid" id="features">
+            <div class="card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+                </div>
+                <h3 class="card-title">Crypto Engine</h3>
+                <p class="card-text">Real-time data extraction from global exchanges with millisecond precision.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                </div>
+                <h3 class="card-title">Signal Fusion</h3>
+                <p class="card-text">Cross-platform aggregation of sentiment, price, and social trends.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <h3 class="card-title">Obsidian Security</h3>
+                <p class="card-text">Enterprise-grade encryption for sensitive data pipelines and automation.</p>
+            </div>
         </div>
     </div>
 
-    <div class="features-grid" id="features">
-        <div class="feature-card">
-            <div class="feature-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
-            </div>
-            <h3 class="feature-title">Crypto Intelligence</h3>
-            <p class="feature-text">High-fidelity data extraction from global exchanges with real-time volatility tracking and anomaly detection.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
-            </div>
-            <h3 class="feature-title">Signal Fusion</h3>
-            <p class="feature-text">Advanced aggregation engine that synthesizes market sentiment, social trends, and technical signals.</p>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            </div>
-            <h3 class="feature-title">Enterprise Security</h3>
-            <p class="feature-text">Obsidian-grade encryption and granular access control for sensitive enterprise data pipelines.</p>
-        </div>
-    </div>
+    <div id="particles"></div>
 
-    <div class="scroll-indicator">
-        <span>Initialize Protocol</span>
-        <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2;"><path d="M7 13l5 5 5-5M7 6l5 5 5-5"/></svg>
-    </div>
-</section>
-{% endblock %}
+    <script>
+        const particleCount = 40;
+        const container = document.getElementById('particles');
+        for(let i=0; i<particleCount; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const size = Math.random() * 3 + 1;
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.setProperty('--x', (Math.random() - 0.5) * 300 + 'px');
+            p.style.setProperty('--d', (Math.random() * 10 + 10) + 's');
+            p.style.animationDelay = (Math.random() * 5) + 's';
+            container.appendChild(p);
+        }
+    </script>
+</body>
+</html>
