@@ -26,48 +26,52 @@
             color: var(--text-main);
             line-height: 1.6;
             overflow-x: hidden;
-            background-attachment: fixed;
         }
-        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; letter-spacing: -0.02em; }
         
-        /* ── BACKGROUND ANIMATIONS ────────────────── */
-        .bg-container {
+        /* ── DYNAMIC BACKGROUND ──────────────────── */
+        .bg-canvas {
             position: fixed; inset: 0; z-index: -1;
-            background-color: var(--bg-dark);
-            overflow: hidden;
+            background: radial-gradient(circle at 50% 50%, #0f0f1a 0%, #070709 100%);
         }
         
-        /* Ambient Orbs */
-        .orb {
-            position: absolute; border-radius: 50%;
-            filter: blur(120px); opacity: 0.4;
-            animation: orbFloat var(--d) ease-in-out infinite alternate;
-        }
-        .orb-1 { width: 600px; height: 600px; background: radial-gradient(circle, var(--accent), transparent 70%); top: -10%; left: -10%; --d: 15s; }
-        .orb-2 { width: 500px; height: 500px; background: radial-gradient(circle, #a855f7, transparent 70%); bottom: -10%; right: -10%; --d: 20s; }
-        .orb-3 { width: 400px; height: 400px; background: radial-gradient(circle, var(--accent-secondary), transparent 70%); top: 40%; left: 30%; --d: 18s; opacity: 0.2; }
+        #canvas-bg { position: absolute; inset: 0; }
 
-        @keyframes orbFloat {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(100px, 50px) scale(1.1); }
+        /* Shooting Stars */
+        .shooting-star {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 2px; height: 2px;
+            background: linear-gradient(90deg, #fff, transparent);
+            border-radius: 50%;
+            filter: drop-shadow(0 0 6px #fff);
+            animation: shoot var(--d) linear infinite;
+            opacity: 0;
+        }
+        @keyframes shoot {
+            0% { transform: rotate(var(--r)) translateX(0); opacity: 1; }
+            70% { opacity: 1; }
+            100% { transform: rotate(var(--r)) translateX(1000px); opacity: 0; }
         }
 
         /* Tech Grid */
         .grid-overlay {
             position: absolute; inset: 0;
             background-image: 
-                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
+                linear-gradient(rgba(91, 91, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(91, 91, 255, 0.05) 1px, transparent 1px);
+            background-size: 60px 60px;
             mask-image: radial-gradient(circle at center, black, transparent 80%);
-            animation: gridPulse 10s ease-in-out infinite;
         }
-        @keyframes gridPulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }
-
-        /* Noise Overlay */
-        .noise {
-            position: absolute; inset: 0; opacity: 0.03; pointer-events: none;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        
+        /* Floating Orbs */
+        .orb {
+            position: absolute; border-radius: 50%; filter: blur(100px);
+            animation: drift var(--d) ease-in-out infinite alternate;
+            opacity: 0.3;
+        }
+        @keyframes drift {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(100px, 100px) scale(1.2); }
         }
 
         /* ─────────────────────────────────────────── */
@@ -174,18 +178,6 @@
         .card-text { font-size: 15px; color: var(--text-dim); transition: 0.3s; }
         .card:hover .card-text { color: #fff; }
 
-        /* Particles */
-        #particles { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
-        .particle {
-            position: absolute; background: #fff; border-radius: 50%; opacity: 0.1;
-            animation: drift var(--d) linear infinite;
-        }
-        @keyframes drift {
-            from { transform: translateY(110vh) translateX(0); opacity: 0; }
-            50% { opacity: 0.2; }
-            to { transform: translateY(-10vh) translateX(var(--x)); opacity: 0; }
-        }
-
         @media (max-width: 768px) {
             .nav { padding: 0 20px; }
             .nav-actions .nav-link { display: none; }
@@ -196,13 +188,12 @@
     </style>
 </head>
 <body>
-    <div class="bg-container">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
+    <div class="bg-canvas">
+        <canvas id="canvas-bg"></canvas>
         <div class="grid-overlay"></div>
-        <div class="noise"></div>
-        <div id="particles"></div>
+        <div id="stars-container"></div>
+        <div class="orb" style="width: 600px; height: 600px; background: radial-gradient(circle, #5b5bff22, transparent 70%); top: -10%; left: -10%; --d: 15s;"></div>
+        <div class="orb" style="width: 500px; height: 500px; background: radial-gradient(circle, #a855f722, transparent 70%); bottom: -10%; right: -10%; --d: 20s;"></div>
     </div>
 
     <nav class="nav">
@@ -263,30 +254,92 @@
     </div>
 
     <script>
-        // Particle System
-        const particleCount = 40;
-        const container = document.getElementById('particles');
-        for(let i=0; i<particleCount; i++) {
-            const p = document.createElement('div');
-            p.className = 'particle';
-            const size = Math.random() * 3 + 1;
-            p.style.width = size + 'px';
-            p.style.height = size + 'px';
-            p.style.left = Math.random() * 100 + 'vw';
-            p.style.setProperty('--x', (Math.random() - 0.5) * 300 + 'px');
-            p.style.setProperty('--d', (Math.random() * 10 + 10) + 's');
-            p.style.animationDelay = (Math.random() * 5) + 's';
-            container.appendChild(p);
+        // --- Neural Network Background ---
+        const canvas = document.getElementById('canvas-bg');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
 
-        // Interactive Card Hover Effects
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 100; i++) particles.push(new Particle());
+        }
+        initParticles();
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, i) => {
+                p.update();
+                p.draw();
+                for (let j = i + 1; j < particles.length; j++) {
+                    const p2 = particles[j];
+                    const dx = p.x - p2.x;
+                    const dy = p.y - p2.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        ctx.strokeStyle = `rgba(91, 91, 255, ${0.1 * (1 - dist / 150)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // --- Shooting Stars ---
+        const starsContainer = document.getElementById('stars-container');
+        function createStar() {
+            const star = document.createElement('div');
+            star.className = 'shooting-star';
+            const r = Math.random() * 360 + 'deg';
+            const d = (Math.random() * 2 + 1) + 's';
+            star.style.setProperty('--r', r);
+            star.style.setProperty('--d', d);
+            star.style.top = Math.random() * 100 + '%';
+            star.style.left = Math.random() * 100 + '%';
+            starsContainer.appendChild(star);
+            setTimeout(() => star.remove(), 3000);
+        }
+        setInterval(createStar, 2000);
+
+        // --- Interactive Card Hover ---
         document.querySelectorAll('.card').forEach(card => {
             card.addEventListener('mousemove', e => {
                 const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                card.style.setProperty('--x', `${x}px`);
-                card.style.setProperty('--y', `${y}px`);
+                card.style.setProperty('--x', `${e.clientX - rect.left}px`);
+                card.style.setProperty('--y', `${e.clientY - rect.top}px`);
             });
         });
     </script>
